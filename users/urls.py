@@ -14,6 +14,14 @@ urlpatterns = [
     path('dashboard/favourites', views.favourites, name='favourites'),
     path('dashboard/messages', views.messages, name='messages'),
     path('dashboard/orders', views.orders, name='orders'),
+    path('dashboard/wallet', views.wallet, name='wallet'),
+    path('dashboard/shop/about', views.about_shop, name='about_shop'),
+    path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
+    path('dashboard/shop/order', views.shop_order, name='shop_order'),
+
+
+
+
     
 
 ]

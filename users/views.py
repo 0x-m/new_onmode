@@ -171,6 +171,19 @@ def messages(request: HttpRequest):
 def orders(request: HttpRequest):
     return render(request, 'user/dashboard/orders.html')
 
+
+def wallet(request: HttpRequest):
+    return render(request, 'user/dashboard/wallet.html')
+
+def about_shop(request: HttpRequest):
+    return render(request, 'shop/about.html')
+
+def shop_orders(request: HttpRequest):
+    return render(request, 'shop/orders.html')
+
+def shop_order(request: HttpRequest):
+    return render(request, 'shop/order.html')
+
 # @login_required
 # def like(request: HttpRequest):
 #     customer = request.user
