@@ -18,6 +18,8 @@ urlpatterns = [
     path('dashboard/shop/about', views.about_shop, name='about_shop'),
     path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
     path('dashboard/shop/order', views.shop_order, name='shop_order'),
+    path('dashboard/shop/404', views.notfound, name='notfound'),
+
 
 
 
