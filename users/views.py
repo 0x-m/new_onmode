@@ -1,4 +1,5 @@
 
+from pickletools import read_uint1
 from wsgiref.handlers import read_environ
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.contrib.auth import login, logout, authenticate
@@ -36,7 +37,7 @@ def signup(request: HttpRequest):
         else:
             return render(request, 'user/signup.html', {
                 'form': SignUpForm(),
-                'error': 'invalid'
+                'error': form.errors
             })
     return render(request, 'user/signup.html', {
         'form': SignUpForm()
@@ -117,6 +118,10 @@ def profile(request: HttpRequest):
     return render(request, 'user/dashboard/profile.html', {
         'form': ''
     })
+
+@login_required
+def addresses(request: HttpRequest):
+    return render(request, 'user/dashboard/address.html')
 
 @login_required
 def dashboard(request: HttpRequest):

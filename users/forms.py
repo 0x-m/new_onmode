@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator
 
 #from catalog.models import Product
-from .models import Comment
+#from .models import Comment
 from .models import Address, User
 
 class SignUpForm(forms.Form):

@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <title>Document</title>
+    </head>
+
+    <body class="bg-stone-50 w-full h-screen flex flex-col justify-center items-center relative">
+        
+        <main class="bg-white flex flex-col items-center justify-self-center  rounded shadow p-4 ">
+            <div class="avatar mb-2">
+                <div class="w-24 rounded-full">
+                    <img src="https://i.pravatar.cc/300"  alt="">
+                </div>
+            </div>
+            <form class="flex flex-col gap-2 " method="post" action="{% url 'users:signup' %}">
+                {% csrf_token %}
+                <input dir="ltr" name="phone_num" placeholder="شماره همراه" type="text"
+                    class="input input-bordered w-full max-w-xs">
+                <button type="submit" class="btn btn-error text-white">دریافت کد تایید</button>
+            </form>
+            <span class="text-xs text-red-700 mt-3">عضویت به منزله پذیرش  تمامی قوانین آنمد میباشد</span>
+        </main>
+        {{error}}
+        <footer class="absolute bottom-0">
+
+        </footer>
+    </body>
+
+</html>

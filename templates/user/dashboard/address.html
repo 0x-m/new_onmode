@@ -1,0 +1,66 @@
+{% extends 'user/dashboard/dashboard.html' %}
+{% load static %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content  %}
+<div class="flex flex-col md:flex-row md:mt-8 items-center justify-center w-full h-full gap-2">
+    <div class="bg-base-100 p-3  w-11/12 md:w-3/4  rounded-box shadow-md flex  flex-col md:flex-row gap-2 mb-20 ">
+        <form class="flex flex-col basis-1/2 gap-2" action="{% url 'users:profile' %}" method="post">
+            <h4 class="text-center text-md text-gray-600 mb-2">آدرسها</h4>
+            <input name="first_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1" type="text">
+            <input name="last_name" placeholder="شماره تماس" class="input input-bordered p-1" type="text">
+            <select class="select  select-bordered w-full" name="province" id="">
+                <option value="" disabled selected>استان</option>
+                <option value="">استان</option>
+                <option value="">استان</option>
+                <option value="">استان</option>
+
+            </select>
+            <select class="select  select-bordered w-full" name="city" id="">
+                <option value="" disabled selected>شهرستان</option>
+                <option value="">استان</option>
+                <option value="">استان</option>
+                <option value="">استان</option>
+
+            </select>
+            <input name="email" placeholder="شهر" class="input input-bordered p-1" type="email">
+            <textarea name="description" id="" placeholder="نشانی دقیق" cols="5" class="textarea textarea-bordered"
+                rows="4"></textarea>
+            <div class="flex gap-8">
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <input type="radio" name="gender" class="radio checked:bg-red-500" id="man">
+                        <span class="label-text p-1 ">مرد</span>
+                    </label>
+                </div>
+                <div class="form-control">
+                    <label class="label cursor-pointer">
+                        <input type="radio" name="gender" class="radio checked:bg-red-500" id="woman">
+                        <span class="label-text p-1 ">زن</span>
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">افزودن</button>
+        </form>
+        <div class="flex flex-col gap-2 p-2 basis-1/2">
+            <h4 class="text-center text-gray-700 text-sm">آدرسهای افزوده شده</h4>
+            <div class="flex justify-between items-center bg-stone-50 rounded p-2">
+                <p class="text-xs text-gray-700">محمد ییی/شیراز/...</p>
+                <button>
+                    <i class="bi-trash text-red-400"></i>
+                </button>
+            </div>
+            <div class="flex justify-between items-center bg-stone-50 rounded p-2">
+                <p class="text-xs text-gray-700">محمد ییی/شیراز/...</p>
+                <button>
+                    <i class="bi-trash text-red-400"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

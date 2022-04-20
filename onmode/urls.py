@@ -1,10 +1,16 @@
 
-from django import views
 from django.contrib import admin
-from django.urls import path
+from django.http import HttpRequest
+from django.shortcuts import render
+from django.urls import path, include
 
-from . import views
+
+
+def index(request: HttpRequest):
+    return render(request, 'index.html')
+
 urlpatterns = [
+    path('', index, name='index'),
     path('admin/', admin.site.urls),
-    path('api/', views.async_view),
+    path('users/', include('users.urls', namespace='users'), )
 ]
