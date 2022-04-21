@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="rtl" class="w-full min-h-screen bg-stone-50" lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <title>Document</title>
+    </head>
+
+    <body class="flex flex-col md:flex-row md:mt-8 items-center md:items-start justify-center gap-4 p-2 w-full min-h-screen">
+            <section class="flex flex-col justify-start gap-2 md:basis-1/3">
+                <article class="relative bg-white rounded-box shadow-md p-2 w-full flex gap-2">
+                    <img src="https://i.pravatar.cc/300" class="rounded-box h-16 w-16 object-cover" alt="">
+                    <div class="flex flex-col gap-2 ">
+                        <h2>نام محصول</h2>
+                        <div class="flex gap-3">
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>رنگ:</span>
+                                <span>سبز</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>سایز:</span>
+                                <span>XXL</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>برند:</span>
+                                <span>پوما</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="absolute top-2 left-4 text-gray-600 text-xs">120000 تومان</span>
+                </article>
+                <article class="relative bg-white rounded-box shadow-md p-2 w-full flex gap-2">
+                    <img src="https://i.pravatar.cc/300" class="rounded-box h-16 w-16 object-cover" alt="">
+                    <div class="flex flex-col gap-2 ">
+                        <h2>نام محصول</h2>
+                        <div class="flex gap-3">
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>رنگ:</span>
+                                <span>سبز</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>سایز:</span>
+                                <span>XXL</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>برند:</span>
+                                <span>پوما</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="absolute top-2 left-4 text-gray-600 text-xs">120000 تومان</span>
+                </article>
+
+                <article class="relative bg-white rounded-box shadow-md p-2 w-full flex gap-2">
+                    <img src="https://i.pravatar.cc/300" class="rounded-box h-16 w-16 object-cover" alt="">
+                    <div class="flex flex-col gap-2 ">
+                        <h2>نام محصول</h2>
+                        <div class="flex gap-3">
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>رنگ:</span>
+                                <span>سبز</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>سایز:</span>
+                                <span>XXL</span>
+                            </div>
+                            <div class="flex gap-1 text-xs text-gray-400">
+                                <span>برند:</span>
+                                <span>پوما</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="absolute top-2 left-4 text-gray-600 text-xs">120000 تومان</span>
+                </article>
+                <div class="divider"></div>
+                <form action="" method="post" class="bg-base-100 p-2 w-full rounded-box shadow-md flex  gap-2">
+                    <input placeholder="کوپن تخفیف" name="coupon" type="text"
+                        class="input input-bordered p-2 basis-full">
+                    <button class="btn btn-primary">اعمال</button>
+                </form>
+                <div class="bg-stone-100 p-4 rounded-box flex flex-col gap-2 ">
+                    <div class="flex justify-between">
+                        <span>جمع کل:</span>
+                        <span>500000تومان</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>کوپن تخفیف:</span>
+                        <span>ندارد</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>جمع کل با تخفیف:</span>
+                        <span>500000تومان</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>نام بوتیک:</span>
+                        <span>تتت</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>تاریخ ثبت</span>
+                        <span>111/111</span>
+                    </div>
+                </div>
+            </section>
+            <section class="bg-base-100 p-3 w-full md:w-1/3  rounded-box shadow-md flex flex-col gap-2 mb-20">
+                <h2 class="text-center text-gray-700 text-md">آدرس گیرنده</h2>
+                <div class="flex flex-col gap-1">
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input type="radio" name="gender" class="radio checked:bg-blue-500" id="man">
+                            <span class="label-text p-1">علی علوی/ فارس / شیراز ...</span>
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-2">
+                            <input type="radio" name="gender" class="radio checked:bg-blue-500" id="woman">
+                            <span class="label-text p-1 ">نیما نن/ تهران /..</span>
+                        </label>
+                    </div>
+                </div>
+                <div tabindex="0" class="collapse collapse-plus">
+                    <input type="checkbox" name="" id="">
+                    <div class="collapse-title text-sm">
+                        افزودن آدرس
+                    </div>
+                    <div class="collapse-content p-1 w-full">
+                        <form class="flex flex-col mt-1 basis-1/2 gap-2" action="{% url 'users:profile' %}"
+                            method="post">
+                            <input name="first_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1"
+                                type="text">
+                            <input name="last_name" placeholder="شماره تماس" class="input input-bordered p-1"
+                                type="text">
+                            <select class="select  select-bordered w-full" name="province" id="">
+                                <option value="" disabled selected>استان</option>
+                                <option value="">استان</option>
+                                <option value="">استان</option>
+                                <option value="">استان</option>
+                            </select>
+                            <select class="select  select-bordered w-full" name="city" id="">
+                                <option value="" disabled selected>شهرستان</option>
+                                <option value="">استان</option>
+                                <option value="">استان</option>
+                                <option value="">استان</option>
+                            </select>
+                            <input name="email" placeholder="شهر" class="input input-bordered p-1" type="email">
+                            <textarea name="description" id="" placeholder="نشانی دقیق" cols="5"
+                                class="textarea textarea-bordered" rows="4"></textarea>
+                            <div class="flex gap-8">
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <input type="radio" name="gender" class="radio checked:bg-red-500" id="man">
+                                        <span class="label-text p-1 ">مرد</span>
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <input type="radio" name="gender" class="radio checked:bg-red-500" id="woman">
+                                        <span class="label-text p-1 ">زن</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">افزودن</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <form class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box" action="{% url 'users:profile' %}"
+                    method="post">
+                    <textarea name="" class="textarea textarea-bordered" placeholder="توضیحات سفارش" id="" cols="30"
+                        rows="2"></textarea>
+                    <button type="submit" class="btn w-full btn-primary">پرداخت</button>
+                </form>
+
+            </section>
+    </body>
+
+</html>

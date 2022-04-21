@@ -19,6 +19,12 @@ urlpatterns = [
     path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
     path('dashboard/shop/order', views.shop_order, name='shop_order'),
     path('dashboard/shop/404', views.notfound, name='notfound'),
+    path('dashboard/shop/checkout_result', views.checkout_result, name='checkout_result'),
+    path('dashboard/shop/checkout', views.checkout, name='checkout_result'),
+    path('dashboard/shop/cart', views.cart, name='cart'),
+
+
+
 
 
 

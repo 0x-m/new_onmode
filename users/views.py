@@ -87,18 +87,22 @@ def verify_code(request: HttpRequest):
 
 #temp
 def cart(request: HttpRequest):
-    return render(request, 'store/cart.html')
+    return render(request, 'shop/cart.html')
 
 def notfound(request:HttpRequest):
     return render(request, '404.html')
 
-def checkout(request: HttpRequest):
-    return render(request, 'store/checkout_result.html')
-
 def product(request: HttpRequest):
-    return render(request, 'store/product.html')
+    return render(request, 'shop/product.html')
 def store(request: HttpRequest):
-    return render(request, 'store/store.html')
+    return render(request, 'shop/store.html')
+
+def checkout_result(request: HttpRequest):
+    return render(request, 'shop/checkout_result.html')
+
+def checkout(request: HttpRequest):
+    return render(request, 'shop/checkout.html')
+
 
 @login_required
 def profile(request: HttpRequest):
