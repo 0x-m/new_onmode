@@ -43,10 +43,18 @@ class User(AbstractUser):
     objects = CustomUserManager()
     has_password = models.BooleanField(default=False)
 
-    @classmethod
-    def create_wallet(cls, sender, instance, created, *args, **kwargs):
-        if created:
-            pass
+    def make_me_shop(self, shop):
+        '''
+        first checks if current user has any shop
+        if so, do nothing, othewise make a shop for the user
+        '''
+        if self.has_shop:
+            return
+        shop.owner = self
+        shop.save()
+        
+        self.has_shop = True
+        self.save()
 
 
 class Address(models.Model):

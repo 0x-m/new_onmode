@@ -1,5 +1,7 @@
 
+from email.policy import default
 from re import T
+from xmlrpc.client import TRANSPORT_ERROR
 from django.db import models
 from django.utils import timezone
 
@@ -23,7 +25,7 @@ class Category(models.Model):
                             #   null=True)
 
 class Shop(models.Model):
-    owner = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(to=User,related_name='shops' , on_delete=models.SET_NULL, null=True,)
     name = models.CharField(max_length=40)
     meta_title = models.CharField(max_length=100)
     meta_description = models.CharField(max_length=400)
@@ -36,8 +38,44 @@ class Shop(models.Model):
     fee = models.PositiveIntegerField(default=9)
     active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    supported_provinces = models.CharField(max_length=1000, blank=True, null=True)
     
+    def has_capacity(self):
+        return self.product_capacity > self.product_count
+    
+    #NOTE: using signals for managing product counts..? bad idea!?
+    def inc_product_count(self):
+        if not self.has_capacity():
+            return #NOTE: raising Exception..??
+
+        self.product_count +=1
+        self.save()
+    
+    def dec_product_count(self):
+        if not self.product_count > 0:
+            return
+        self.product_count -=1
+        self.save()
+
+class CreateShopRequest(models.Model):
+    user = models.ForeignKey(to=User, related_name='shop_requests', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100, unique=True, blank=False)
+    name = models.CharField(max_length=20, blank=False)
+    description = models.TextField(max_length=1000, blank=True)
+    date_created = models.DateTimeField(default=timezone.now)
+    accepted = models.BooleanField(default=False)
+    status = models.TextField(max_length=1000, blank=True)
+    
+    def accept(self):
+        shop = Shop(owner=self.user, 
+                    name=self.name, 
+                    meta_title=self.title, 
+                    meta_description=self.description)
+
+        self.user.make_me_shop(shop)
+    
+    
+    
+
 
 class Option(models.Model):
     class TYPES(models.TextChoices):
@@ -65,35 +103,33 @@ class Product(models.Model):
     shop = models.ForeignKey(to=Shop, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=False, null=False)
     en_name = models.CharField(max_length=50, blank=True, null=False)
-    title = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, null=True)
-    en_slug = models.SlugField()
-    meta_description = models.CharField(max_length=144)
-    meta_keywords = models.CharField(max_length=100)
-    sku = models.CharField(max_length=50)
+    en_slug = models.SlugField(null=True, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True)
+    meta_description = models.CharField(max_length=255, blank=True)
+    meta_keywords = models.CharField(max_length=255, blank=True)
+    sku = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField(default=0, blank=False)
     stock_low_threshold = models.IntegerField(default=1)
     free_shipping = models.BooleanField(default=False)
-    published = models.BooleanField(default=True)
+    published = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
     sold_individually = models.BooleanField(default=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     has_sales = models.BooleanField(default=False)
     sales_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    sales_from = models.DateTimeField(null=True)
-    sales_to = models.DateTimeField(null=True)
     #discount = models....
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    shipping_cost_description = models.TextField(max_length=1000)
-    description = models.TextField(max_length=2000, blank=True)
+    description = models.TextField(max_length=5000, blank=True)
     #image = models.ImageField()
     # gallery = models.ForeignKey(to='gallery')
     attributes = models.JSONField(default=dict)
-    options = models.ManyToManyField(to=Option, related_name='products')
+    options = models.JSONField(default=dict)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     last_updated = models.DateTimeField(auto_now=True,
                                         null=True,
                                         editable=False)
+    
     # discount = models.ForeignKey(to='Discount',
     #                              on_delete=models.SET_NULL,
     #                              null=True, blank=True)
