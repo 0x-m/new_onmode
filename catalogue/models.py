@@ -1,12 +1,9 @@
 
-from email.policy import default
-from itertools import product
 from re import T
-from statistics import mode
 from django.db import models
-from django.forms import modelformset_factory
 from django.utils import timezone
 
+from users.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -26,24 +23,24 @@ class Category(models.Model):
                             #   null=True)
 
 class Shop(models.Model):
-    owner = models.ForeignKey(to='User', on_delete=models.SET_NULL)
+    owner = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=40)
     meta_title = models.CharField(max_length=100)
     meta_description = models.CharField(max_length=400)
     #baner = models.ForeignKey(to='Photos', on_delete=models.SET_NULL)
     #logo = models.ForeignKey(to='Photo', on_delete=models.SET_NULL)
     address_description = models.TextField(max_length=1000)
-    telephone = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
     product_capacity = models.PositiveIntegerField(default=100)
     product_count = models.PositiveIntegerField(default=0)
-    site_fee = models.PositiveIntegerField(default=9)
+    fee = models.PositiveIntegerField(default=9)
     active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
     supported_provinces = models.CharField(max_length=1000, blank=True, null=True)
     
 
-class Attribute(models.Model):
-    class ATTR_TYPES(models.TextChoices):
+class Option(models.Model):
+    class TYPES(models.TextChoices):
         Number = 'NUM', 'Number'
         Text = 'TXT', 'Text'
         Boolean = 'BOL', 'Boolean'
@@ -53,19 +50,19 @@ class Attribute(models.Model):
 
     name = models.CharField(max_length=20, unique=True)
     type = models.CharField(max_length=3,
-                            choices=ATTR_TYPES.choices,
-                            default=ATTR_TYPES.Number)
+                            choices=TYPES.choices,
+                            default=TYPES.Number)
     
     default = models.CharField(max_length=100, blank=True)
     choices = models.TextField(max_length=10000, blank=True)
-    meta = models.JSONField(default={})
+    meta = models.JSONField(default=dict)
     description = models.CharField(max_length=400)
     
     
 
 
 class Product(models.Model):
-    shop = models.ForeignKey(to='shop', related_name='products')
+    shop = models.ForeignKey(to=Shop, related_name='products', on_delete=models.CASCADE)
     name = models.CharField(max_length=50, blank=False, null=False)
     en_name = models.CharField(max_length=50, blank=True, null=False)
     title = models.CharField(max_length=50)
@@ -74,35 +71,32 @@ class Product(models.Model):
     meta_description = models.CharField(max_length=144)
     meta_keywords = models.CharField(max_length=100)
     sku = models.CharField(max_length=50)
-    upc = models.CharField(max_length=50)
     quantity = models.PositiveIntegerField(default=0, blank=False)
     stock_low_threshold = models.IntegerField(default=1)
     free_shipping = models.BooleanField(default=False)
     published = models.BooleanField(default=True)
     deleted = models.BooleanField(default=False)
     sold_individually = models.BooleanField(default=False)
-    tax = models.DecimalField()
-    price = models.DecimalField(blank=False, null=False, default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     has_sales = models.BooleanField(default=False)
-    sales_price = models.DecimalField(blank=True, default=0)
-    sales_from = models.DateTimeField(blank=True)
-    sales_to = models.DateTimeField(blank=True)
+    sales_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sales_from = models.DateTimeField(null=True)
+    sales_to = models.DateTimeField(null=True)
     #discount = models....
-    shipping_cost = models.DecimalField(blank=True)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     shipping_cost_description = models.TextField(max_length=1000)
     description = models.TextField(max_length=2000, blank=True)
-    image = models.ImageField()
+    #image = models.ImageField()
     # gallery = models.ForeignKey(to='gallery')
-    more_attributes = models.JSONField(default={})
+    attributes = models.JSONField(default=dict)
+    options = models.ManyToManyField(to=Option, related_name='products')
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     last_updated = models.DateTimeField(auto_now=True,
                                         null=True,
                                         editable=False)
-    discount = models.ForeignKey(to='Discount',
-                                 on_delete=models.SET_NULL,
-                                 null=True, blank=True)
-    attributes = models.ManyToManyField(to=Attribute, related_name='products')
-    attribute_values = models.JSONField(default={})
+    # discount = models.ForeignKey(to='Discount',
+    #                              on_delete=models.SET_NULL,
+    #                              null=True, blank=True)
     
     
 
@@ -125,6 +119,66 @@ class Product(models.Model):
        
 
 
+class ProductStats(models.Model):
+    product = models.OneToOneField(to=Product,
+                                   on_delete=models.CASCADE,
+                                   related_name='stats')
+    views = models.IntegerField(default=0)
+    comments = models.IntegerField(default=0)
+    sales = models.IntegerField(default=0)
+    likes = models.IntegerField(default=0)
+    fails = models.IntegerField(default=0)
+    rates_avg = models.FloatField(default=0)
+    
+    def inc_views(self):
+        self.views += 1
+        self.save()
+
+    def dec_views(self):
+        if (self.views > 0):
+            self.views -= 1
+            self.save()
+
+    def inc_comments(self):
+        self.comments += 1
+        self.save()
+
+    def dec_comments(self):
+        if (self.comments > 0):
+            self.comments -= 1
+            self.save()
+
+    def inc_likes(self):
+        self.likes += 1
+        self.save()
+
+    def dec_likes(self):
+        if (self.likes > 0):
+            self.likes -= 1
+            self.save()
+
+    def inc_sales(self):
+        self.sales += 1
+        self.save()
+
+    def dec_sales(self):
+        if (self.sales > 0):
+            self.sales -= 1
+            self.save()
+    
+    def inc_fails(self):
+        self.fails += 1
+        self.save()
+    
+    def dec_fails(self):
+        if (self.fails > 0):
+            self.fails -= 1
+            self.save()
+    
+
+#TODO: create a stats for shop
+
+
 class Collection(models.Model):
     products = models.ManyToManyField(to=Product, related_name='collections')
     name = models.CharField(max_length=40)
@@ -134,7 +188,7 @@ class Collection(models.Model):
     meta_title = models.CharField(max_length=40)
     meta_description = models.CharField(max_length=90)
     description = models.TextField(max_length=2000)
-    photo = models.ForeignKey(to='Photo', on_delete=models.DO_NOTHING)
+    # photo = models.ForeignKey(to='Photo', on_delete=models.DO_NOTHING)
     #discount = models.ForeignKey(to='Discount', on_delete=models.SET_NULL, null=True, blank=True)
     prefer_collection_discount = models.BooleanField(default=False)
     

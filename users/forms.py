@@ -1,9 +1,11 @@
+from pyexpat import model
+from attr import fields
 from django import forms
 from django.core.validators import RegexValidator
 
 #from catalog.models import Product
 #from .models import Comment
-from .models import Address, User
+from .models import Address, CheckoutRequest, User
 
 class SignUpForm(forms.Form):
     phone_num = forms.CharField(max_length=11,
@@ -18,12 +20,19 @@ class VerificationCodeForm(forms.Form):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'gender']
         
+
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
-        fields = ['province', 'city', 'town', 'description', 'postal_code']
+        fields = ['full_name', 'phone_number', 'province', 'city', 'town', 'description', 'postal_code']
+        
+        
+class CheckoutForm(forms.ModelForm):
+    class Meta:
+        model = CheckoutRequest
+        fields = ['merch_card', 'call_me', 'amount']
 
 
 # class CommentForm(forms.ModelForm):

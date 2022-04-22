@@ -15,12 +15,12 @@ urlpatterns = [
     path('dashboard/messages', views.messages, name='messages'),
     path('dashboard/orders', views.orders, name='orders'),
     path('dashboard/wallet', views.wallet, name='wallet'),
+    path('dashboard/wallet/checkout', views.wallet_checkout, name='wallet_checkout'),
     path('dashboard/shop/about', views.about_shop, name='about_shop'),
     path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
     path('dashboard/shop/order', views.shop_order, name='shop_order'),
     path('dashboard/shop/404', views.notfound, name='notfound'),
     path('dashboard/shop/checkout_result', views.checkout_result, name='checkout_result'),
-    path('dashboard/shop/checkout', views.checkout, name='checkout_result'),
     path('dashboard/shop/cart', views.cart, name='cart'),
 
 
