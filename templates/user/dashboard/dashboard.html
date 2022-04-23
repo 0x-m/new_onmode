@@ -18,8 +18,8 @@
         </header>
         <main  class="flex flex-col md:flex-row w-full min-h-full ">
             <section
-                class="md:basis-1/6  md:mt-8 p-2 flex justify-center items-center w-full md:h-screen fixed bottom-2 md:static">
-                <ul class="menu menu-horizontal md:menu-vertical  z-40 bg-base-100 p-0 md:p-2 shadow-md  rounded-box">
+                class="md:basis-1/6  md:mt-8 p-2 flex justify-center z-50 items-center w-full md:h-screen fixed bottom-2 md:static">
+                <ul class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md  rounded-box">
                     <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
                         <label tabindex="0">
                             <i class="bi-person md:text-xl"></i>
@@ -53,24 +53,33 @@
                             <span class="hidden md:block">فروشگاه</span>
                         </label>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
-                            <li>
-                                <a href="{% url 'users:about_shop' %}">
-                                    <i class="bi-info-circle"></i>
-                                    <span>مشخصات بوتیک</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'users:shop_orders' %}">
-                                    <i class="bi-box"></i>
-                                    <span>سفارشها</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <i class="bi-plus"></i>
-                                    <span>افزودن محصول</span>
-                                </a>
-                            </li>
+                            {% if user.has_shop %}
+                                <li>
+                                    <a href="{% url 'users:about_shop' %}">
+                                        <i class="bi-info-circle"></i>
+                                        <span>مشخصات بوتیک</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'users:shop_orders' %}">
+                                        <i class="bi-box"></i>
+                                        <span>سفارشها</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="">
+                                        <i class="bi-plus"></i>
+                                        <span>افزودن محصول</span>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="{% url 'users:create-shop' %}">
+                                        <i class="bi-box2-heart"></i>
+                                        <span>ساخت بوتیک</span>
+                                    </a>
+                                </li>
+                            {% endif %}
 
                         </ul>
                     </li>

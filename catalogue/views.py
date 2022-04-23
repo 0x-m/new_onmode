@@ -1,13 +1,15 @@
 from asyncio import FastChildWatcher
 from distutils.command.install_scripts import install_scripts
+from doctest import FAIL_FAST
 from itertools import product
+from mimetypes import common_types
 from pickletools import read_uint1
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from .models import Product, Shop
-from .forms import ProductForm, ShopForm
+from .models import CreateShopRequest, Product, Shop
+from .forms import CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
 
@@ -125,17 +127,61 @@ def edit_shop(requeset: HttpRequest):
         'shop': shop
     })
 
+
 @login_required
 def create_shop_request(request: HttpRequest):
-    # Does the user have any shop...? 
+    # Does the user have any shop...?
     # if so, it is not allowed to have more than one shop!
-    shop = request.user.shops.first()
-    if shop:
+    if request.user.has_shop:
         return Http404()
     
-    if request.method == 'POST':
+    # Does the user have any request for creating a shop ?
+    shop_req = None
+    try:
+        shop_req = CreateShopRequest.objects.get(user=request.user)
+    except CreateShopRequest.DoesNotExist:
         pass
     
+    if request.method == 'POST':
+        form = None
+        if shop_req:
+            form = CreateShopForm(request.POST, instance=shop_req)
+            # create shop request registered and not yet processed by admin
+            # so it can not be edited.
+            if not shop_req.rejected:
+                return Http404()
+            
+            # admin rejected the request so, user must modify it.
+            if form.is_valid():
+                shop_req.rejected = False #so admin must revisit it.
+                shop_req = form.save()
+                return render(request, 'shop/create_shop.html', {
+                    'status': 'edited',
+                    'shop_req': shop_req
+                })
+            else:
+                return render(request, 'shop/create_shop.html', {
+                    'status': 'invalid name',
+                    'shop_req': shop_req
+                })
+            
+        else:
+            # Create shop request does not exist so, create one...
+            form = CreateShopForm(request.POST)
+            if form.is_valid():
+                shop_req = form.save(commit=False)
+                shop_req.user = request.user
+                shop_req.save()
+                return render(request, 'shop/create_shop.html', {
+                    'status': 'created',
+                    'shop_req': shop_req
+                })
+
     # Handle Get request.
-    return render(request, 'shop/create_shop.html')
-    
+    return render(request, 'shop/create_shop.html', {
+        'status': '',
+        'shop_req': shop_req
+    })
+                
+
+  

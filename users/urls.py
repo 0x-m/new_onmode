@@ -1,6 +1,8 @@
+from gettext import Catalog
 from unicodedata import name
 from django.urls import path
 from . import views
+from catalogue import views as catalog
 
 app_name = 'users'
 urlpatterns = [
@@ -16,6 +18,7 @@ urlpatterns = [
     path('dashboard/orders', views.orders, name='orders'),
     path('dashboard/wallet', views.wallet, name='wallet'),
     path('dashboard/wallet/checkout', views.wallet_checkout, name='wallet_checkout'),
+    path('dashboard/shop/create-shop', catalog.create_shop_request,name='create-shop' ),
     path('dashboard/shop/about', views.about_shop, name='about_shop'),
     path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
     path('dashboard/shop/order', views.shop_order, name='shop_order'),

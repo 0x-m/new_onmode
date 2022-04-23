@@ -1,11 +1,28 @@
+from calendar import c
 from pyexpat import model
+from xml.dom import ValidationErr
 from attr import fields
 from django import forms
 
-from .models import Product, Shop
+from .models import CreateShopRequest, Product, Shop
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
 
+
+#TODO: move reserved_words to the utils..or settings
+reserved_words = [
+    'admin',
+    'dashboard',
+    'user', 
+    'users',
+    'catalog', 
+    'catalogue',
+    'discount',
+    'promotion',
+    'order',
+    'orders',
+    'payment',    
+]
 
 
 class ProductForm(forms.ModelForm):
@@ -36,11 +53,29 @@ class ShopForm(forms.ModelForm):
     class Meta:
         model = Shop
         fields = [
-            'owmer', 
             'name', 
             'meta_title' , 
             'meta_description', 
-            'meta_keywords',
-            'address',
+            'address_description',
             'phone',
         ]
+
+class CreateShopForm(forms.ModelForm):
+    class Meta:
+        model = CreateShopRequest
+        fields = ['title', 'name']
+    
+    def clean_name(self):
+        name: str = self.cleaned_data['name']
+
+        # name should not include any punctuations
+        if not name.isidentifier():
+            return ValidationErr(msg='invalid name', code='invalid')
+        
+        if name in reserved_words:
+            return ValidationErr(msg='the name is reserved for onmode system', 
+                                 code='reserved_words')
+        return name
+        
+        
+        

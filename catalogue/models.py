@@ -60,10 +60,10 @@ class CreateShopRequest(models.Model):
     user = models.ForeignKey(to=User, related_name='shop_requests', on_delete=models.CASCADE)
     title = models.CharField(max_length=100, unique=True, blank=False)
     name = models.CharField(max_length=20, blank=False)
-    description = models.TextField(max_length=1000, blank=True)
     date_created = models.DateTimeField(default=timezone.now)
     accepted = models.BooleanField(default=False)
-    status = models.TextField(max_length=1000, blank=True)
+    rejected = models.BooleanField(default=False)
+    reject_status = models.TextField(max_length=1000, blank=True)
     
     def accept(self):
         shop = Shop(owner=self.user, 

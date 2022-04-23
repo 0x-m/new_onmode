@@ -26,6 +26,8 @@ def add_p(request: HttpRequest):
         return HttpResponse('fff')
     return render(request, 'shop/add_product.html')
 
+    
+
 urlpatterns = [
     path('', index, name='index'),
     path('aboutus/', about_us, name='aboutus' ),
