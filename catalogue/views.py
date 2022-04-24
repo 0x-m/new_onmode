@@ -1,14 +1,9 @@
-from asyncio import FastChildWatcher
-from distutils.command.install_scripts import install_scripts
-from doctest import FAIL_FAST
-from itertools import product
-from mimetypes import common_types
-from pickletools import read_uint1
-from django.http import Http404, HttpRequest, HttpResponse
-from django.shortcuts import render
+from wsgiref.util import request_uri
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 
-from .models import CreateShopRequest, Product, Shop
+from .models import CreateShopRequest, Option, Product, ProductOptionValue, Shop
 from .forms import CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
@@ -17,7 +12,7 @@ from .forms import CreateShopForm, ProductForm, ShopForm
 def get_user_shop_or_404(user):
     ''' Get the user shop otherwise return 404 http error'''
     try:
-        shop = Shop.objects.get(owner=user, is_active=True)
+        shop = Shop.objects.get(owner=user, active=True, deleted=False)
         return shop
     except Shop.DoesNotExist:
         return Http404()
@@ -48,10 +43,14 @@ def product(request: HttpRequest, pid=None):
 
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=prod)
-
+        # colors = request.POST.getlist('colors', None)
+        # sizes = request.POST.getlist('sizes', None)
+        # categories = request.POST.getlist('categories', None)
+        # brand = request.POST.get('brand', None)
+        
         if not form.is_valid():
             return render(request, 'shop/add_product.html', {
-                'status': 'invalid',
+                'status':  form.errors,
                 'product': prod
             })
 
@@ -103,6 +102,50 @@ def add_photo(requeset: HttpRequest):
 def delete_photo(request: HttpRequest):
     pass
 
+@login_required
+def add_option(request: HttpRequest):
+    if not request.user.has_shop:
+        return Http404()
+    if request.method == 'POST':
+        data = request.POST
+        pid = data.get('pid', None)
+        product = get_object_or_404(Product, pk=pid, deleted=False, published=True)
+            
+        options = Option.objects.filter(name__in=list(data.keys))
+        for o in options:
+            opt_value = data.getlist(o.name, None) if o.is_list else data.get(o.name, None)
+            Option.objects.update_or_create(
+                product=product,
+                option=o,
+                value=opt_value
+            )
+          
+            
+    return HttpResponseNotAllowed(['POST'])
+
+@login_required
+def delete_option(request: HttpRequest):
+    if not request.user.has_shop:
+        return Http404()
+    
+    if request.method == 'POST':
+        pid = request.POST.get('pid', None)
+        option_name = request.POST.get('name', None)
+        if not pid or not option_name:
+            return HttpResponseBadRequest()
+        
+        product = get_object_or_404(Product, pk=pid, published=True, deleted=False)
+        option = product.options.all().filter(name=option_name).first()
+        if option:
+            option.delete()
+            return render(request, 'shop/add_product.html', {
+                'status': '',
+                'product': product
+            })
+        else:
+            return Http404()
+        
+    return HttpResponseNotAllowed(['POST'])
 
 @login_required
 def edit_shop(requeset: HttpRequest):
@@ -114,7 +157,8 @@ def edit_shop(requeset: HttpRequest):
         shop_form = ShopForm(requeset.POST, instance=shop)
         if not shop_form.is_valid():
             return render(requeset, 'shop/about.html', {
-                'status': 'invalid'
+                'status': 'invalid',
+                'shop': shop
             })
 
         shop_form.save()

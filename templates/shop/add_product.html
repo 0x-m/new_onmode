@@ -1,204 +1,231 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
-
+{% load options %}
 {% block title %}
 
 {% endblock %}
 
 {% block content  %}
+{{ status }}
 <div class="flex flex-col md:flex-row md:mt-8 items-center md:items-start justify-center w-full h-full gap-2">
-    <form class="flex flex-col md:flex-row gap-2 w-full p-2 basis-3/4 md:w-3/4" action="/add/" method="post">
+    <form class="flex flex-col md:flex-row items-start gap-2 w-full p-2 basis-3/4 md:w-3/4" action="{% url 'users:add-product' %}"
+        method="post">
         {% csrf_token %}
-        <section class="bg-base-100 p-3 w-full  rounded-box shadow-md basis-2/3 flex flex-col gap-2">
-            <h4 class="text-center text-md text-gray-800 mb-2">افزودن محصول</h4>
+        <section class="bg-base-100 p-3 w-fil  rounded-box shadow-md basis-2/3 flex flex-col gap-2">
+            <h4 class="text-center text-md text-gray-800 mb-2">مشخصات کلی محصول</h4>
             <div class="flex gap-2">
-                <input name="title" placeholder="نام محصول" class="input input-bordered p-1 w-full" type="text">
-                <input name="en_title" placeholder="نام محصول به انگلیسی" class="input input-bordered w-full p-1"
+                <input name="name" placeholder="نام محصول" class="input input-bordered p-1 w-full" type="text">
+                <input name="en_name" placeholder="نام محصول به انگلیسی" class="input input-bordered w-full p-1"
                     type="text">
             </div>
-            <input name="last_name" placeholder="SKU" class="input input-bordered p-1 " type="text">
+            <input name="sku" placeholder="SKU" class="input input-bordered p-1 " type="text">
             <textarea name="description" id="" class="textarea textarea-bordered" cols="30" rows="5"
                 placeholder="توضیحات"></textarea>
             <div class="flex gap-2">
-                <input name="last_name" placeholder="قیمت" min="0" step="1000" class="input input-bordered p-1  w-full"
+                <input name="price" placeholder="قیمت" min="0" step="1000" class="input input-bordered p-1  w-full"
                     type="number">
-                <input name="last_name" placeholder="تعداد" class="input input-bordered p-1 w-full " type="number">
-                <input name="last_name" placeholder="آستانه اتمام" class="input input-bordered p-1 w-full " min="0"
+                <input name="quantity" placeholder="تعداد" class="input input-bordered p-1 w-full " type="number">
+                <input name="stock_low_threshold" placeholder="آستانه اتمام" class="input input-bordered p-1 w-full " min="0"
                     type="number">
             </div>
             <h2 class="text-center text-blue-500 text-lg mt-2">SEO</h2>
             <div class="divider w-1/2 mx-auto -mt-2"></div>
             <div dir="ltr" class="flex flex-col gap-2">
                 <div class="flex gap-2 -mt-4">
-                    <input type="text" class="input input-bordered w-full" placeholder="meta title">
-                    <input type="text" class="input input-bordered w-full" placeholder="meta keywords">
+                    <input name="meta_title" type="text" class="input input-bordered w-full" placeholder="meta title">
+                    <input name="meta_keywords" type="text" class="input input-bordered w-full" placeholder="meta keywords">
                 </div>
-                <textarea type="text" class="textarea textarea-bordered" cols="10" rows="2"
+                <textarea name="meta_description" type="text" class="textarea textarea-bordered" cols="10" rows="2"
                     placeholder="meta description"></textarea>
             </div>
-            <h2 class="text-center text-blue-500 text-lg mt-2">تخفیف</h2>
-            <div class="divider w-1/2 mx-auto -mt-2"></div>
-            <div class="form-control w-fit ">
-                <label class="label cursor-pointer -mt-4">
-                    <input type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
-                    <span class="label-text mr-2"> تخفیف</span>
-                </label>
-            </div>
-            <input type="text" class="input input-bordered" placeholder="قیمت با تخفیف">
-            <div class="divider w-1/2 mx-auto "></div>
-            <div class="flex gap-8">
-                <div class="form-control w-fit ">
-                    <label class="label cursor-pointer">
-                        <input type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
-                        <span class="label-text mr-2">ارسال رایگان</span>
-                    </label>
-                </div>
-                <div class="form-control w-fit ">
-                    <label class="label cursor-pointer">
-                        <input type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
-                        <span class="label-text mr-2"> فروش تکی</span>
-                    </label>
-                </div>
-            </div>
+            <input type="text" name="shipping_cost" class="input input-bordered" placeholder="هزینه تقریبی ارسال پستی">
+            <input type="text" name="sales_price" class="input input-bordered" placeholder="قیمت با تخفیف">
+            <button class="btn btn-primary">ثبت</button>
         </section>
         <section class="flex flex-col gap-2 basis-1/3">
+            {% with product.category.id as current_cat_id %}
             <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-2">
                 <h2 class="text-center text-lg text-blue-500">دسته بندی</h2>
                 <div class="p-2 rounded border border-gray-400 max-h-52 overflow-auto">
                     <div class="form-control">
+                        {% for category in categories %}
                         <label class="label cursor-pointer w-fit">
-                            <input type="checkbox" class="checkbox checkbox-primary checkbox-xs" name="categories"
-                                value="1" id="">
-                            <span class="label-text text-xs mr-2">زنانه</span>
+                            <input type="radio" class="radio radio-primary radio-xs" name="category"
+                                value="{{category.id}}" id="" {% if category.id == current_cat_id %}checked{% endif %}>
+                            <span class="label-text text-xs mr-2">{{category.name}}</span>
                         </label>
+                        <div class="pr-4">
+                            {% if category.childs %}
+                            {% for sub_1 in category.childs.all %}
+                            <div class="form-control">
+                                <label class="label cursor-pointer w-fit">
+                                    <input type="radio" class="radio radio-primary radio-xs" name="category"
+                                        value="{{sub_1.id}}" id="" {% if sub_1.id == current_cat_id %}checked{% endif %}>
+                                    <span class="label-text text-xs mr-2">{{sub_1.name}}</span>
+                                </label>
+                                <div class="pr-4">
+                                    {% if sub_1.childs %}
+                                    {% for sub_2 in sub_1.childs.all %}
+                                    <div class="form-control">
+                                        <label class="label cursor-pointer w-fit">
+                                            <input type="radio" class="radio radio-primary radio-xs" name="category"
+                                                value="{{sub_2.id}}" id="" {% if sub_2.id == current_cat_id %}checked{% endif %}>
+                                            <span class="label-text text-xs mr-2">{{sub_2.name}}</span>
+                                        </label>
+                                        <div class="pr-4">
+                                            {% if sub_2.childs %}
+                                            {% for sub_3 in sub_2.childs.all %}
+                                            <div class="form-control">
+                                                <label class="label cursor-pointer w-fit">
+                                                    <input type="radio" class="radio radio-primary radio-xs"
+                                                        name="category" value="{{sub_3.id}}" id="" {% if category.id == sub_3 %}checked{% endif %}>
+                                                    <span class="label-text text-xs mr-2">{{sub_3.name}}</span>
+                                                </label>
+                                                <div class="mr-4">
+                                                    {% if sub_3.childs %}
+                                                    {% for sub_4 in sub_3.childs.all %}
+                                                    <div class="form-control">
+                                                        <label class="label cursor-pointer w-fit">
+                                                            <input type="radio" class="radio radio-primary radio-xs"
+                                                                name="category" value="{{sub_4.id}}" id="" {% if sub_4.id == current_cat_id %}checked{% endif %}>
+                                                            <span class="label-text text-xs mr-2">{{sub_4.name}}</span>
+                                                        </label>
+                                                    </div>
+                                                    {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </section>
+            {% endwith %}
+
+
+
+
+
             <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-2">
                 <h2 class="text-center text-lg text-blue-500">برند</h2>
                 <div class="p-2 rounded border border-gray-400 max-h-52 overflow-auto">
+                    {% get_option brand as brands  %}
+
+                    {% if brands %}
+                    {% for brand in brands.meta %}
                     <div class="form-control">
                         <label class="label cursor-pointer w-fit">
-                            <input type="checkbox" class="checkbox checkbox-primary checkbox-xs" name="categories"
-                                value="1" id="">
-                            <span class="label-text text-xs mr-2">پوما</span>
+                            <input type="radio" class="radio radio-primary radio-xs" name="categories"
+                                value="{{brand.name}}" id="">
+                            <span class="label-text text-xs mr-2">{{brand.name}}</span>
                         </label>
                     </div>
-                </div>
-            </section>
-            <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-1">
-                <h2 class="text-right text-gray-600 p-1">رنگبندی</h2>
-                <div class="flex gap-3 gap-y-0 flex-wrap w-full -mt-4 ">
-                    <label class="rounded-full   group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full  group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-                    <label class="rounded-full   group cursor-pointer">
-                        <input type="checkbox" class="appearance-none peer">
-                        <div
-                            class="rounded-full bg-red-200 w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                        </div>
-                    </label>
-
-                  
-                </div>
-                <div class="form-control">
-                    <h2 class="text-right text-gray-600 p-1">سایزبندی</h2>
-                    <div class="flex gap-1 flex-wrap w-full pr-1 pl-1 -mt-4 text-xs">
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input type="checkbox" class="appearance-none peer">
-                            <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
-                                SM
-                            </div>
-                        </label>
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input type="checkbox" class="appearance-none peer">
-                            <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
-                                MD
-                            </div>
-                        </label>
-
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input type="checkbox" class="appearance-none peer">
-                            <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
-                                XXL
-                            </div>
-                        </label>
-                    </div>
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
                 </div>
             </section>
             <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-2">
-                <h2 class="text-gray-600 text-lg text-center">سایر ویژگیها</h2>
-                <div class="flex gap-2 items-center">
-                    <input placeholder="ویژگی" class="input w-1/2 input-bordered" type="text">
-                    <span>:</span>
-                    <input placeholder="مقدار" class="input w-1/2 input-bordered" type="text">
-                </div>
-                <button class="btn btn-primary">افزودن</button>
-                <div class="flex flex-col gap-2 text-xs">
-                    <div class="flex justify-between rounded-md items-center  p-1 text-gray-800 bg-stone-50 p1">
-                        <div class="flex gap-2 item">
-                            <span>ویژگی:</span>
-                            <span>مقدار</span>
-                        </div>
-                        <i class="bi-x text-lg"></i>
+                <div class="flex flex-col  mt-2 ">
+                    <div class="form-control w-fit ">
+                        <label class="label cursor-pointer">
+                            <input name="has_sales" type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
+                            <span  class="label-text mr-2"> تخفیف دارد</span>
+                        </label>
                     </div>
-                    <div class="flex justify-between rounded-md items-center  p-1 text-gray-800 bg-stone-50 p1">
-                        <div class="flex gap-2 item">
-                            <span>ویژگی:</span>
-                            <span>مقدار</span>
+                    <div class="form-control w-fit ">
+                        <label class="label cursor-pointer">
+                            <input name="free_shipping" type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
+                            <span class="label-text mr-2">ارسال رایگان</span>
+                        </label>
+                    </div>
+                    <div class="form-control w-fit ">
+                        <label class="label cursor-pointer">
+                            <input name="sold_individually" type="checkbox" name="a" value="dd" class="checkbox checkbox-primary" id="">
+                            <span class="label-text mr-2"> فروش تکی</span>
+                        </label>
+                    </div>
+
+                </div>
+            </section>
+            {% if  product %}
+            <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-1">
+                <h2 class="text-right text-gray-600 p-1">رنگبندی</h2>
+                <div class="flex gap-3 gap-y-0 flex-wrap w-full -mt-4 ">
+                    {% get_option color as colors  %}
+                    {% if colors %}
+                    {% for color in colros.meta %}
+                    <div class="form-control">
+                        <label class="rounded-full   group cursor-pointer">
+                            <input name="colors" type="checkbox" value="{{color.id}}" class="appearance-none peer">
+                            <div style="background-color:{{color.code}};"
+                                class="rounded-full w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                </div>
+                <div class="form-control">
+                    <h2 class="text-right text-gray-600 p-1">سایزبندی</h2>
+
+                    <div class="flex gap-1 flex-wrap w-full pr-1 pl-1 -mt-4 text-xs">
+                        {% get_option size as sizes  %}
+                        {% if sizes %}
+                        {% for size in sizes.meta %}
+                        <div class="form-control">
+                            <label class="rounded-full p-1 group cursor-pointer">
+                                <input name="sizes" type="checkbox" value="{{size.id}}" class="appearance-none peer">
+                                <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
+                                    {{size.code}}
+                                </div>
+                            </label>
                         </div>
-                        <i class="bi-x text-lg"></i>
+                        {% endfor %}
+                        {% else %}
+                        {% endif %}
                     </div>
                 </div>
             </section>
-            
+            {% endif %}
+            <input type="hidden" name="attributes" value="">
+            <section class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-2">
+                <h2 class="text-gray-600 text-lg text-center">سایر ویژگیها</h2>
+                <div class="flex gap-2 items-center">
+                    <input id="attr_key" placeholder="ویژگی" class="input w-1/2 input-bordered" type="text">
+                    <span>:</span>
+                    <input id="attr_val" placeholder="مقدار" class="input w-1/2 input-bordered" type="text">
+                </div>
+                <button type="button" onclick="add_attribute();" class="btn btn-primary">افزودن</button>
+                <div id="attr_list" class="flex flex-col gap-2 text-xs">
+                    {% if product.attributes %}
+                        {% for item in product.attributes %}
+                        <div class="flex justify-between rounded-md items-center  p-1 text-gray-800 bg-stone-50 p1">
+                            <div class="flex gap-2 item">
+                                <span>{{item.name}}</span>:
+                                <span>{{item.value}}</span>
+                            </div>
+                            <i class="bi-x text-lg"></i>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </section>
+
         </section>
     </form>
+    {% if  product %}
     <section class="bg-base-100 w-full md:basis-1/3 p-3 rounded-box shadow-md flex flex-col items-center mb-20  gap-2">
         <h2 class="text-center text-lg text-blue-500">تصاویر</h2>
         <div class="flex gap-2">
@@ -211,8 +238,70 @@
         </div>
         <button class="btn btn-primary w-full mt-1">ثبت</button>
     </section>
+    {% endif %}
 </div>
 
+<template id="attr_template">
+    <div class="flex justify-between rounded-md items-center  p-1 text-gray-800 bg-stone-50 p1">
+        <div class="flex gap-2 item">
+            <span id="key"></span>:
+            <span id="val"></span>
+        </div>
+        <i data-key="" id="del" class="bi-x text-lg"></i>
+    </div>
+</template>
 
+{% endblock %}
 
+{% block scripts %}
+<script defer>
+    // holds attributes added to the product
+    let attributes = new Map();
+    /*(function populate_attr() {
+        
+    })();*/
+
+    {%  if product.attributes %}
+        {% for item in product.attributes %}
+            attributes.set({{item.key}}, {{item.value}})
+        {% endfor %}
+    {% endif %}
+    
+
+    function update_attr_filed() {
+        const attr_fiels = document.getElementsByName('attributes')[0];
+        attr_fiels.value = JSON.stringify(Object.fromEntries(attributes));
+
+    }
+
+    function add_attribute() {
+        
+        const key = document.querySelector('#attr_key').value.trim();
+        const val = document.querySelector('#attr_val').value.trim();
+        if (key == '' || val == '')
+            return
+
+        if (attributes.has(key))
+            return
+
+        attributes.set(key, val);
+        update_attr_filed()
+
+        const _attr_element = document.querySelector('#attr_template').content.cloneNode(true);
+        _attr_element.getElementById('key').innerText = key;
+        _attr_element.getElementById('val').innerText = val;
+        _attr_element.getElementById('del').dataset['key'] = key;
+        document.querySelector('#attr_list').appendChild(_attr_element);
+
+    }
+
+    function delete_attribute(e){
+        const key = e.dataset['key'];
+        if (attributes.has(key)) {
+            attributes.delete(key);
+        }
+
+        update_attr_filed();        
+    }
+</script>
 {% endblock %}

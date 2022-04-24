@@ -29,6 +29,8 @@ class AddressForm(forms.ModelForm):
         fields = ['full_name', 'phone_number', 'province', 'city', 'town', 'description', 'postal_code']
         
         
+
+        
 class CheckoutForm(forms.ModelForm):
     class Meta:
         model = CheckoutRequest

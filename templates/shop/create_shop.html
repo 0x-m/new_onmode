@@ -13,28 +13,31 @@
 
         {% if shop_req.rejected %}
 
-        <div class="w-full  flex flex-col gap-2 items-center justify-center">
-            <i class="bi-shop text-primary text-7xl"></i>
-            <p class="text-gray-500 text-sm">
-                با ساخت بوتیک...
+            <div class="w-full  flex flex-col gap-2 items-center justify-center">
+                <i class="bi-shop text-primary text-7xl"></i>
+                <p class="text-gray-500 text-sm">
+                    با ساخت بوتیک...
+                </p>
+            </div>
+            <div class="divider -mt-1 w-2/3 mx-auto"></div>
+            <h4 class="text-center text-md text-gray-800 mb-2">درخواست ساخت بوتیک</h4>
+            <p class="text-error text-sm text-center">
+                {{shop_req.reject_status}}
             </p>
-        </div>
-        <div class="divider -mt-1 w-2/3 mx-auto"></div>
-        <h4 class="text-center text-md text-gray-800 mb-2">درخواست ساخت بوتیک</h4>
-        <div class="flex gap-1 p-2 items-center" dir="ltr">
-            <span class="w-1/4 text-gray-500">onmode.ir/</span>
-            <input name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 input input-bordered p-1"
-                type="text" required value="{% if shop_req.rejected %}{{shop_req.name}}{% endif %}">
-        </div>
-        <p class="text-xs text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ باشد.</p>
-        <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
-            value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
-        {{shop_req.reject_status}}
-        <button type="submit" class="btn btn-primary">ثبت درخواست</button>
+            <div class="flex gap-1 p-2 items-center" dir="ltr">
+                <span class="w-1/4 text-gray-500">onmode.ir/</span>
+                <input name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 input input-bordered p-1"
+                    type="text" required value="{% if shop_req.rejected %}{{shop_req.name}}{% endif %}">
+            </div>
+            <p class="text-xs text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ باشد.</p>
+            <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
+                value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
+           
+            <button type="submit" class="btn btn-primary">ثبت درخواست</button>
 
         {% else %}
-        <i class="bi-emoji-heart-eyes text-blue-400 text-5xl mx-auto"></i>
-        <span class="text-sm text-blue-400  text-center">درخواست شما ثبت شده است و درحال بررسی است</span>
+            <i class="bi-emoji-heart-eyes text-blue-400 text-5xl mx-auto"></i>
+            <span class="text-sm text-blue-400  text-center">درخواست شما ثبت شده است و درحال بررسی است</span>
         {% endif %}
 
         {% else %}
@@ -54,13 +57,12 @@
         <p class="text-xs text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ باشد.</p>
         <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
             value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
-        {{shop_req.reject_status}}
         <button type="submit" class="btn btn-primary">ثبت درخواست</button>
 
         {% endif %}
         {% csrf_token %}
     </form>
-    {% if shop_req.rejected %}
+    {% if not shop or  shop_req.rejected %}
     <div class="bg-white rounded-box shadow-md w-11/12 md:w-1/3 md:basis-1/3 p-2 flex flex-col">
         <div class="flex gap-2 p-2">
             <p class="text-xs text-gray-400">

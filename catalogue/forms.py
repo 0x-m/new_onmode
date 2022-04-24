@@ -8,6 +8,8 @@ from .models import CreateShopRequest, Product, Shop
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
 
+from . import models
+
 
 #TODO: move reserved_words to the utils..or settings
 reserved_words = [
@@ -41,11 +43,14 @@ class ProductForm(forms.ModelForm):
             'free_shipping',
             'sold_individually',
             'has_sales',
+            'sales_price',
             'shipping_cost',
             'description',
             'attributes',
-            'options',
+            
         ]
+    
+
         
   
         
@@ -53,7 +58,6 @@ class ShopForm(forms.ModelForm):
     class Meta:
         model = Shop
         fields = [
-            'name', 
             'meta_title' , 
             'meta_description', 
             'address_description',

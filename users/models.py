@@ -1,14 +1,14 @@
 
-from ast import arg
-from pickletools import read_uint1
-from secrets import choice
-from statistics import mode
+import string
 from django.db import models
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
 from django.utils import timezone
+
+import secrets
+import string
 
 # from catalog.models import Product
 
@@ -23,6 +23,12 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractUser):
+    
+    def generate_usecode():
+        alphabet = string.ascii_letters + string.digits
+        code = ''.join(secrets.choice(alphabet) for _ in range(8))
+        
+    
     username = None
 
     email = models.EmailField()
@@ -32,7 +38,7 @@ class User(AbstractUser):
                                      ], unique=True)
     gender = models.CharField(max_length=10, choices=[(
         'man', 'man'), ('woman', 'woman')], blank=True)
-    user_code = models.CharField(max_length=20)
+    user_code = models.CharField(max_length=20, default=generate_usecode, editable=False)
     referral_code = models.CharField(max_length=20, blank=True, null=True)
     request_for_shop = models.BooleanField(default=False)
     request_accepted = models.BooleanField(default=False)

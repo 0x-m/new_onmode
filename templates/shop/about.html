@@ -6,20 +6,41 @@
 {% endblock %}
 
 {% block content  %}
+{% if status == 'invalid' %}
+    <div class="flex items-center gap-2 w-fit mt-4 mb-2 mx-auto p-2 bg-error text-white rounded-box shadow-md ">
+        <i class="bi-emoji-frown text-3xl"></i>
+        <p class="text-sm text-white">
+            لطفا همه موارد را به درستی تکمیل نمایید
+        </p>
+    </div>
+{% elif status == 'success' %}
+    <div class="flex items-center gap-2 w-fit mt-4 mb-2 mx-auto p-2 bg-success text-white rounded-box shadow-md ">
+        <i class="bi-emoji-smile text-3xl"></i>
+        <p class="text-sm text-white">
+            اطلاعات بوتیک با موفقیت ویرایش شد
+        </p>
+    </div>
+{% endif %}
 <div class="flex flex-col md:mt-8 items-center justify-center w-full h-full gap-2">
     <form class="bg-base-100 p-3 w-11/12 md:w-1/3  rounded-box shadow-md flex flex-col gap-2"
-        action="{% url 'users:profile' %}" method="post">
+        action="{% url 'users:edit-shop' %}" method="post">
+        {% csrf_token %}
         <h4 class="text-center text-md text-gray-800 mb-2">مشخصات بوتیک</h4>
-        <input name="first_name" placeholder="نام" class="input input-bordered p-1" type="text" disabled>
-        <input name="last_name" placeholder="عنوان" class="input input-bordered p-1" type="text">
-        <input name="last_name" placeholder="شماره تماس بوتیک" class="input input-bordered p-1" type="text">
-        <textarea name="" id="" class="textarea textarea-bordered" cols="30" rows="5" placeholder="درباره بوتیک"></textarea>
-        <label  class="label w-full flex justify-between rounded-md bg-stone-50" for="">
-            <span>لوگو</span> 
+        <input name="" placeholder="نام" value="{{shop.name}}" class="input input-bordered p-1" type="text" disabled>
+        <input name="meta_title" placeholder="عنوان" value="{{shop.meta_title}}" class="input input-bordered p-1"
+            type="text">
+        <input name="meta_description" placeholder="meta description" value="{{shop.meta_description}}"
+            class="input input-bordered p-1" type="text">
+        <input name="phone" placeholder="شماره تماس بوتیک" value="{{shop.phone}}" class="input input-bordered p-1"
+            type="text">
+        <textarea name="address_description" id="" class="textarea textarea-bordered" cols="30" rows="5"
+            placeholder="درباره بوتیک">{{shop.address_description}}</textarea>
+        <label class="label w-full flex justify-between rounded-md bg-stone-50" for="">
+            <span>لوگو</span>
             <input name="logo" type="file" accept="image/*">
         </label>
-        <label  class="label w-full flex justify-between rounded-md bg-stone-50" for="">
-            <span> نمایه</span> 
+        <label class="label w-full flex justify-between rounded-md bg-stone-50" for="">
+            <span> نمایه</span>
             <input name="poster" type="file" accept="image/*">
         </label>
         <button type="submit" class="btn btn-primary">ثبت</button>

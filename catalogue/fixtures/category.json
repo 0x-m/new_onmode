@@ -1,0 +1,81 @@
+[
+    {
+        "model": "catalogue.Category",
+        "pk": 1, 
+        "fields": {
+            "name": "men"
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 2, 
+        "fields": {
+            "name": "women"
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 3, 
+        "fields": {
+            "name": "children"
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 4, 
+        "fields": {
+            "name": "eye glass",
+            "parent": 1
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 5, 
+        "fields": {
+            "name": "aa",
+            "parent": 4
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 6, 
+        "fields": {
+            "name": "cc",
+            "parent": 4
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 7, 
+        "fields": {
+            "name": "dd",
+            "parent": 5
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 8, 
+        "fields": {
+            "name": "ee",
+            "parent": 7
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 9, 
+        "fields": {
+            "name": "ss",
+            "parent": 7
+        }
+    },
+    {
+        "model": "catalogue.Category",
+        "pk": 10, 
+        "fields": {
+            "name": "hh",
+            "parent": 7
+        }
+    }
+
+
+]
