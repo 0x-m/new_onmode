@@ -1,3 +1,6 @@
+from math import prod
+from tkinter import N
+from unicodedata import name
 from wsgiref.util import request_uri
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.shortcuts import render, get_object_or_404, get_list_or_404
@@ -47,9 +50,9 @@ def product(request: HttpRequest, pid=None):
         # sizes = request.POST.getlist('sizes', None)
         # categories = request.POST.getlist('categories', None)
         # brand = request.POST.get('brand', None)
-        
+        print(request.POST['attributes'])
         if not form.is_valid():
-            return render(request, 'shop/add_product.html', {
+            return render(request, 'shop/add_product.html/', {
                 'status':  form.errors,
                 'product': prod
             })
@@ -62,7 +65,7 @@ def product(request: HttpRequest, pid=None):
         else:
             form.save()
 
-        return render(request, 'shop/add_product.html', {
+        return render(request, 'shop/add_product.html/', {
             'status': 'edited' if prod else 'created',
             'product': prod
         })
@@ -102,39 +105,43 @@ def add_photo(requeset: HttpRequest):
 def delete_photo(request: HttpRequest):
     pass
 
+
 @login_required
-def add_option(request: HttpRequest):
+def add_option(request: HttpRequest, pid):
     if not request.user.has_shop:
         return Http404()
+
+    product = get_object_or_404(
+            Product, shop=request.user.shops.first(), pk=pid, deleted=False)
+
     if request.method == 'POST':
         data = request.POST
-        pid = data.get('pid', None)
-        product = get_object_or_404(Product, pk=pid, deleted=False, published=True)
-            
-        options = Option.objects.filter(name__in=list(data.keys))
-        for o in options:
-            opt_value = data.getlist(o.name, None) if o.is_list else data.get(o.name, None)
-            Option.objects.update_or_create(
-                product=product,
-                option=o,
-                value=opt_value
-            )
-          
-            
-    return HttpResponseNotAllowed(['POST'])
+        option_name = data.get('name', None)
+        option_value = data.get('value', None)
+        if not (option_name and option_value):
+            return HttpResponseBadRequest('empty fields')
+        
+        option = get_object_or_404(Option, name=name)
+        ProductOptionValue.objects.update_or_create(product=product, option=option, value=option_value)
+
+    return render(request, 'shop/product_options.html', {
+        'product': prod
+    })
+
 
 @login_required
 def delete_option(request: HttpRequest):
     if not request.user.has_shop:
         return Http404()
-    
+
     if request.method == 'POST':
         pid = request.POST.get('pid', None)
         option_name = request.POST.get('name', None)
         if not pid or not option_name:
             return HttpResponseBadRequest()
-        
-        product = get_object_or_404(Product, pk=pid, published=True, deleted=False)
+
+        product = get_object_or_404(
+            Product, pk=pid, deleted=False)
         option = product.options.all().filter(name=option_name).first()
         if option:
             option.delete()
@@ -144,8 +151,9 @@ def delete_option(request: HttpRequest):
             })
         else:
             return Http404()
-        
+
     return HttpResponseNotAllowed(['POST'])
+
 
 @login_required
 def edit_shop(requeset: HttpRequest):
@@ -178,14 +186,14 @@ def create_shop_request(request: HttpRequest):
     # if so, it is not allowed to have more than one shop!
     if request.user.has_shop:
         return Http404()
-    
+
     # Does the user have any request for creating a shop ?
     shop_req = None
     try:
         shop_req = CreateShopRequest.objects.get(user=request.user)
     except CreateShopRequest.DoesNotExist:
         pass
-    
+
     if request.method == 'POST':
         form = None
         if shop_req:
@@ -194,10 +202,10 @@ def create_shop_request(request: HttpRequest):
             # so it can not be edited.
             if not shop_req.rejected:
                 return Http404()
-            
+
             # admin rejected the request so, user must modify it.
             if form.is_valid():
-                shop_req.rejected = False #so admin must revisit it.
+                shop_req.rejected = False  # so admin must revisit it.
                 shop_req = form.save()
                 return render(request, 'shop/create_shop.html', {
                     'status': 'edited',
@@ -208,7 +216,7 @@ def create_shop_request(request: HttpRequest):
                     'status': 'invalid name',
                     'shop_req': shop_req
                 })
-            
+
         else:
             # Create shop request does not exist so, create one...
             form = CreateShopForm(request.POST)
@@ -226,6 +234,3 @@ def create_shop_request(request: HttpRequest):
         'status': '',
         'shop_req': shop_req
     })
-                
-
-  

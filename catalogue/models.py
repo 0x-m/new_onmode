@@ -31,6 +31,9 @@ class Category(models.Model):
                             #   null=True)
     class Meta:
         verbose_name_plural = 'categories'
+    
+    def __str__(self) -> str:
+        return self.name
 
 
 class Shop(models.Model):
@@ -185,7 +188,7 @@ class Product(models.Model):
     description = models.TextField(max_length=5000, blank=True)
     # image = models.ImageField()
     # gallery = models.ForeignKey(to='gallery')
-    attributes = models.JSONField(default=dict)
+    attributes = models.JSONField(default=dict, null=True, blank=True)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     last_updated = models.DateTimeField(auto_now=True,
                                         null=True,

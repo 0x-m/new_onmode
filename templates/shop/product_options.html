@@ -1,0 +1,109 @@
+{% extends 'user/dashboard/dashboard.html' %}
+{% load static %}
+{% load options %}
+{% block title %}
+
+{% endblock %}
+
+{% block content  %}
+{{ status }}
+
+<div class="flex justify-center items-center mt-8 p-2">
+    <div class="tabs gap-4">
+        <a class="tab tab-bordered " href="{% if product %}{% url 'users:edit-product' product.id %}{% endif %}">مشخصات</a>
+        <a class="tab tab-bordered tab-active"  >سایر ویژگیها</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  md:mt-2  items-start p-2 md:p-1   w-full h-full gap-2">
+    {% if not  product %}
+    <form class="bg-base-100 p-3 rounded-box shadow-md flex flex-col gap-2">
+        <h2 class="text-center text-sm text-blue-500">برند</h2>
+        <div class="p-2 rounded border border-gray-400 max-h-52 overflow-auto">
+            {% get_option brand as brands  %}
+
+            {% if brands %}
+            {% for brand in brands.meta %}
+            <div class="form-control">
+                <label class="label cursor-pointer w-fit">
+                    <input type="radio" class="radio radio-primary radio-xs" name="brand" value="{{brand.name}}"
+                        id="">
+                    <span class="label-text text-xs mr-2">{{brand.name}}</span>
+                </label>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+        </div>
+        <div class="flex gap-2 -full p-1 items-center justify-center">
+            <button type="submit" class="btn w-1/2 btn-primary">ثبت</button>
+            <a href="#" class="btn w-1/2 btn-outline">لغو</a>
+        </div>
+    </form>
+
+    <section class="bg-base-100 p-4  rounded-box shadow-md flex flex-col gap-2">
+        <h2 class="text-center text-sm text-blue-500">رنگبندی</h2>
+        <div class="flex gap-3 gap-y-0 flex-wrap w-full -mt-4 ">
+            {% get_option color as colors  %}
+            {% if colors %}
+            {% for color in colors.meta %}
+            <div class="form-control">
+                <label class="rounded-full   group cursor-pointer">
+                    <input name="colors" type="checkbox" value="{{color.id}}" class="appearance-none peer">
+                    <div style="background-color:{{color.code}};"
+                        class="rounded-full w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+        </div>
+    </section>
+
+
+
+    <section class="bg-base-100 p-4 rounded-box shadow-md flex flex-col gap-1">
+        <h2 class="text-center text-sm text-blue-500">سایزبندی</h2>
+        <div class="flex gap-1 flex-wrap w-full pr-1 pl-1 -mt-4 text-xs">
+            {% get_option size as sizes  %}
+            {% if sizes %}
+            {% for size in sizes.meta %}
+            <div class="form-control">
+                <label class="rounded-full p-1 group cursor-pointer">
+                    <input name="sizes" type="checkbox" value="{{size.id}}" class="appearance-none peer">
+                    <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
+                        {{size.code}}
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    </section>
+    {% if  product %}
+    <section class="bg-base-100 w-full md:basis-1/3 p-3 rounded-box shadow-md flex flex-col items-center mb-20  gap-2">
+        <h2 class="text-center text-lg text-blue-500">تصاویر</h2>
+        <div class="flex gap-2">
+            <img src="https://i.pravatar.cc/300" class="w-12 h-12 rounded object-cover" alt="">
+            <img src="https://i.pravatar.cc/300" class="w-12 h-12 rounded object-cover" alt="">
+            <img src="https://i.pravatar.cc/300" class="w-12 h-12 rounded object-cover" alt="">
+            <img src="https://i.pravatar.cc/300" class="w-12 h-12 rounded object-cover" alt="">
+            <img src="https://i.pravatar.cc/300" class="w-12 h-12 rounded object-cover" alt="">
+        </div>
+        <button class="btn btn-primary w-full mt-1">ثبت</button>
+    </section>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer>
+   
+</script>
+{% endblock %}

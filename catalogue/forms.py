@@ -28,6 +28,8 @@ reserved_words = [
 
 
 class ProductForm(forms.ModelForm):
+    colors = forms.CharField(required=False)
+    sizes = forms.CharField(required=False) 
     class Meta:
         model = Product
         fields = [
@@ -47,6 +49,7 @@ class ProductForm(forms.ModelForm):
             'shipping_cost',
             'description',
             'attributes',
+            'category'
             
         ]
     

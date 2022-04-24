@@ -45,5 +45,6 @@ class CollectionAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['shop' ,'name', 'quantity', 'published']
+    list_display = ['shop','id','prod_code' ,'name', 'quantity', 'published']
+    readonyl_fields = ['prod_code', 'date_created']
     
