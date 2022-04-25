@@ -1,7 +1,7 @@
 
 from math import prod
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from httpx import delete
 
@@ -11,13 +11,6 @@ from .forms import CreateShopForm, ProductForm, ShopForm
 # TODO: move to the shop custom manager!
 
 
-def get_user_shop_or_404(user):
-    ''' Get the user shop otherwise return 404 http error'''
-    try:
-        shop = Shop.objects.get(owner=user, active=True, deleted=False)
-        return shop
-    except Shop.DoesNotExist:
-        return Http404()
 
 
 @login_required
@@ -28,41 +21,35 @@ def product(request: HttpRequest, pid=None):
     edit the product with id=pid if it is exist otherwise return 404 
     '''
 
+
     # Does user have any active shop ?
-    shop = get_user_shop_or_404(request.user)
-
-    # Does the (shop) have a product with id=pid ?
-    prod = None
-    if pid:
-        try:
-            prod = Product.objects.get(pk=pid, shop=shop, deleted=False)
-        except Product.DoesNotExist:
-            return Http404()
+    user = request.user
+    shop = get_object_or_404(Shop, owner=user, active=True)
+    product = None
+    if pid: #product exists if not return 404 
+        product = get_object_or_404(Product, pk=pid, deleted=False)
     else:
-        # So user wants add a new product
+        #request to add a new product
         if not shop.has_capacity():
-            pass  # TODO
-
+            return HttpResponseNotAllowed() #TODO
+        
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=prod)
-        # colors = request.POST.getlist('colors', None)
-        # sizes = request.POST.getlist('sizes', None)
-        # categories = request.POST.getlist('categories', None)
-        # brand = request.POST.get('brand', None)
-        print(request.POST['attributes'])
+
         if not form.is_valid():
             return render(request, 'shop/add_product.html/', {
                 'status':  form.errors,
-                'product': prod
+                'product': product
             })
 
         # NOTE: any better way?
-        if not prod:
-            prod = form.save(commit=False)
-            prod.shop = shop
-            prod.save()
+        if not product:
+            # create a new product
+            product = form.save(commit=False)
+            product.shop = shop
+            product.save()
         else:
-            form.save()
+            form.save() #update the product
 
         return render(request, 'shop/add_product.html/', {
             'status': 'edited' if prod else 'created',
@@ -70,7 +57,7 @@ def product(request: HttpRequest, pid=None):
         })
 
     return render(request, 'shop/add_product.html', {
-        'product': prod
+        'product': product
     })
 
 
@@ -80,22 +67,13 @@ def delete_product(request: HttpRequest, pid):
     Mark a product as deleted if the product with id=pid
     exists otherwise return http 404
     '''
-
     # Does the user have any active shop ?
-    shop = get_user_shop_or_404(request.user)
-
-    # Does the shop have a product with id=pid
-    prod = None
-    if pid:
-        try:
-            prod = Product.objects.filter(shop=shop, pk=pid, deleted=False)
-        except Product.DoesNotExist:
-            return Http404()
-
-    prod.deleted = True
-    prod.save()
+    user = request.user
+    shop = get_object_or_404(Shop, owner=user, active=True)
+    product = get_object_or_404(Product,pk=pid, shop=shop, deleted=False)
+    product.deleted = True
+    product.save()
     return render(request, '')  # TODO
-
 
 
 
@@ -123,11 +101,13 @@ def add_option(request: HttpRequest, pid):
 
         option.value = option_value
         option.save()
-        return render(request, 'shop/product_options.html', {
-            'product': product,
-            'add_status': 'added' if created else 'edited',
-            'option_name': option_name
-        })
+        return redirect('users:add-option', pid=pid)
+    
+        # return render(request, 'shop/product_options.html', {
+        #     'product': product,
+        #     'add_status': 'added' if created else 'edited',
+        #     'option_name': option_name
+        # })
     return render(request, 'shop/product_options.html', {
         'product': product
     })
@@ -149,11 +129,7 @@ def delete_option(request: HttpRequest, pid):
         option = product.options.all().filter(name=option_name).first()
         if option:
             option.delete()
-            return render(request, 'shop/product_options.html', {
-                'option_name': option_name,
-                'delete_status': 'deleted',
-                'product': product
-            })
+            return redirect('users:add-option', pid=pid)
         else:
             return Http404()
 
@@ -182,21 +158,15 @@ def add_photo(request: HttpRequest, pid):
                 product_photo = Photo(product=product, img=photo, alt=alt_text)
                 product_photo.save()
                 user.consume_storage(photo_size)  # IMPORTANT....
-
-                return render(request, 'shop/product_options.html', {
-                    'phto_status': 'added',
-                    'product': product
-                })
+                return redirect('users:add-option', pid=pid)
+            
             else:
-                return HttpResponseBadRequest('Run out of storage.')
+                return HttpResponseBadRequest('Run out of storage.') ##make decent error page
 
         if url:
             product_photo = Photo(product=product, url=url)
             product.photo.save()
-            return render(request, 'shop/product_options.html', {
-                'phto_status': 'added',
-                'product': product
-            })
+            return redirect('users:add-option', pid=pid)
 
     #...
     return HttpResponseNotAllowed(['POST'])
@@ -206,7 +176,7 @@ def add_photo(request: HttpRequest, pid):
 def change_preview_photo(request: HttpRequest, pid):
     if request.method == 'POST':
         user = request.user
-        shop = get_object_or_404(Shop, onwer=user, active=True)
+        shop = get_object_or_404(Shop, owner=user, active=True)
         product = get_object_or_404(Product,shop=shop, pk=pid, deleted=False)
 
         photo_id = request.POST.get('photo_id')
@@ -216,10 +186,8 @@ def change_preview_photo(request: HttpRequest, pid):
         the_photo = product.photos.get(pk=photo_id)
         if the_photo:
             product.preview = the_photo
-            return render(request, 'sop/prodcut_options.html', {
-                'change_preview_status': 'success',
-                'product': product
-            })
+            product.save()
+            return redirect('users:add-option', pid=pid)
 
     return HttpResponseNotAllowed(['POST'])
 
@@ -234,11 +202,10 @@ def delete_photo(request: HttpRequest, pid):
             return HttpResponseBadRequest('photo id is not entered')
         try:
             the_photo = product.photos.get(pk=photo_id)
-            the_photo.img.delete()
-            return render(request, 'shop/product_options.html', {
-                'delete_photo_status': 'deleted',
-                'product': product
-            })
+            user.free_storage(the_photo.img.size) ##
+            the_photo.img.delete() ##
+            the_photo.delete()
+            return redirect('users:add-option',pid=pid)
         except Photo.DoesNotExist:
             return HttpResponseNotFound('photo with  give id is not found')
     
@@ -251,7 +218,8 @@ def delete_photo(request: HttpRequest, pid):
 def edit_shop(requeset: HttpRequest):
 
     # Does the user have any active shop if not return http404
-    shop = get_user_shop_or_404(requeset.user)
+    user = requeset.user
+    shop = get_object_or_404(Shop, owner=user, active=True)
 
     if requeset.method == 'POST':
         shop_form = ShopForm(requeset.POST, instance=shop)

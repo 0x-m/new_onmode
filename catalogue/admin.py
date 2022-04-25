@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Collection, CreateShopRequest, Option, Product, ProductOptionValue, ProductType, Shop
+from .models import Category, Collection, CreateShopRequest, Option, Photo, Product, ProductOptionValue, ProductType, Shop
 
 @admin.register(CreateShopRequest)
 class CreateShopRequestAdmin(admin.ModelAdmin):
@@ -50,4 +50,8 @@ class ProductAdmin(admin.ModelAdmin):
     
 @admin.register(ProductOptionValue)
 class ProductoptionValueAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Photo)
+class PhotoAdmin(admin.ModelAdmin):
     pass

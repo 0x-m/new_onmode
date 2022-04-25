@@ -41,7 +41,7 @@ class UserModelAdmin(UserAdmin):
         "fields": ['phone_num',]
         }),
         (_("Other informations"),{
-            'fields': ('id','first_name','last_name','gender','email', 'has_shop')
+            'fields': ('id','first_name','last_name','gender','email', 'has_shop', 'consumed_storage')
         }),
         (_('History'),{
             'fields':('date_joined','last_login',)

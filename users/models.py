@@ -50,7 +50,7 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
     has_password = models.BooleanField(default=False)
-    consumed_storage = models.PositiveIntegerField(default=0) #in MB
+    consumed_storage = models.FloatField(default=0) #in MB
 
     def make_me_shop(self, shop):
         '''
@@ -79,10 +79,20 @@ class User(AbstractUser):
         return self.storage + size < self.MAX_STORAGE_SIZE
     
     def consume_storage(self, size):
-        self.consumed_storage += size
+        '''
+        size in bytes
+        '''
+        size_mb = size / (1024*1024)
+        self.consumed_storage += size_mb #TODO:
         self.save()
     
-
+    def free_storage(self, size):
+        '''
+        size in bytes
+        '''
+        size_mb = size / (1024*1024)
+        self.consumed_storage -= size_mb
+        self.save()
 
 class Address(models.Model):
     user = models.ForeignKey(

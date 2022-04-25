@@ -28,6 +28,7 @@ urlpatterns = [
     path('dashboard/shop/product/delete/<pid>', catalog.delete_product, name='delete-product'),
     path('dashboard/shop/product/photo/add/<pid>', catalog.add_photo, name='add-photo'),
     path('dashboard/shop/product/photo/delete/<pid>', catalog.delete_photo, name='delete-photo'),
+    path('dashboard/shop/product/photo/preview/<pid>', catalog.change_preview_photo, name='make-as-preview'),
     path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
     path('dashboard/shop/order', views.shop_order, name='shop_order'),
     path('dashboard/shop/404', views.notfound, name='notfound'),
