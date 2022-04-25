@@ -1,9 +1,4 @@
 
-from email.policy import default
-import json
-from operator import truediv
-import string
-from tokenize import String
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
@@ -91,7 +86,6 @@ class Option(models.Model):
         Boolean = 'BOL', 'Boolean'
         Choices = 'CHO', 'Choices'
         MultiChoices = 'CHS', 'MultiChoices'
-        Json = 'JSO', 'Json'
 
     name = models.CharField(max_length=20, unique=True)
     type = models.CharField(max_length=3,
@@ -99,26 +93,9 @@ class Option(models.Model):
                             default=TYPES.Number)
 
     default = models.CharField(max_length=100, blank=True)
-    choices = models.TextField(max_length=10000, blank=True)
-    meta = models.JSONField(default=dict)
-    description = models.CharField(max_length=400)
-
-    def parse(self, value: str):
-        try:
-            if self.type == self.TYPES.Number:
-                return int(value)
-            elif self.type == self.TYPES.Text:
-                return value
-            elif self.type == self.TYPES.Boolean:
-                return bool(value)
-            elif self.type == self.TYPES.Choices or self.type == self.TYPES.MultiChoices:  # list of comma seperated
-                temp = value.strip()
-                items = temp.split(',')
-                return items
-            elif self.type == self.TYPES.Json:
-                return json.loads(value)
-        except Exception as e:
-            pass  # TODO:
+    identifier = models.CharField(max_length=255, blank=True)
+    choices = models.JSONField(default=dict, blank=True)
+    
 
     @property
     def is_list(self):
@@ -193,6 +170,8 @@ class Product(models.Model):
     last_updated = models.DateTimeField(auto_now=True,
                                         null=True,
                                         editable=False)
+    preview = models.ForeignKey(to='Photo',related_name='preview', on_delete=models.SET_NULL, null=True)
+    
     
 
     
@@ -307,3 +286,17 @@ class ProductOptionValue(models.Model):
     option = models.ForeignKey(to=Option, related_name='option_values', on_delete=models.CASCADE)
     value = models.TextField(max_length=5000)
     
+
+import os
+class Photo(models.Model):
+    
+    def generate_path(instance, filename):
+        return os.path.join('product', str(instance.product.id), 'photos', filename )
+    
+    product = models.ForeignKey(to=Product, related_name='photos', on_delete=models.CASCADE)
+    img = models.ImageField(upload_to=generate_path)
+    url = models.URLField(null=True)
+    alt = models.CharField(max_length=255, blank=True)
+    
+    
+

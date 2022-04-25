@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Collection, CreateShopRequest, Option, Product, ProductType, Shop
+from .models import Category, Collection, CreateShopRequest, Option, Product, ProductOptionValue, ProductType, Shop
 
 @admin.register(CreateShopRequest)
 class CreateShopRequestAdmin(admin.ModelAdmin):
@@ -48,3 +48,6 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['shop','id','prod_code' ,'name', 'quantity', 'published']
     readonyl_fields = ['prod_code', 'date_created']
     
+@admin.register(ProductOptionValue)
+class ProductoptionValueAdmin(admin.ModelAdmin):
+    pass

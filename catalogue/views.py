@@ -1,12 +1,11 @@
+
 from math import prod
-from tkinter import N
-from unicodedata import name
-from wsgiref.util import request_uri
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
+from httpx import delete
 
-from .models import CreateShopRequest, Option, Product, ProductOptionValue, Shop
+from .models import CreateShopRequest, Option, Photo, Product, ProductOptionValue, Shop
 from .forms import CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
@@ -98,12 +97,7 @@ def delete_product(request: HttpRequest, pid):
     return render(request, '')  # TODO
 
 
-def add_photo(requeset: HttpRequest):
-    pass
 
-
-def delete_photo(request: HttpRequest):
-    pass
 
 
 @login_required
@@ -112,7 +106,7 @@ def add_option(request: HttpRequest, pid):
         return Http404()
 
     product = get_object_or_404(
-            Product, shop=request.user.shops.first(), pk=pid, deleted=False)
+        Product, shop=request.user.shops.first(), pk=pid, deleted=False)
 
     if request.method == 'POST':
         data = request.POST
@@ -120,39 +114,137 @@ def add_option(request: HttpRequest, pid):
         option_value = data.get('value', None)
         if not (option_name and option_value):
             return HttpResponseBadRequest('empty fields')
-        
-        option = get_object_or_404(Option, name=name)
-        ProductOptionValue.objects.update_or_create(product=product, option=option, value=option_value)
 
+        option = get_object_or_404(Option, name=option_name)
+        _, created = ProductOptionValue.objects.update_or_create(
+            product=product, option=option)
+        if option.type in [Option.TYPES.Choices, Option.TYPES.MultiChoices]:
+            option_value = data.getlist('value')
+
+        option.value = option_value
+        option.save()
+        return render(request, 'shop/product_options.html', {
+            'product': product,
+            'add_status': 'added' if created else 'edited',
+            'option_name': option_name
+        })
     return render(request, 'shop/product_options.html', {
-        'product': prod
+        'product': product
     })
 
 
 @login_required
-def delete_option(request: HttpRequest):
+def delete_option(request: HttpRequest, pid):
     if not request.user.has_shop:
         return Http404()
 
+    product = get_object_or_404(
+        Product, pk=pid, shop=request.user.shops.first(), deleted=False)
+
     if request.method == 'POST':
-        pid = request.POST.get('pid', None)
         option_name = request.POST.get('name', None)
-        if not pid or not option_name:
+        if not option_name:
             return HttpResponseBadRequest()
 
-        product = get_object_or_404(
-            Product, pk=pid, deleted=False)
         option = product.options.all().filter(name=option_name).first()
         if option:
             option.delete()
-            return render(request, 'shop/add_product.html', {
-                'status': '',
+            return render(request, 'shop/product_options.html', {
+                'option_name': option_name,
+                'delete_status': 'deleted',
                 'product': product
             })
         else:
             return Http404()
 
     return HttpResponseNotAllowed(['POST'])
+
+
+@login_required
+def add_photo(request: HttpRequest, pid):
+
+    if request.method == 'POST':
+        user = request.user
+        shop = get_object_or_404(Shop, owner=user, active=True)
+        product = get_object_or_404(Product, pk=pid, shop=shop, deleted=False)
+
+        photo = request.FILES.get('photo', None)
+        url = request.POST.get('url')
+        alt_text = request.POST.get('alt')
+        
+        if not (photo or url):
+            return HttpResponseBadRequest('empty fields' + 'url:' + str(url) + 'img:' + str(photo))
+
+        # in MBytes
+        if photo:
+            photo_size = photo.size  # in bytes
+            if user.storage_has_capacity(photo_size):
+                product_photo = Photo(product=product, img=photo, alt=alt_text)
+                product_photo.save()
+                user.consume_storage(photo_size)  # IMPORTANT....
+
+                return render(request, 'shop/product_options.html', {
+                    'phto_status': 'added',
+                    'product': product
+                })
+            else:
+                return HttpResponseBadRequest('Run out of storage.')
+
+        if url:
+            product_photo = Photo(product=product, url=url)
+            product.photo.save()
+            return render(request, 'shop/product_options.html', {
+                'phto_status': 'added',
+                'product': product
+            })
+
+    #...
+    return HttpResponseNotAllowed(['POST'])
+
+
+@login_required
+def change_preview_photo(request: HttpRequest, pid):
+    if request.method == 'POST':
+        user = request.user
+        shop = get_object_or_404(Shop, onwer=user, active=True)
+        product = get_object_or_404(Product,shop=shop, pk=pid, deleted=False)
+
+        photo_id = request.POST.get('photo_id')
+        if not photo_id:
+            return HttpResponseBadRequest('photo_id is not provided')
+        
+        the_photo = product.photos.get(pk=photo_id)
+        if the_photo:
+            product.preview = the_photo
+            return render(request, 'sop/prodcut_options.html', {
+                'change_preview_status': 'success',
+                'product': product
+            })
+
+    return HttpResponseNotAllowed(['POST'])
+
+@login_required
+def delete_photo(request: HttpRequest, pid):
+    if request.method == 'POST':
+        user = request.user
+        shop = get_object_or_404(Shop,owner=user, active=True)
+        product = get_object_or_404(Product, pk=pid, shop=shop, deleted=False)
+        photo_id = request.POST.get('photo_id')
+        if not photo_id:
+            return HttpResponseBadRequest('photo id is not entered')
+        try:
+            the_photo = product.photos.get(pk=photo_id)
+            the_photo.img.delete()
+            return render(request, 'shop/product_options.html', {
+                'delete_photo_status': 'deleted',
+                'product': product
+            })
+        except Photo.DoesNotExist:
+            return HttpResponseNotFound('photo with  give id is not found')
+    
+    return HttpResponseNotAllowed(['POST'])
+
+
 
 
 @login_required

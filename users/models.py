@@ -1,7 +1,5 @@
 
-import string
 from django.db import models
-
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
@@ -10,24 +8,28 @@ from django.utils import timezone
 import secrets
 import string
 
-# from catalog.models import Product
+
+# from catalogue.models import Product
 
 
 class CustomUserManager(UserManager):
+        
     def create_superuser(self, phone_num, email, password: str):
         u = self.model(phone_num=phone_num, email=self.normalize_email(email))
         u.set_password(password)
         u.is_staff = True
         u.is_superuser = True
         u.save(using=self._db)
+        w = Wallet.objects.create(user=u)
+        w.save()
 
 
 class User(AbstractUser):
-    
+    MAX_STORAGE_SIZE = 20 * 1024  * 1024 #move to env
     def generate_usecode():
         alphabet = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(alphabet) for _ in range(8))
-        
+        return code
     
     username = None
 
@@ -48,6 +50,7 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
     has_password = models.BooleanField(default=False)
+    consumed_storage = models.PositiveIntegerField(default=0) #in MB
 
     def make_me_shop(self, shop):
         '''
@@ -61,6 +64,24 @@ class User(AbstractUser):
         
         self.has_shop = True
         self.save()
+    
+    @property
+    def storage(self):
+        '''
+        Get user consumed storage size in bytes
+        '''
+        return self.consumed_storage * 1024 *1024
+    
+    def storage_has_capacity(self, size):
+        '''
+        size: in bytes
+        '''
+        return self.storage + size < self.MAX_STORAGE_SIZE
+    
+    def consume_storage(self, size):
+        self.consumed_storage += size
+        self.save()
+    
 
 
 class Address(models.Model):
@@ -184,7 +205,7 @@ class DepositTransaction(models.Model):
     
     
 # class Comment(models.Model):
-#     product = models.ForeignKey(to=Product, related_name='comments', on_delete=models.CASCADE)
+#     product = models.ForeignKey(to='Product', related_name='comments', on_delete=models.CASCADE)
 #     customer = models.ForeignKey(to=User, related_name='comments', on_delete=models.CASCADE)
 #     title = models.CharField(max_length=255)
 #     body = models.TextField()
@@ -193,6 +214,6 @@ class DepositTransaction(models.Model):
     
    
 # class Favourite(models.Model):
-#     product = models.ForeignKey(to=Product, related_name='likes', on_delete=models.CASCADE)
+#     product = models.ForeignKey(to='Product', related_name='likes', on_delete=models.CASCADE)
 #     customer = models.ForeignKey(to=User, related_name='favourites', on_delete=models.CASCADE)
     
