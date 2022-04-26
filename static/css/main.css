@@ -4047,16 +4047,16 @@ body[dir="rtl"] .checkbox:checked,
   height: 50%;
 }
 
+.h-72 {
+  height: 18rem;
+}
+
 .h-4 {
   height: 1rem;
 }
 
 .h-screen {
   height: 100vh;
-}
-
-.h-72 {
-  height: 18rem;
 }
 
 .max-h-52 {
@@ -4133,16 +4133,16 @@ body[dir="rtl"] .checkbox:checked,
   width: 25%;
 }
 
+.w-80 {
+  width: 20rem;
+}
+
 .w-4 {
   width: 1rem;
 }
 
 .w-24 {
   width: 6rem;
-}
-
-.w-80 {
-  width: 20rem;
 }
 
 .max-w-\[120px\] {
@@ -4187,6 +4187,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .basis-1\/2 {
   flex-basis: 50%;
+}
+
+.basis-1\/4 {
+  flex-basis: 25%;
 }
 
 .cursor-pointer {
@@ -4378,24 +4382,19 @@ body[dir="rtl"] .checkbox:checked,
   background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
 
-.bg-red-200 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
-}
-
 .bg-slate-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
 }
 
-.bg-red-500 {
+.bg-red-50 {
   --tw-bg-opacity: 1;
-  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+  background-color: rgb(254 242 242 / var(--tw-bg-opacity));
 }
 
-.bg-red-400 {
+.bg-red-100 {
   --tw-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+  background-color: rgb(254 226 226 / var(--tw-bg-opacity));
 }
 
 .fill-current {
@@ -4515,6 +4514,11 @@ body[dir="rtl"] .checkbox:checked,
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
+}
+
+.text-8xl {
+  font-size: 6rem;
+  line-height: 1;
 }
 
 .font-bold {
@@ -4666,6 +4670,21 @@ body[dir="rtl"] .checkbox:checked,
 .checked\:bg-red-500:checked {
   --tw-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-red-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-stone-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(250 250 249 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-stone-100:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 245 244 / var(--tw-bg-opacity));
 }
 
 .hover\:text-gray-600:hover {
@@ -4828,10 +4847,6 @@ body[dir="rtl"] .checkbox:checked,
 
   .md\:basis-5\/6 {
     flex-basis: 83.333333%;
-  }
-
-  .md\:basis-3\/4 {
-    flex-basis: 75%;
   }
 
   .md\:grid-cols-3 {

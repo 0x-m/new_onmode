@@ -34,7 +34,7 @@ def product(request: HttpRequest, pid=None):
             return HttpResponseNotAllowed() #TODO
         
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=prod)
+        form = ProductForm(request.POST, instance=product)
 
         if not form.is_valid():
             return render(request, 'shop/add_product.html/', {
@@ -53,7 +53,7 @@ def product(request: HttpRequest, pid=None):
 
         return render(request, 'shop/add_product.html/', {
             'status': 'edited' if prod else 'created',
-            'product': prod
+            'product': product
         })
 
     return render(request, 'shop/add_product.html', {
@@ -202,7 +202,7 @@ def delete_photo(request: HttpRequest, pid):
             return HttpResponseBadRequest('photo id is not entered')
         try:
             the_photo = product.photos.get(pk=photo_id)
-            user.free_storage(the_photo.img.size) ##
+            user.free_storage(the_photo.img.size) #TODO: move to the photo post delete!
             the_photo.img.delete() ##
             the_photo.delete()
             return redirect('users:add-option',pid=pid)

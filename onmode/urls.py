@@ -30,6 +30,7 @@ def add_p(request: HttpRequest):
 
 urlpatterns = [
     path('', index, name='index'),
+    path('cart/', include('cart.urls', namespace='cart')),
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
     path('cert/', cert, name='cert' ),

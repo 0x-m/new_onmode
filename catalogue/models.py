@@ -6,7 +6,7 @@ from django.db.models.signals import pre_delete
 import secrets
 import string
 from users.models import User
-
+from promotions.models import Discount
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -34,7 +34,7 @@ class Category(models.Model):
 class Shop(models.Model):
     owner = models.ForeignKey(
         to=User, related_name='shops', on_delete=models.SET_NULL, null=True,)
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40) #TODO: make it unique
     meta_title = models.CharField(max_length=100)
     meta_description = models.CharField(max_length=400)
     # baner = models.ForeignKey(to='Photos', on_delete=models.SET_NULL)
@@ -170,14 +170,10 @@ class Product(models.Model):
     last_updated = models.DateTimeField(auto_now=True,
                                         null=True,
                                         editable=False)
-    preview = models.ForeignKey(to='Photo',related_name='preview', on_delete=models.SET_NULL, null=True)
-    
-    
-
-    
-    # discount = models.ForeignKey(to='Discount',
-    #                              on_delete=models.SET_NULL,
-    #                              null=True, blank=True)
+    preview = models.ForeignKey(to='Photo',related_name='preview', on_delete=models.SET_NULL, null=True)    
+    discount = models.ForeignKey(to=Discount,
+                                 on_delete=models.SET_NULL,
+                                 null=True, blank=True)
     
 
 
@@ -185,18 +181,39 @@ class Product(models.Model):
     def is_available(self) -> bool:
         pass
 
-    @property
-    def has_valid_discount(self) -> bool:
-        pass
-    
     def inc_quantity(self, count=1):
         pass
     
     def dec_quantity(self, count=1):
         pass
 
-    def get_price(self):
-        pass
+    def has_qunatity(self, q):
+        return self.quantity >= q
+    
+  
+    
+    def compute_price(self):
+        
+        price = self.price
+        if self.has_sales:
+            price = self.sales_price
+        if self.discount:
+            if self.discount.is_valid():
+                discount = self.discount
+                difference = price * (1 - (discount.percent / 100))
+                if difference <= discount.max_amount:
+                    price -= difference
+                else:
+                    price -= discount.max_amount
+        if price < 0:
+            price = 0
+        
+        return price
+        
+
+    
+   
+    
        
 
 

@@ -25,10 +25,10 @@
                         <img src="{{product.preview.img.url}}" class=" w-80 h-72 rounded-box object-cover" alt="{{product.preview.alt}}">
                     {% endif %}
                 </div>
-                <div class="flex flex-col gap-2 w-full basis-1/2 ">
+                <div class="flex flex-col gap-1 mt-2 w-full basis-1/2 ">
                    {% if product.photos %}
                         {% for photo in product.photos.all %}
-                            <div class="flex w-full items-center bg-slate-50 justify-between p-1 rounded-md">
+                            <div class="flex w-full items-center  bg-slate-50 justify-between p-1 rounded-md">
                                 <img src="{% if photo.img %}{{photo.img.url}}{% else %}{% if photo.url %}{{photo.url}}{% endif %}{% endif %}" 
                                 class="w-12 h-12 rounded-box object-cover" 
                                 alt="{{photo.alt}}">
@@ -37,10 +37,14 @@
                                     <input type="hidden" name="photo_id" value="{{photo.id}}">
                                     <div class="flex gap-2">
                                         <button formmethod="post" formaction="{% url 'users:make-as-preview' product.id %}" type="submit">
-                                            <i class="bi-file-earmark-image text-gray-300 text-lg "></i>
+                                           {% if product.preview.id == photo.id %} 
+                                           <i class="bi-check-circle text-gray-800 text-lg "></i>
+                                           {% else %}
+                                           <i class="bi-file-earmark-image text-gray-300 text-lg "></i>
+                                           {% endif %}
                                         </button>
                                         <button type="submit">
-                                            <i class="bi-trash text-gray-300 text-lg "></i>
+                                            <i class="bi-trash text-gray-500 text-lg "></i>
                                         </button>
                                     </div>
                                 </form>
@@ -53,8 +57,8 @@
             <form enctype="multipart/form-data" class="w-full p-2  mt-4 flex flex-col items-center gap-2" method="post" action="{% url 'users:add-photo' product.id %}">
                 {% csrf_token %}
                 <h2 class="text-sm text-gray-500 text-center ">افزودن تصویر</h2>
-                <input type="file" class="mt-4" name="photo" accept="image/*" >
-                <input type="text" name="alt" placeholder="متن جایگزین" class="input input-bordered mt-2" id="">
+                <input type="file" class="" name="photo" accept="image/*" >
+                <input type="text" name="alt" placeholder="متن جایگزین تصویر" class="input input-bordered mt-2" id="">
                 <button class="btn btn-primary w-1/2 mx-auto mt-2">افزودن</button>
             </form>
         </section>

@@ -52,6 +52,13 @@ class User(AbstractUser):
     has_password = models.BooleanField(default=False)
     consumed_storage = models.FloatField(default=0) #in MB
 
+    @property
+    def shop(self):
+        shop = None
+        if self.has_shop:
+            shop = self.shops.first()
+        return shop
+
     def make_me_shop(self, shop):
         '''
         first checks if current user has any shop

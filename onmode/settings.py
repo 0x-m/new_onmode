@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     'jalali_date',
     'users',
     'catalogue',
+    'promotions',
+    'cart',
     
 ]
 
