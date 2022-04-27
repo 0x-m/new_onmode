@@ -43,10 +43,16 @@
                             class="input input-bordered p-1 w-full " min="0" type="number"
                             value="{{product.stock_low_threshold}}">
                     </div>
-                    <input type="text" name="shipping_cost" class="input input-bordered"
-                        placeholder="هزینه تقریبی ارسال پستی" value="{{product.shipping_cost}}">
-                    <input type="text" name="sales_price" class="input input-bordered" placeholder="قیمت با تخفیف"
-                        value="{{product.sales_price}}">
+                    <div class="form-control">
+                        <label class="label text-xs">هزینه تقریبی پست:</label>
+                        <input type="number" min="1000" step="500" name="shipping_cost" class="input input-bordered"
+                            placeholder="هزینه تقریبی ارسال پستی" value="{{product.shipping_cost}}">
+                    </div>
+                    <div class="form-control">
+                        <label class="label text-xs">قیمت با تخفیف:</label>
+                        <input type="number" min="1000" step="500" name="sales_price" class="input input-bordered" placeholder="قیمت با تخفیف"
+                            value="{{product.sales_price}}">
+                    </div>
 
                     <h2 class="text-center text-blue-500 text-lg mt-2">SEO</h2>
                     <div class="divider w-1/2 mx-auto -mt-2"></div>

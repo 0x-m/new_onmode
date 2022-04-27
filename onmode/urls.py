@@ -5,9 +5,16 @@ from django.shortcuts import render
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from index.models import BlogPost, SliderPhoto
+
 
 def index(request: HttpRequest):
-    return render(request, 'index.html')
+    posts = BlogPost.objects.all()[0:5]
+    slides = SliderPhoto.objects.all().order_by('precedence')
+    return render(request, 'index.html', {
+        'slides': slides,
+        'posts': posts
+    })
 
 def about_us(request: HttpRequest):
     return render(request, 'aboutus.html')

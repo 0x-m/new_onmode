@@ -21,11 +21,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_quill',
     'jalali_date',
     'users',
     'catalogue',
     'promotions',
     'cart',
+    'index'
     
 ]
 

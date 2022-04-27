@@ -24,82 +24,47 @@
     </head>
 
     <body class="bg-stone-50 min-h-full ">
-        <!-- <header class="w-full bg-white shadow-md">
-            <nav class="navbar bg-base-100 gap-2">
-                <div class="flex-1 gap-2 p-1">
-                    <a href="#" class="p-1">
-                        onMode
+        <header class="w-full bg-white shadow">
+            <nav class="navbar bg-base-100 gap-1 ">
+                <div class="flex-1 gap-2 p-1 basis-12">
+                    <a href="#">
+                        <img src="https://i.pravatar.cc/300" class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full"
+                            alt="">
                     </a>
-                    <div class="form-control w-11/12 mx-auto">
-                        <input type="text" placeholder="جستجو..." class="input input-md rounded-box input-bordered">
+                    <div class="form-control w-full mr-2">
+                        <div class="border items-center p-0 rounded-box bg-stone-50 flex gap-2 ">
+                            <!-- <label for="my-drawer"
+                                class="cursor-pointer rounded-r-box flex items-center gap-1 drawer-button ">
+                                <i class="bi-list pr-1"></i>
+                                <span class="text-xs hidden md:block">محصولات</span>
+                            </label> -->
+                            <div class="bg-white flex justify-between w-full rounded-box">
+                                <input type="text" placeholder="جستجو..."
+                                    class="text-xs w-full p-2 outline-none basis-full bg-transparent mr-1">
+                                <i class="bi-search p-2"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex-none">
-                    <div class="dropdown dropdown-hover dropdown-right">
-                        <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
-                            <div class="indicator">
-                                <i class="bi-bag text-2xl "></i>
-                                <span class="badge badge-primary badge-sm indicator-item">10</span>
-                            </div>
-                        </a>
-                        <div tabindex="0" class="mt-3  card card-compact dropdown-content w-52 bg-base-100 shadow">
-                            <div class="card-body">
-                                <h2 class="font-bold text-center">سبدخرید</h2>
-                                <div class="flex flex-col gap-2">
-                                    <div class="flex gap-2 justify-between items-center bg-stone-50 p-1 rounded-box">
-                                        <img src="https://i.pravatar.cc/300" class="w-12 h-12 object-cover rounded-box"
-                                            alt="">
-                                        <span class="text-xs">12000تومان</span>
-                                    </div>
-                                    <div class="flex gap-2 justify-between items-center bg-stone-50 p-1 rounded-box">
-                                        <img src="https://i.pravatar.cc/300" class="w-12 h-12 object-cover rounded-box"
-                                            alt="">
-                                        <span class="text-xs">12000تومان</span>
-                                    </div>
+                    <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
+                        <i class="bi-person text-xl md:text-3xl "></i>
+                    </a>
 
-                                    <div class="flex gap-2 justify-between items-center">
-                                        <img src="https://i.pravatar.cc/300" class="w-12 h-12 object-cover rounded-box"
-                                            alt="">
-                                        <span class="text-xs">12000تومان</span>
-                                    </div>
-                                </div>
-                                <span class="text-info">80000تومان</span>
-                                <div class="card-action">
-                                    <button class="btn btn-primary btn-block">مشاهده سبد خرید</button>
-                                </div>
-                            </div>
+                    <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
+                        <div class="indicator">
+                            <i class="bi-bag text-xl md:text-2xl "></i>
+                            <span class="badge badge-primary badge-sm indicator-item">10</span>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </nav>
-
-            <nav class="navbar min-h-8 ">
-                <div class="flex-1">
-                    <div tabindex="0" class="dropdown dropdown-hover w-full">
-                        <label tabindex="0" class="btn btn-ghost">محصولات</label>
-                        <div class="dropdown-content w-full bg-white shadow-sm p-1">
-                            gfdgdf
-                        </div>
-                    </div>
-                </div>
-                <div class="flex-none p-1 flex gap-1">
-                    <a class="btn btn-ghost btn-circle">
-                        <i class="bi-person text-2xl"></i>
-                    </a>
-                    <a class="btn btn-ghost btn-circle">
-                        <i class="bi-heart text-2xl"></i>
-                    </a>
-                    <a class="btn btn-ghost btn-circle">
-                        <i class="bi-bell text-2xl"></i>
-                    </a>
-
-                </div>
-            </nav>
-        </header> -->
-        <main  class="flex flex-col md:flex-row w-full min-h-full ">
+        </header>
+        <main class="flex flex-col md:flex-row w-full min-h-full ">
             <section
                 class="md:basis-1/6  md:mt-8 p-2 flex justify-center z-50 items-center w-full md:h-screen fixed bottom-2 md:static">
-                <ul class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md text-sm  rounded-box">
+                <ul
+                    class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md text-sm  rounded-box">
                     <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
                         <label tabindex="0">
                             <i class="bi-person md:text-xl"></i>
@@ -134,31 +99,31 @@
                         </label>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             {% if user.has_shop %}
-                                <li>
-                                    <a href="{% url 'users:edit-shop' %}">
-                                        <i class="bi-info-circle"></i>
-                                        <span>مشخصات بوتیک</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'users:shop_orders' %}">
-                                        <i class="bi-box"></i>
-                                        <span>سفارشها</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'users:add-product' %}">
-                                        <i class="bi-plus"></i>
-                                        <span>افزودن محصول</span>
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="{% url 'users:edit-shop' %}">
+                                    <i class="bi-info-circle"></i>
+                                    <span>مشخصات بوتیک</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:shop_orders' %}">
+                                    <i class="bi-box"></i>
+                                    <span>سفارشها</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:add-product' %}">
+                                    <i class="bi-plus"></i>
+                                    <span>افزودن محصول</span>
+                                </a>
+                            </li>
                             {% else %}
-                                <li>
-                                    <a href="{% url 'users:create-shop' %}">
-                                        <i class="bi-box2-heart"></i>
-                                        <span>ساخت بوتیک</span>
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="{% url 'users:create-shop' %}">
+                                    <i class="bi-box2-heart"></i>
+                                    <span>ساخت بوتیک</span>
+                                </a>
+                            </li>
                             {% endif %}
 
                         </ul>
@@ -187,7 +152,7 @@
                             <span class="hidden md:block">پیامها</span>
                         </a>
                     </li>
-                  
+
                 </ul>
             </section>
             <section class="md:basis-5/6 p-2">

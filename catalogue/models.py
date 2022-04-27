@@ -1,4 +1,5 @@
 
+from contextlib import nullcontext
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
@@ -287,14 +288,23 @@ class Collection(models.Model):
     products = models.ManyToManyField(to=Product, related_name='collections')
     name = models.CharField(max_length=40)
     en_name = models.CharField(max_length=40)
-    slug = models.SlugField()
-    en_slug = models.SlugField()
+    slug = models.SlugField(editable=False, blank=True)
+    en_slug = models.SlugField(editable=False, blank=True)
     meta_title = models.CharField(max_length=40)
     meta_description = models.CharField(max_length=90)
     description = models.TextField(max_length=2000)
     # photo = models.ForeignKey(to='Photo', on_delete=models.DO_NOTHING)
     # discount = models.ForeignKey(to='Discount', on_delete=models.SET_NULL, null=True, blank=True)
     prefer_collection_discount = models.BooleanField(default=False)
+    page_poster_url = models.URLField(blank=True, null=True)
+    
+    page_poster = models.ImageField(null=True)
+    index_view = models.BooleanField(default=False)
+    index_poster = models.ImageField(null=True)
+    index_poster_url = models.ImageField(null=True)
+    index_poster_link = models.URLField(blank=True, null=True)
+
+    
     
 
 

@@ -1,12 +1,10 @@
 
-from math import prod
-from ssl import create_default_context
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
 from .models import Cart, CartItem
 
-from catalogue.models import Product
+from catalogue.models import Product, Shop
 
 
 
@@ -19,7 +17,7 @@ def cart(request: HttpRequest):
     
 
 def checkout(request: HttpRequest, shop_name):
-    shop = get_object_or_404(name=shop_name, active=True)
+    shop = get_object_or_404(Shop,name=shop_name, active=True)
     user = request.user
     cart = Cart.objects.get(user=user, shop=shop)
     return render(request, 'shop/checkout.html', {
@@ -96,7 +94,3 @@ def decrement_item(request: HttpRequest, pid):
     #     'quantity': len(cart),
     #     'final_price': cart.final_price
     # })
-
-
-def checkout(request: HttpRequest, id):
-    pass

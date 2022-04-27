@@ -80,7 +80,7 @@
                         <span>{{ cart.final_price }}تومان</span>
                     </div>
                 </div>
-                <a href="#" class="btn btn-primary">پرداخت</a>
+                <a href="{% url 'cart:checkout' cart.shop.name %}" class="btn btn-primary">پرداخت</a>
             </section>
             {% endfor %}
                 
