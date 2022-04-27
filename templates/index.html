@@ -115,7 +115,8 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             </div>
             <div class="flex justify-between gap-4">
                 {% if collection.discount.is_valid or product.discount.is_valid %}
-                <del class="text-[0.6rem] md:text-sm text-gray-400">{{product.price}}</del>
+
+                <del class="text-[0.6rem] md:text-sm text-gray-400">{% if product.has_sales %}{{product.sales_price}}{% else %}{{product.price}}{% endif %}</del>
                 <strong class="text-[0.6rem] md:text-sm text-red-400">{% compute_price product collection %} تومان</strong>
                 {% else %}
                 <strong class="text-[0.6rem] md:text-sm text-gray-600">{% compute_price product collection %} تومان</strong>
@@ -139,9 +140,10 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 {% endif  %}
                
             </div>
-            {% if collection.discount.is_valid and collection.prefer_collection_discount %}
-                <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>
-
+            {% if collection.discount.is_valid  %}
+                {% if collection.prefer_collection_discount or not product.discount %}
+                    <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>
+                {% endif %}
             {% elif product.discount and product.discount.is_valid %}
                 <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>        
             {% endif %}
