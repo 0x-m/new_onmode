@@ -99,12 +99,18 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         {% for product in collection.get_featureds %}
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
             method="post">
-            <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover" alt="{{product.preview.img.alt}}">
+            <a href="">
+                <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover" alt="{{product.preview.img.alt}}">
+            </a>
             <div class="flex justify-between w-full items-center">
                 <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
-                <div class="text-xs md:text-sm flex gap-1  text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
+                <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
+                    {% for i in product.stats.rate %}
+                    <i class="bi-star-fill "></i>
+                    {% endfor %}
+                    {% for i in product.stats.rate_complement %}
+                    <i class="bi-star "></i>
+                    {% endfor%}
                 </div>
             </div>
             <div class="flex justify-between gap-4">
@@ -116,12 +122,22 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 {% endif %}
             </div>
             <div class="flex items-center justify-center w-full gap-1 ">
+                {% if not product.shop == user.shops.first %}
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-bag text-gray  text-xl"></i>
                 </button>
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-heart text-gray  text-xl"></i>
+                </button>
+                {% else  %}
+                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-pencil text-gray  text-xl"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-trash text-gray  text-xl"></i>
                 </button>
+                {% endif  %}
+               
             </div>
             {% if collection.discount.is_valid and collection.prefer_collection_discount %}
                 <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>

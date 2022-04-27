@@ -5,6 +5,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
 from django.db.models.signals import pre_delete, post_save
+from django.core.validators import MinValueValidator, MaxValueValidator
 import secrets
 import string
 from users.models import User
@@ -141,7 +142,6 @@ class Product(models.Model):
     shop = models.ForeignKey(to=Shop, related_name='products', on_delete=models.CASCADE)
     prod_code = models.CharField(max_length=20, default=generate_code, editable=False)
     category = models.ForeignKey(to=Category, related_name='products', on_delete=models.CASCADE, null=True)
-    type = models.ForeignKey(to=ProductType, related_name='products', on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=50, blank=False, null=False)
     en_name = models.CharField(max_length=50, blank=True, null=False)
     slug = models.SlugField(blank=True, null=True)
@@ -173,11 +173,6 @@ class Product(models.Model):
     
     
     
-    @receiver(post_save)
-    def create_stats(sender, instance, created,**kwargs):
-        if created:
-            ProductStats.objects.get_or_create(product=instance)
-            
     
 
 
@@ -218,7 +213,14 @@ class Product(models.Model):
             
         return price
         
-       
+        
+        
+@receiver(post_save, sender=Product)
+def create_stats(sender, instance, created,**kwargs):
+    if created:
+        ProductStats.objects.get_or_create(product=instance)
+        
+
 
 
 #TODO: stores similarity between products....
@@ -231,12 +233,23 @@ class ProductStats(models.Model):
     product = models.OneToOneField(to=Product,
                                    on_delete=models.CASCADE,
                                    related_name='stats')
-    views = models.IntegerField(default=0)
-    comments = models.IntegerField(default=0)
-    sales = models.IntegerField(default=0)
-    likes = models.IntegerField(default=0)
-    fails = models.IntegerField(default=0)
-    rates_avg = models.FloatField(default=0)
+    views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    comments = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    sales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    likes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    fails = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    rates_avg = models.FloatField(default=0, validators=[
+        MinValueValidator(0), MaxValueValidator(5)
+    ])
+    
+    
+    @property
+    def rate(self):
+        return range(int(self.rates_avg))
+    
+    @property
+    def rate_complement(self):
+        return range(5 - len(self.rate))
     
     def inc_views(self):
         self.views += 1

@@ -55,10 +55,7 @@ class User(AbstractUser):
 
 
 
-    @receiver(post_save)
-    def create_wallet(sender, instance, created, **kwargs):
-        if created:
-            Wallet.objects.get_or_create(user=instance)
+    
 
     @property
     def shop(self):
@@ -108,6 +105,13 @@ class User(AbstractUser):
         size_mb = size / (1024*1024)
         self.consumed_storage -= size_mb
         self.save()
+
+
+@receiver(post_save, sender=User)
+def create_wallet(sender, instance, created, **kwargs):
+    if created:
+        Wallet.objects.get_or_create(user=instance)
+
 
 class Address(models.Model):
     user = models.ForeignKey(

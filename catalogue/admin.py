@@ -50,7 +50,6 @@ class CollectionAdmin(admin.ModelAdmin):
 
 class ProductStatsInline(admin.StackedInline):
     model = ProductStats
-    readonly_fields = ['views', 'likes', 'comments', 'sales', 'fails', 'rates_avg']
 
 
 @admin.register(Product)
