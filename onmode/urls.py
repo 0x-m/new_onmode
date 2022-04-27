@@ -6,14 +6,19 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from index.models import BlogPost, SliderPhoto
-
+from catalogue.models import Collection, Product
 
 def index(request: HttpRequest):
     posts = BlogPost.objects.all()[0:5]
     slides = SliderPhoto.objects.all().order_by('precedence')
+    product = Product.objects.first()
+    collections = Collection.objects.filter(index_view=True)
+    print(collections)
     return render(request, 'index.html', {
         'slides': slides,
-        'posts': posts
+        'posts': posts,
+        'product': product,
+        'collections': collections
     })
 
 def about_us(request: HttpRequest):

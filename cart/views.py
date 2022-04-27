@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
 from .models import Cart, CartItem
 
-from catalogue.models import Product, Shop
+from catalogue.models import Collection, Product, Shop
 
 
 
@@ -30,8 +30,15 @@ def add_item(request: HttpRequest, pid):
     product = get_object_or_404(Product, pk=pid, deleted=False)
     quantity = request.POST.get('quantity')
     options = request.POST.get('options')
+    collection_id = request.POST.get('col_id')
     #TODO: check options validity
     
+    collection = None
+    try:
+        collection = Collection.objects.get(pk=collection_id)
+    except:
+        pass
+        
     if not quantity:
         quantity = 1
     # a shopkeeper cant buy his product
@@ -44,8 +51,8 @@ def add_item(request: HttpRequest, pid):
 
     cart, _ = Cart.objects.get_or_create(user=user, shop=shop)
     item , created =  CartItem.objects.get_or_create(product=product, cart=cart)
-    item.price = product.compute_price() #TODO: use signals
-    
+    item.price = product.compute_price(collection) #TODO: use signals
+    item.collection = collection
     if quantity:
         item.quantity = quantity
     if options:

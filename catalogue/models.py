@@ -1,9 +1,10 @@
 
 from contextlib import nullcontext
+from re import T
 from django.db import models
 from django.dispatch import receiver
 from django.utils import timezone
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 import secrets
 import string
 from users.models import User
@@ -137,9 +138,6 @@ class Product(models.Model):
         code = ''.join(secrets.choice(alphabet) for _ in range(12))
         return code
         
-        
-    
-    
     shop = models.ForeignKey(to=Shop, related_name='products', on_delete=models.CASCADE)
     prod_code = models.CharField(max_length=20, default=generate_code, editable=False)
     category = models.ForeignKey(to=Category, related_name='products', on_delete=models.CASCADE, null=True)
@@ -161,11 +159,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     has_sales = models.BooleanField(default=False)
     sales_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    # discount = models....
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     description = models.TextField(max_length=5000, blank=True)
-    # image = models.ImageField()
-    # gallery = models.ForeignKey(to='gallery')
     attributes = models.JSONField(default=dict, null=True, blank=True)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     last_updated = models.DateTimeField(auto_now=True,
@@ -175,6 +170,14 @@ class Product(models.Model):
     discount = models.ForeignKey(to=Discount,
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True)
+    
+    
+    
+    @receiver(post_save)
+    def create_stats(sender, instance, created,**kwargs):
+        if created:
+            ProductStats.objects.get_or_create(product=instance)
+            
     
 
 
@@ -190,17 +193,21 @@ class Product(models.Model):
 
     def has_qunatity(self, q):
         return self.quantity >= q
-    
-  
-    
-    def compute_price(self):
         
+    
+    
+    def compute_price(self, collection=None):
+        discount = self.discount
+        if collection:
+            if collection.discount and collection.prefer_collection_discount:
+                discount = collection.discount       
+
         price = self.price
         if self.has_sales:
             price = self.sales_price
-        if self.discount:
-            if self.discount.is_valid():
-                discount = self.discount
+            
+        if discount:
+            if  discount.is_valid():
                 difference = price * (1 - (discount.percent / 100))
                 if difference <= discount.max_amount:
                     price -= difference
@@ -208,13 +215,9 @@ class Product(models.Model):
                     price -= discount.max_amount
         if price < 0:
             price = 0
-        
+            
         return price
         
-
-    
-   
-    
        
 
 
@@ -286,23 +289,34 @@ class ProductStats(models.Model):
 
 class Collection(models.Model):
     products = models.ManyToManyField(to=Product, related_name='collections')
+    featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40)
     en_name = models.CharField(max_length=40)
     slug = models.SlugField(editable=False, blank=True)
     en_slug = models.SlugField(editable=False, blank=True)
-    meta_title = models.CharField(max_length=40)
-    meta_description = models.CharField(max_length=90)
-    description = models.TextField(max_length=2000)
-    # photo = models.ForeignKey(to='Photo', on_delete=models.DO_NOTHING)
-    # discount = models.ForeignKey(to='Discount', on_delete=models.SET_NULL, null=True, blank=True)
+    slogan = models.CharField(max_length=1000, blank=True)
+    meta_title = models.CharField(max_length=40,blank=True)
+    meta_description = models.CharField(max_length=90, blank=True)
+    description = models.TextField(max_length=2000, blank=True)
+    discount = models.ForeignKey(to=Discount, on_delete=models.SET_NULL, null=True, blank=True)
     prefer_collection_discount = models.BooleanField(default=False)
+    page_poster_alt = models.CharField(max_length=255,blank=True)
     page_poster_url = models.URLField(blank=True, null=True)
-    
-    page_poster = models.ImageField(null=True)
+    page_poster = models.ImageField(null=True, blank=True)
     index_view = models.BooleanField(default=False)
-    index_poster = models.ImageField(null=True)
-    index_poster_url = models.ImageField(null=True)
+    index_poster = models.ImageField(null=True, blank=True)
+    index_poster_url = models.URLField(null=True, blank=True)
     index_poster_link = models.URLField(blank=True, null=True)
+    index_poster_alt = models.CharField(max_length=255,blank=True)
+    
+
+    @property
+    def get_featureds(self):
+        featureds = None
+        if self.featureds:
+            ids = self.featureds.split(',')
+            featureds = self.products.filter(id__in=ids)
+        return featureds
 
     
     

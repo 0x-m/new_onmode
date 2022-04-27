@@ -38,3 +38,7 @@ def get_option(parser, token):
         pass
     else:
         return GetOption(name, var_name)
+
+@register.simple_tag
+def compute_price(product ,collection=None):
+    return product.compute_price(collection)

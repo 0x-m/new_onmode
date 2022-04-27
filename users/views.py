@@ -66,7 +66,7 @@ def verify_code(request: HttpRequest):
             otp = OTP(request)
             otp.check(code)
             user, _ = User.objects.get_or_create(phone_num=phone_num)
-            wallet,_ = Wallet.objects.get_or_create(user=user)
+            # wallet,_ = Wallet.objects.get_or_create(user=user)
 
             login(request=request, user=user)
             del request.session['phone_num']

@@ -3,9 +3,8 @@ from nis import cat
 from shutil import ExecError
 from django.db import models
 from users.models import User
-from catalogue.models import Product, Shop
+from catalogue.models import Collection, Product, Shop
 from promotions.models import Coupon
-
 
 class Cart(models.Model):
     user = models.ForeignKey(
@@ -65,6 +64,7 @@ class Cart(models.Model):
 class CartItem(models.Model):
     product = models.ForeignKey(
         to=Product, related_name='incart', on_delete=models.CASCADE)
+    collection = models.ForeignKey(to=Collection, related_name='cartitems', on_delete=models.SET_NULL, null=True)
     cart = models.ForeignKey(
         to=Cart, related_name='items', on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -72,11 +72,11 @@ class CartItem(models.Model):
     options = models.JSONField(null=True)
 
     def update(self):
-        self.price = self.product.price
+        self.price = self.product.compute_price(self.collection)
         self.save()
 
     def is_valid(self):
-        return self.price == self.product.price and self.product.has_quantity(self.quantity)
+        return self.price == self.product.compute_price(self.collection) and self.product.has_quantity(self.quantity)
 
     @property
     def total(self):

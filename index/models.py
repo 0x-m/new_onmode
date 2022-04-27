@@ -2,7 +2,7 @@ from turtle import title
 from django.db import models
 from django.dispatch import receiver
 
-from catalogue.models import Collection, Shop
+from catalogue.models import  Shop
 from django_quill.fields import QuillField
 from django.db.models.signals import pre_delete
 
@@ -72,7 +72,3 @@ class ShopSet(models.Model):
     title = models.CharField(max_length=255, blank=True)
     slogan = models.CharField(max_length=255, blank=True)
 
-    @receiver(pre_delete)
-    def delet_photo(sender, instance, **kwargs):
-        if instance.photo:
-            instance.photo.delete()

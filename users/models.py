@@ -3,8 +3,9 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
+from django.dispatch import receiver
 from django.utils import timezone
-
+from django.db.models.signals import post_save
 import secrets
 import string
 
@@ -51,6 +52,13 @@ class User(AbstractUser):
     objects = CustomUserManager()
     has_password = models.BooleanField(default=False)
     consumed_storage = models.FloatField(default=0) #in MB
+
+
+
+    @receiver(post_save)
+    def create_wallet(sender, instance, created, **kwargs):
+        if created:
+            Wallet.objects.get_or_create(user=instance)
 
     @property
     def shop(self):

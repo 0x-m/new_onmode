@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load options  %}
 {% block content %}
 <!--
 https://source.unsplash.com/p-I9wV811qk/1920x1047
@@ -12,11 +12,11 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         <div class="swiper-slide w-full h-60 md:h-96">
             <a href="{{slide.link}}">
                 {% if slide.photo_url %}
-                <img src="{{slide.photo_url}}"
-                class=" w-full   h-60 md:h-96  object-cover  shadow " alt="{{slide.alt}}">
+                <img src="{{slide.photo_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+                    alt="{{slide.alt}}">
                 {% elif slide.photo %}
-                <img src="{{slide.photo.url}}"
-                    class=" w-full   h-60 md:h-96  object-cover  shadow " alt="{{slide.alt}}">
+                <img src="{{slide.photo.url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+                    alt="{{slide.alt}}">
                 {% endif %}
             </a>
         </div>
@@ -81,33 +81,39 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
     <section class=""></section>
 </div>
 
-
-
 <div class="divider w-1/3 mx-auto"></div>
+
+{% if collections %}
+{% for collection in collections %}
 <div class="flex flex-col items-center justify-center  mx-auto  p-2 mt-8">
     <div class="flex flex-col w-11/12 mt-2 mx-auto gap-4  p-3">
         <div class="w-full flex items-center justify-between">
             <div class="flex flex-col gap-2">
-                <h2 class="text-sm md:text-xl text-gray-500 drop-shadow">نام کلکسیون</h2>
-                <h4 class="text-xs mt-1 md:text-md text-gray-400">slogan</h4>
+                <h2 class="text-sm md:text-xl text-gray-500 drop-shadow">{{collection.name}}</h2>
+                <h4 class="text-xs mt-1 md:text-md text-gray-400">{{collection.slogan}}</h4>
             </div>
             <h2 class="text-xs">مشاهده همه</h2>
         </div>
     </div>
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-6">
+        {% for product in collection.get_featureds %}
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
             method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
+            <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover" alt="{{product.preview.img.alt}}">
             <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-[0.6rem] md:text-sm">نام محصول</h4>
+                <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
                 <div class="text-xs md:text-sm flex gap-1  text-gray-500">
                     <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
                         class="bi-star"></i>
                 </div>
             </div>
             <div class="flex justify-between gap-4">
-                <del class="text-[0.6rem] md:text-sm text-gray-400">125000000</del>
-                <strong class="text-[0.6rem] md:text-sm text-red-400">1200000 تومان</strong>
+                {% if collection.discount.is_valid or product.discount.is_valid %}
+                <del class="text-[0.6rem] md:text-sm text-gray-400">{{product.price}}</del>
+                <strong class="text-[0.6rem] md:text-sm text-red-400">{% compute_price product collection %} تومان</strong>
+                {% else %}
+                <strong class="text-[0.6rem] md:text-sm text-gray-600">{% compute_price product collection %} تومان</strong>
+                {% endif %}
             </div>
             <div class="flex items-center justify-center w-full gap-1 ">
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
@@ -117,421 +123,36 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                     <i class="bi-trash text-gray  text-xl"></i>
                 </button>
             </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
+            {% if collection.discount.is_valid and collection.prefer_collection_discount %}
+                <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>
 
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
+            {% elif product.discount and product.discount.is_valid %}
+                <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>        
+            {% endif %}
         </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
+        {% endfor %}
     </section>
 </div>
-
-
-
-
 <div class="w-full md:w-3/4 mx-auto p-2 flex items-center justify-center mt-2 gap-2">
-    <img src="https://source.unsplash.com/O0N9MF--hK4/1920x1047" class="w-full h-80 object-cover rounded-box shadow-sm"
-        alt="">
+    {% if collection.index_poster_url %}
+        <a href="{{collection.index_poster_link}}">
+            <img src="{{collection.index_poster_url}}}" class="w-full h-80 object-cover rounded-box shadow-sm"
+                alt="">
+        </a>
+    {% elif collection.index_poster %}
+        <a class="block w-full" href="{{collection.index_poster_link}}">
+            <img src="{{collection.index_poster.url}}" class="w-full h-80 object-cover rounded-box shadow-sm"
+                alt="{{collection.index_poster_alt}}">
+        </a>
+    {% endif %}
 </div>
+{% endfor %}
 
 
-<div class="flex flex-col items-center justify-center  p-2 mt-4">
-    <div class="flex flex-col w-11/12 mt-2 mx-auto gap-4  p-3">
-        <div class="w-full flex items-center justify-between">
-            <div class="flex flex-col gap-2">
-                <h2 class="text-sm md:text-xl text-gray-500">نام کلکسیون</h2>
-                <h4 class="text-xs md:text-md text-gray-400">slogan</h4>
-            </div>
-            <h2>مشاهده همه</h2>
-        </div>
-    </div>
-    <section class="grid grid-cols-2  md:grid-cols-3 lg:grid-cols-4 gap-2 mt-6">
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <strong class="text-xs md:text-sm text-gray-400">125000000</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-end mt-2 w-full">
-                <strong class="text-xs md:text-sm text-gray-400">150000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
-            method="post">
-            <img src="https://i.pravatar.cc/300" class="w-60 rounded-box h-52 object-cover" alt="">
-            <div class="flex justify-between w-full items-center">
-                <h4 class="text-gray-500 text-sm">نام محصول</h4>
-                <div class="text-xs flex gap-1 text-gray-500">
-                    <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                        class="bi-star"></i>
-                </div>
-            </div>
-            <div class="flex justify-between gap-4">
-                <del class="text-xs md:text-sm text-gray-400">125000000</del>
-                <strong class="text-xs md:text-sm text-red-400">1200000 تومان</strong>
-            </div>
-            <div class="flex items-center justify-center w-full gap-1 ">
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-bag text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
-                    <i class="bi-trash text-gray  text-xl"></i>
-                </button>
-            </div>
-            <span class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">17%</span>
-        </article>
-    </section>
-</div>
+{% endif %}
 
 
-<div class="w-full  flex items-center justify-center mt-2">
-    <img src="https://source.unsplash.com/OV2bhF6fpRo/1920x1047" class=" w-3/4 h-80 mx-auto object-cover rounded-box shadow-sm"
-        alt="">
-</div>
+
 <div class="flex flex-col items-center justify-center  mx-auto  p-2 mt-8">
     <div class="flex flex-col w-11/12 mt-2 mx-auto gap-4  p-3">
         <div class="w-full flex items-center justify-between">
@@ -548,14 +169,13 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         <a href="{{post.url}}">
             <article class="rounded-box relative shadow-md">
                 {% if post.photo_url %}
-                <img src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover"
-                    alt="{{post.alt}}">
+                <img src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
                 {% elif post.photo %}
-                <img src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover"
-                    alt="{{post.alt}}">
+                <img src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
                 {% endif %}
-                <div class="w-full h-1/2 absolute flex  items-center justify-center  left-0 bottom-0 rounded-b-box " style="background-color: #33333355;">
-                    <h2 class="text-white text-center text-sm leading-6" >{{post.title}}</h2>
+                <div class="w-full h-1/2 absolute flex  items-center justify-center  left-0 bottom-0 rounded-b-box "
+                    style="background-color: #33333355;">
+                    <h2 class="text-white text-center text-sm leading-6">{{post.title}}</h2>
                 </div>
             </article>
         </a>
@@ -564,6 +184,8 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
     {% endif %}
 </div>
 {% endblock %}
+
+
 
 {% block scripts %}
 <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
