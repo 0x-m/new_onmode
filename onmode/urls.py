@@ -45,6 +45,12 @@ def shop(request: HttpRequest):
         'shop': shop
     })
     
+def collection(request: HttpRequest):
+    collection = Collection.objects.first()
+
+    return render(request, 'shop/collection.html', {
+        'collection': collection
+    })
 
 urlpatterns = [
     path('', index, name='index'),
@@ -52,6 +58,7 @@ urlpatterns = [
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
     path('cert/', cert, name='cert' ),
+    path('collection/', collection, name='col' ),
     path('shop/', shop, name='shop' ),
     path('add/', add_p, name='add' ),
     path('admin/', admin.site.urls),
