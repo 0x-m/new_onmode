@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render, get_object_or_404, get_list_or_40
 from django.contrib.auth.decorators import login_required
 from httpx import delete
 
-from .models import CreateShopRequest, Option, Photo, Product, ProductOptionValue, Shop
+from .models import CreateShopRequest, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
 from .forms import CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
@@ -77,6 +77,15 @@ def delete_product(request: HttpRequest, pid):
 
 
 
+def filter(requeset: HttpRequest):
+    form = ProductFilter(data=requeset.GET, 
+                         queryset=Product.objects.filter(deleted=False).all(),
+                         request=requeset)
+
+    return render(requeset, 'shop/filter.html', {
+        'filter': form
+    })
+
 
 @login_required
 def add_option(request: HttpRequest, pid):
@@ -94,13 +103,14 @@ def add_option(request: HttpRequest, pid):
             return HttpResponseBadRequest('empty fields')
 
         option = get_object_or_404(Option, name=option_name)
-        _, created = ProductOptionValue.objects.update_or_create(
+        optval, created = ProductOptionValue.objects.get_or_create(
             product=product, option=option)
         if option.type in [Option.TYPES.Choices, Option.TYPES.MultiChoices]:
-            option_value = data.getlist('value')
+            option_value = ','.join(data.getlist('value')) + ',' #needed for filtering
 
-        option.value = option_value
-        option.save()
+        print(option_value, created)
+        optval.value = option_value
+        optval.save()
         return redirect('users:add-option', pid=pid)
     
         # return render(request, 'shop/product_options.html', {

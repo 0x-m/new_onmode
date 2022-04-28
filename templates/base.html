@@ -59,16 +59,20 @@
                         </div>
                     </div>
                     <div class="flex-none">
+                        {% if user.is_authenticated %}
                         <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                             <i class="bi-person text-xl md:text-3xl "></i>
                         </a>
-
+                        {% endif  %}
                         <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                             <div class="indicator">
                                 <i class="bi-bag text-xl md:text-2xl "></i>
                                 <span class="badge badge-primary badge-sm indicator-item">10</span>
                             </div>
                         </a>
+                        {% if not user.is_authenticated  %}
+                            <a href="{% url 'users:signup' %}" class="btn btn-sm text-xs btn-primary">عضویت/ورود</a>
+                        {% endif %}
                     </div>
                 </nav>
             </header>

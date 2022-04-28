@@ -1,9 +1,10 @@
 
+from cgitb import lookup
 import os
-from contextlib import nullcontext
-from re import T
+from attr import field
 from django.db import models
 from django.dispatch import receiver
+from django.http import HttpRequest
 from django.utils import timezone
 from django.db.models.signals import pre_delete, post_save
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -11,7 +12,8 @@ import secrets
 import string
 from users.models import User
 from promotions.models import Discount
-import decimal
+import django_filters
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -100,6 +102,9 @@ class Option(models.Model):
     default = models.CharField(max_length=100, blank=True)
     identifier = models.CharField(max_length=255, blank=True)
     choices = models.JSONField(default=dict, blank=True)
+    
+    def __str__(self) -> str:
+        return self.name
 
     @property
     def is_list(self):
@@ -190,11 +195,11 @@ class Product(models.Model):
         return self.quantity >= q
 
     def compute_price(self, collection=None):
-        
+
         discount = self.discount
         if collection:
             if collection.discount:
-                if  collection.prefer_collection_discount or not discount:
+                if collection.prefer_collection_discount or not discount:
                     discount = collection.discount
 
         price = self.price
@@ -213,6 +218,63 @@ class Product(models.Model):
             price = 0
 
         return price
+
+def get_brand(request: HttpRequest):
+    if request is None:
+        return Product.objects.none()
+    
+    brand_ids = request.GET.getlist('brands')
+    print(brand_ids)
+    products = Product.objects.filter(options__option__name='brand', options__value__in=brand_ids).all()
+
+    print(products)
+    return products
+
+
+
+class ProductFilter(django_filters.FilterSet):
+    categories = django_filters.BaseInFilter(field_name='category__id')
+    brands = django_filters.CharFilter(method='brand_filter')
+    colors = django_filters.CharFilter(method='color_filter')
+    sizes = django_filters.CharFilter(method='filter_size')
+
+
+    def brand_filter(self, queryset, name, value):
+        ls = self.request.GET.getlist('brands')
+        return queryset.filter(options__option__name='brand', options__value__in=ls)
+    
+    
+    def color_filter(self, queryset, name, value):
+        ids = self.request.GET.getlist('colors')
+       
+        #TODO: below code repeat two times....
+        rx = '('
+        for i in ids:
+            rx += (i +',|')
+        rx = rx[:len(rx) - 1]
+        rx += ')'
+       
+        return queryset.filter(options__option__name='color', options__value__regex=rx)
+    
+    
+    def size_filter(self, queryset, name, value):
+        ids = self.request.GET.getlist('sizes')
+        rx = '('
+        for i in ids:
+            rx += (i + ',|')
+        rx = rx[:len(rx) -1]
+        rx += ')'
+        
+        return queryset.filter(options__option__name='size', options__option__regex=rx)
+        
+    
+    
+    class Meta:
+        model = Product
+        fields = {
+            'price': ['gt', 'lt'],
+        }
+
 
 
 @receiver(post_save, sender=Product)
@@ -335,6 +397,7 @@ class ProductOptionValue(models.Model):
     option = models.ForeignKey(
         to=Option, related_name='option_values', on_delete=models.CASCADE)
     value = models.TextField(max_length=5000)
+    
 
 
 class Photo(models.Model):

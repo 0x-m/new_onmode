@@ -171,16 +171,24 @@ class Wallet(models.Model):
 
         return t >= self.date_last_withdraw + timezone.timedelta(days=period)
 
-    def freeze(self, amount):
+    def inc_freeze(self, amount):
         self.freezed += amount
         self.save()
 
+    def dec_freeze(self, amount):
+        if self.freezed >= amount:
+            self.freezed -= amount
+            self.save()
+    
     def release(self, amount):
         if self.freezed >= amount:
             self.freezed -= amount
-            self.deposit(amount)
+            self.available += amount
+            self.save()
+            
 
 
+    
 class CheckoutRequest(models.Model):
 
     class STATES(models.TextChoices):

@@ -1,9 +1,10 @@
-from doctest import FAIL_FAST
-import rlcompleter
+
 import secrets 
 import string
 from django.db import models
+from django.dispatch import receiver
 from django.utils import timezone
+from django.db.models.signals import post_save
 
 from users.models import Address
 
@@ -16,8 +17,11 @@ class Order(models.Model):
     class STATES(models.TextChoices):
         PENDING = 'pending'
         ACCEPTED = 'accepted'
+        REJECTED = 'Rejected'
         SENT = 'sent'
-        VERIFIED = 'verified'
+        VERIFYING = 'verifying',
+        VERIFIED = 'verified',
+        NOTVERIFIED = 'notverified'
         CANCELED = 'canceled'
         FULFILLED = 'fulfilled'
         RETURNED = 'returned'
@@ -26,7 +30,9 @@ class Order(models.Model):
     user = models.ForeignKey(to='Customer')
     shop = models.ForeignKey(to='Shop')
     state = models.CharField(choices=STATES.choices, default=STATES.PENDING)
+    reject_msg = models.TextField(max_length=2000)
     tracking_code = models.CharField(max_length=20, blank=True)
+    tracking_code_msg = models.CharField(max_length=255, blank=True)
     verified = models.BooleanField(default=False)
     date_created = models.DateTimeField(default=timezone.now)
     date_fulfilled = models.DateTimeField(null=True)
@@ -43,6 +49,86 @@ class Order(models.Model):
         for item in self.items:
             total += item.price
         return total
+    
+    @property
+    def has_tracking_code(self):
+        return self.tracking_code not in [None, '']
+    
+    def accept(self):
+        if self.state == self.STATES.PENDING:
+            self.state = self.STATES.ACCEPTED
+            self.save()
+        else:
+            raise Exception()
+    
+    
+    
+    #TODO: use meaningful exceptions... 
+    
+    def reject(self, msg):
+        if self.state == self.STATES.PENDING:
+            self.state = self.STATES.REJECTED
+            self.reject_msg = msg
+            #decrease seller freezed and increase buyer available
+            self.user.deposit(self.total_price)
+            self.shop.user.dec_freeze(self.total_price)
+            
+            self.save()
+        else:
+            raise Exception()
+    
+    def fulfill(self):
+        if self.state == self.STATES.SENT and self.verified:
+            self.state = self.STATES.FULFILLED
+            #move seller freezed to available and remove buyer freezed
+            self.shop.user.release(self.total_price)
+            self.save()
+        else:
+            raise Exception()
+    
+    def set_tracking_code(self, code):
+        if self.state == self.STATES.ACCEPTED:
+            self.tracking_code = code
+            self.state = self.STATES.VERIFYING
+            self.save()
+        else:
+            raise Exception('') #TODO
+        
+        
+    def verify(self):
+        if self.state == self.STATES.VERIFYING:
+            self.state = self.STATES.VERIFIED
+            self.save()
+        else:
+            raise Exception()
+    
+    def refuse(self):
+        if self.state == self.STATES.VERIFYING:
+            self.state = self.STATES.NOTVERIFIED
+            self.save()
+        else:
+            raise Exception()
+    
+    def cancel(self):
+        if self.state == self.STATES.PENDING:
+            self.state = self.STATES.CANCELED
+            # back money to buyer
+            self.user.deposit(self.total_price)
+            self.shop.user.dec_freeze(self.total_price)
+            
+            self.save()
+        else:
+            raise Exception()
+    
+    
+@receiver(post_save, sender=Order)
+def transaction(sender, instance, created, **kwargs):
+    if created:
+        amount = instance.total_price
+        instance.user.wallet.withdraw(amount)
+        instance.shop.user.inc_freeze(amount)
+    
+    
     
 class OrderItem(models.Model):
     order = models.ForeignKey(to=Order,

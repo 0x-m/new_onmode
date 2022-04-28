@@ -13,7 +13,7 @@ class Cart(models.Model):
         to=Shop, related_name='carts', on_delete=models.CASCADE)
     coupon = models.ForeignKey(
         to=Coupon, related_name='cart', on_delete=models.SET_NULL, null=True)
-    final_price = models.DecimalField(max_digits=10, decimal_places=2)
+    final_price = models.PositiveBigIntegerField(default=0)
 
     def __len__(self):
         return len(self.items.all())
@@ -67,7 +67,7 @@ class CartItem(models.Model):
     collection = models.ForeignKey(to=Collection, related_name='cartitems', on_delete=models.SET_NULL, null=True)
     cart = models.ForeignKey(
         to=Cart, related_name='items', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price = models.PositiveBigIntegerField(default=0)
     quantity = models.PositiveIntegerField(default=1)
     options = models.JSONField(null=True)
 
