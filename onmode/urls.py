@@ -6,7 +6,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from index.models import BlogPost, SliderPhoto
-from catalogue.models import Collection, Product
+from catalogue.models import Collection, Product, Shop
 
 def index(request: HttpRequest):
     posts = BlogPost.objects.all()[0:5]
@@ -38,6 +38,12 @@ def add_p(request: HttpRequest):
         return HttpResponse('fff')
     return render(request, 'shop/add_product.html')
 
+
+def shop(request: HttpRequest):
+    shop = Shop.objects.first()
+    return render(request, 'shop/shop.html', {
+        'shop': shop
+    })
     
 
 urlpatterns = [
@@ -46,6 +52,7 @@ urlpatterns = [
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
     path('cert/', cert, name='cert' ),
+    path('shop/', shop, name='shop' ),
     path('add/', add_p, name='add' ),
     path('admin/', admin.site.urls),
     path('users/', include('users.urls', namespace='users'), ),

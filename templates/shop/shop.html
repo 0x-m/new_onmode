@@ -1,0 +1,237 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load options  %}
+{% block content %}
+
+<img src="https://source.unsplash.com/p-I9wV811qk/1920x1047
+" class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
+<div class="w-full mt-2 p-1 md:hidden">
+    <button onclick="openFilter();" class="btn btn-primary">فیلتر</button>
+</div>
+<div class="flex gap-2">
+    <section id="filter" class="md:basis-1/4 fixed hidden md:w-1/4 md:static  top-0 w-3/4 md:bg-stone-50  md:rounded-box md:mr-4  bg-white md:flex flex-col md:mt-6 z-50 overflow-auto h-screen md:h-full md:ml-2 md:shadow-none shadow-md"  >
+        <section class=" p-3   flex flex-col gap-2">
+           <div class="md:hidden flex justify-end">
+            <button onclick="openFilter();">
+                <i class="bi-x text-2xl"></i>
+            </button>
+           </div>
+            <h2 class="text-center text-sm text-blue-500">دسته بندی</h2>
+            <div class="p-2 rounded-md border border-gray-400 max-h-60 bg-white  overflow-auto">
+                <div class="form-control">
+                    {% for category in categories %}
+                    <label class="label cursor-pointer w-fit">
+                        <input type="checkbox" class="checkbox checkbox-primary checkbox-xs" name="categories"
+                            value="{{category.id}}" id="">
+                        <span class="label-text text-xs mr-2">{{category.name}}</span>
+                    </label>
+                    <div class="pr-4">
+                        {% if category.childs %}
+                        {% for sub_1 in category.childs.all %}
+                        <div class="form-control">
+                            <label class="label cursor-pointer w-fit">
+                                <input type="checkbox" class="checkbox checkbox-primary checkbox-xs" name="categories"
+                                    value="{{sub_1.id}}" id="">
+                                <span class="label-text text-xs mr-2">{{sub_1.name}}</span>
+                            </label>
+                            <div class="pr-4">
+                                {% if sub_1.childs %}
+                                {% for sub_2 in sub_1.childs.all %}
+                                <div class="form-control">
+                                    <label class="label cursor-pointer w-fit">
+                                        <input type="checkbox" class="checkbox checkbox-primary checkbox-xs"
+                                            name="categories" value="{{sub_2.id}}" id="">
+                                        <span class="label-text text-xs mr-2">{{sub_2.name}}</span>
+                                    </label>
+                                    <div class="pr-4">
+                                        {% if sub_2.childs %}
+                                        {% for sub_3 in sub_2.childs.all %}
+                                        <div class="form-control">
+                                            <label class="label cursor-pointer w-fit">
+                                                <input type="checkbox" class="checkbox checkbox-primary checkbox-xs"
+                                                    name="categories" value="{{sub_3.id}}" id="">
+                                                <span class="label-text text-xs mr-2">{{sub_3.name}}</span>
+                                            </label>
+                                            <div class="mr-4">
+                                                {% if sub_3.childs %}
+                                                {% for sub_4 in sub_3.childs.all %}
+                                                <div class="form-control">
+                                                    <label class="label cursor-pointer w-fit">
+                                                        <input type="checkbox"
+                                                            class="checkbox checkbox-primary checkbox-xs"
+                                                            name="categories" value="{{sub_4.id}}" id="">
+                                                        <span class="label-text text-xs mr-2">{{sub_4.name}}</span>
+                                                    </label>
+                                                </div>
+                                                {% endfor %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% get_option brand as brands  %}
+        <section class="flex flex-col p-3 gap-2">
+            <h2 class="text-center text-sm text-blue-500">برند</h2>
+            {% if brands %}
+            <div class="p-2 rounded-md border border-gray-400 max-h-60 bg-neutral-content overflow-auto">
+                {% for brand in brands.choices %}
+                <div class="form-control">
+                    <label class="label cursor-pointer w-fit">
+                        <input type="radio" class="radio radio-primary radio-xs" name="value" value="{{brand.name}}"
+                            id="">
+                        <span class="label-text text-xs mr-2">{{brand.name}}</span>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            {% endif %}
+        </section>
+
+        <section class="flex flex-col">
+            <h2 class="text-blue-500 text-sm text-center p-2">قیمت</h2>
+            <div class="flex gap-2 p-2 justify-center">
+                <input placeholder="از" class="w-1/2 input-md input input-bordered" type="text" name="" id="">
+                <input placeholder="تا" class="w-1/2 input-md input input-bordered" type="text" name="" id="">
+            </div>
+            <div class="form-control p-1 pr-2">
+                <label class="label cursor-pointer w-fit">
+                    <input type="checkbox"
+                        class="checkbox checkbox-primary "
+                        name="discount" value="{{sub_4.id}}" id="">
+                    <span class="label-text text-xs mr-2">تخفیف دار</span>
+                </label>
+            </div>
+        </section>
+        <h2 class="text-center text-sm mt-2 text-blue-500">رنگبندی</h2>
+
+        {% get_option color as colors  %}
+        {% if colors %}
+        <input type="hidden" name="name" value="color">
+        <div class="flex gap-3 gap-y-0 flex-wrap w-full p-3  -mt-4 ">
+            {% for color in colors.choices %}
+            <div class="form-control">
+                <label class="rounded-full   group cursor-pointer">
+                    <input name="value" type="checkbox" value="{{color.id}}" class="appearance-none peer">
+                    <div style="background-color:{{color.code}};"
+                        class="rounded-full w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        {% endif %}
+        <h2 class="text-center text-sm text-blue-500">سایزبندی</h2>
+        {% get_option size as sizes  %}
+        {% if sizes %}
+        <input type="hidden" name="name" value="size">
+        <div class="flex gap-1 flex-wrap w-full p-3  pr-1 pl-1 -mt-4 text-xs">
+            {% for size in sizes.choices %}
+            <div class="form-control">
+                <label class="rounded-full p-1 group cursor-pointer">
+                    <input name="value" type="checkbox" value="{{size.id}}" class="appearance-none peer">
+                    <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
+                        {{size.code}}
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        {% endif %}
+        <div class="flex flex-col gap-2">
+           
+        </div>
+        <div class="p-3 justify-center w-full">
+            <button class="btn btn-primary w-full">فیلتر</button>
+        </div>
+    </section>
+
+
+    <section class="w-full md:basis-3/4">
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
+            {% for product in shop.products.all %}
+            <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
+                method="post">
+                <a href="">
+                    <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                        alt="{{product.preview.img.alt}}">
+                </a>
+                <div class="flex justify-between w-full items-center">
+                    <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
+                    <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
+                        {% for i in product.stats.rate %}
+                        <i class="bi-star-fill "></i>
+                        {% endfor %}
+                        {% for i in product.stats.rate_complement %}
+                        <i class="bi-star "></i>
+                        {% endfor%}
+                    </div>
+                </div>
+                <div class="flex justify-between gap-4">
+                    {% if product.discount.is_valid %}
+                    <del
+                        class="text-[0.6rem] md:text-sm text-gray-400">{% if product.has_sales %}{{product.sales_price}}{% else %}{{product.price}}{% endif %}</del>
+                    <strong class="text-[0.6rem] md:text-sm text-red-400">{% compute_price product collection %}
+                        تومان</strong>
+                    {% else %}
+                    <strong class="text-[0.6rem] md:text-sm text-gray-600">{% compute_price product collection %}
+                        تومان</strong>
+                    {% endif %}
+                </div>
+                <div class="flex items-center justify-center w-full gap-1 ">
+                    {% if not product.shop == user.shops.first %}
+                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                        <i class="bi-bag text-gray  text-xl"></i>
+                    </button>
+                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                        <i class="bi-heart text-gray  text-xl"></i>
+                    </button>
+                    {% else  %}
+                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                        <i class="bi-pencil text-gray  text-xl"></i>
+                    </button>
+                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                        <i class="bi-trash text-gray  text-xl"></i>
+                    </button>
+                    {% endif  %}
+
+                </div>
+                {% if product.discount and product.discount.is_valid %}
+                <span
+                    class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </section>
+
+    </section>
+</div>
+{% endblock %}
+
+
+
+{% block scripts %}
+<script defer>
+    function openFilter() {
+        console.log('filter');
+        let filter = document.querySelector('#filter');
+        filter.classList.toggle('hidden');
+    }
+</script>
+{% endblock %}
