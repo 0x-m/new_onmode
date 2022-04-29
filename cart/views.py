@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, JsonRe
 from django.shortcuts import redirect, render
 from django.shortcuts import get_object_or_404
 from .models import Cart, CartItem
+from orders.models import OrderItem,Order
 
 from catalogue.models import Collection, Product, Shop
 
@@ -20,6 +21,15 @@ def checkout(request: HttpRequest, shop_name):
     shop = get_object_or_404(Shop,name=shop_name, active=True)
     user = request.user
     cart = Cart.objects.get(user=user, shop=shop)
+
+    #afte pay----------------------------------
+    if request.method == 'POST':
+        order = Order(user=user, shop=shop)
+        #always create------
+        order_items = []
+        for item in cart.items.all():
+            new_order_item= OrderItem(order=order,)
+        
     return render(request, 'shop/checkout.html', {
         'cart': cart
     })

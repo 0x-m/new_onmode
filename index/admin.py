@@ -1,6 +1,6 @@
 import site
 from django.contrib import admin
-from .models import BlogPost, ShopSet, SliderPhoto
+from .models import BlogPost, ShopSet, SiteInfo, SliderPhoto
 
 @admin.register(SliderPhoto)
 class SlidePhotoAdmin(admin.ModelAdmin):
@@ -16,3 +16,5 @@ class BlogPostAdmin(admin.ModelAdmin):
 class ShopSet(admin.ModelAdmin):
     list_display = ['title', 'slogan']
     filter_horizontal = ['shops']
+
+admin.site.register(SiteInfo)

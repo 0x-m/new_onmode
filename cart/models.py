@@ -11,6 +11,7 @@ class Cart(models.Model):
         to=User, related_name='carts', on_delete=models.CASCADE)
     shop = models.ForeignKey(
         to=Shop, related_name='carts', on_delete=models.CASCADE)
+    
     coupon = models.ForeignKey(
         to=Coupon, related_name='cart', on_delete=models.SET_NULL, null=True)
     final_price = models.PositiveBigIntegerField(default=0)
@@ -68,6 +69,8 @@ class CartItem(models.Model):
     cart = models.ForeignKey(
         to=Cart, related_name='items', on_delete=models.CASCADE)
     price = models.PositiveBigIntegerField(default=0)
+    has_sales = models.BooleanField(default=False)
+    sales_price = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField(default=1)
     options = models.JSONField(null=True)
 

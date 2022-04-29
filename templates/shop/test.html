@@ -7,12 +7,9 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{% url 'users:test' %}" method="post">
+    <form action="{% url 'orders:test' %}" method="post">
         {% csrf_token %}
-        <input type="checkbox" name="colors" value="cc" id="">
-        <input type="checkbox" name="colors" value="cc" id="">
-        <input type="checkbox" name="colors" value="dd" id="">
-        <input type="checkbox" name="colors" value="helo" id="">
+        {{form.as_p}}
         <button>click me</button>
     </form>
 </body>

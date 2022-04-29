@@ -1,5 +1,8 @@
 from asyncio import FastChildWatcher
+from pickle import FALSE
 from tokenize import String
+from urllib.parse import MAX_CACHE_SIZE
+from click import edit
 from django.db import models
 from django.forms import modelformset_factory
 from django.utils import timezone
@@ -9,6 +12,12 @@ import secrets
 
 
 class Discount(models.Model):
+    def generate_code():
+        alphabet = string.ascii_letters + string.digits
+        code = ''.join(secrets.choice(alphabet) for _ in range(8))
+        return code
+    
+    code = models.CharField(max_length=8, default=generate_code, editable=False)
     percent = models.PositiveIntegerField(default=0)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
@@ -25,7 +34,7 @@ class Discount(models.Model):
 class Coupon(models.Model):
     
     #TODO: move it to utils...
-    def generate_code(self):
+    def generate_code():
         alphabet = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(alphabet) for _ in range(8))
         return code
@@ -40,36 +49,37 @@ class Coupon(models.Model):
                             choices=TYPE.choices,
                             default=TYPE.PERCENT)
     percent = models.PositiveIntegerField(default=0)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    max_amount = models.DecimalField(max_digits=10, decimal_places=2, default=10000)
+    amount = models.PositiveBigIntegerField(default=0)
+    max_amount = models.PositiveBigIntegerField(default=10000)
     start_date = models.DateTimeField(null=True)
     end_date = models.DateTimeField(null=True)
     used = models.BooleanField(default=False)
-    reserved = models.BooleanField(default=False)
     date_created = models.DateTimeField(default=timezone.now)
     date_used = models.DateTimeField(default=timezone.now)
     
     
     def is_valid(self):
         nw = timezone.now()
-        return self.start_date < nw < self.end_date
-    
-    
-    def set_reserve(self):
-        self.reserved = True
-        self.save()
-    
-    def reset_reserve(self):
-        self.reserved = False
-        self.save()
+        return self.start_date < nw < self.end_date and not self.used
     
     def set_used(self):
         self.used = True
         self.save()
     
-    def rest_used(self):
-        self.used = False
-        self.save()
+        
+    def apply(self, amount):
+        if self.type == self.TYPE.AMOUNT:
+            amount -= self.amount
+            if amount < 0:
+                amount = 0
+        else:
+            diff = round(amount * (1 - self.percent / 100))
+            if diff > self.max_amount:
+                diff = self.max_amount
+            amount -= diff
+        return amount
+    
+        
         
     
 class GiftCard(models.Model):

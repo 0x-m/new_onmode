@@ -54,7 +54,7 @@ def collection(request: HttpRequest):
 
 urlpatterns = [
     path('', index, name='index'),
-    path('cart/', include('cart.urls', namespace='cart')),
+    path('', include('orders.urls', namespace='orders')),
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
     path('cert/', cert, name='cert' ),

@@ -7,6 +7,26 @@
 
 {% block content  %}
 <div class="grid grid-cols-1 content-start md:grid-cols-4 md:mt-8  w-full h-full gap-2 p-2">
+    {% for order in user.shop.orders %}
+        <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
+            <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
+                <span>کد سفارش:</span>
+                <span>{{order.code}}</span>
+            </div>
+            <div class="flex flex-col gap-2 w-full p-2">
+                <div class="flex justify-between ">
+                    <h2>تعداد اقلام:</h2>
+                    <h2>{{order.quantity}}</h2>
+                </div>
+                <div class="flex justify-between ">
+                    <h2>جمع کل:</h2>
+                    <h2>{{order.total_price}} تومان</h2>
+                </div>
+
+            </div>
+            <a href="{{order.get_absolute_url}}" class="btn btn-primary">مشاهده جزییات</a>
+        </article>
+    {% endfor %}
     <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
         <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
             <span>شماره سفارش:</span>
@@ -25,43 +45,7 @@
         </div>
         <a href="#" class="btn btn-primary">مشاهده جزییات</a>
     </article>
-    <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
-        <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
-            <span>شماره سفارش:</span>
-            <span>112</span>
-        </div>
-        <div class="flex flex-col gap-2 w-full p-2">
-            <div class="flex justify-between ">
-                <h2>تعداد اقلام:</h2>
-                <h2>5</h2>
-            </div>
-            <div class="flex justify-between ">
-                <h2>جمع کل:</h2>
-                <h2>500000 تومان</h2>
-            </div>
 
-        </div>
-        <a href="#" class="btn btn-primary">مشاهده جزییات</a>
-    </article>
-
-    <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
-        <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
-            <span>شماره سفارش:</span>
-            <span>112</span>
-        </div>
-        <div class="flex flex-col gap-2 w-full p-2">
-            <div class="flex justify-between ">
-                <h2>تعداد اقلام:</h2>
-                <h2>5</h2>
-            </div>
-            <div class="flex justify-between ">
-                <h2>جمع کل:</h2>
-                <h2>500000 تومان</h2>
-            </div>
-
-        </div>
-        <a href="#" class="btn btn-primary">مشاهده جزییات</a>
-    </article>
-
+    
 </div>
 {% endblock %}

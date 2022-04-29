@@ -14,10 +14,10 @@ class SliderPhoto(models.Model):
     link = models.URLField(null=True, blank=True)
     precedence = models.PositiveIntegerField(default=0)
 
-    @receiver(pre_delete)
-    def delet_photo(sender, instance, **kwargs):
-        if instance.photo:
-            instance.photo.delete()
+@receiver(pre_delete, sender=SliderPhoto)
+def delet_photo(sender, instance, **kwargs):
+    if instance.photo:
+        instance.photo.delete()
 
 
 class About(models.Model):
@@ -61,10 +61,10 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=255, blank=True)
     url = models.URLField(blank=True, null=True)
 
-    @receiver(pre_delete)
-    def delet_photo(sender, instance, **kwargs):
-        if instance.photo:
-            instance.photo.delete()
+@receiver(pre_delete, sender=BlogPost)
+def delet_photo(sender, instance, **kwargs):
+    if instance.photo:
+        instance.photo.delete()
 
 
 class ShopSet(models.Model):

@@ -102,7 +102,7 @@ class Option(models.Model):
     default = models.CharField(max_length=100, blank=True)
     identifier = models.CharField(max_length=255, blank=True)
     choices = models.JSONField(default=dict, blank=True)
-    
+
     def __str__(self) -> str:
         return self.name
 
@@ -194,9 +194,19 @@ class Product(models.Model):
     def has_qunatity(self, q):
         return self.quantity >= q
 
+    def get_discount(self, collection=None):
+        discount = self.discount
+        if collection and self in collection.products.all():
+            if collection.discount:
+                if collection.prefer_collection_discount or not discount:
+                    discount = collection.discount
+        return discount
+
+
+
     def compute_price(self, collection=None):
 
-        discount = self.discount
+        discount = self.get_discount(collection)
         if collection:
             if collection.discount:
                 if collection.prefer_collection_discount or not discount:
@@ -247,7 +257,7 @@ class ProductFilter(django_filters.FilterSet):
     def color_filter(self, queryset, name, value):
         ids = self.request.GET.getlist('colors')
        
-        #TODO: below code repeat two times....
+        # TODO: below code repeat two times....
         rx = '('
         for i in ids:
             rx += (i +',|')
