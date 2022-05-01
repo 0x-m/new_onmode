@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html dir="rtl" class="min-h-full w-full" lang="en">
+
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,7 +15,7 @@
         <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
 
         {% block head %}
-            
+
         {% endblock %}
         <title>{% block title %}{% endblock %}</title>
         <style>
@@ -27,6 +28,7 @@
             .swiper-button-prev {
                 color: blue;
             }
+
             .swiper-button-next {
                 color: blue;
             }
@@ -60,9 +62,33 @@
                     </div>
                     <div class="flex-none">
                         {% if user.is_authenticated %}
-                        <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
-                            <i class="bi-person text-xl md:text-3xl "></i>
-                        </a>
+                        <div tabindex="0" dir="ltr" class="dropdown  dropdown-hover">
+                            <a tabindex="0" class="btn btn-ghost btn-circle ">
+                                <i class="bi-person text-xl md:text-3xl "></i>
+                            </a>
+                            <ul tabindex="0" dir="rtl"
+                                class="dropdown-content menu menu-vertical menu-compact w-48 p-2 rounded-box shadow bg-base-100">
+                                <li>
+                                    <a href="{% url 'users:profile' %}" class="text-xs">
+                                        <i class="bi-person text-lg"></i>
+                                        ویرایش مشخصات
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'users:messages' %}" class="text-xs">
+                                        <i class="bi-bell text-lg"></i>
+                                        پیامها
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="" class="text-xs text-error">
+                                        <i class="bi-box-arrow-in-right text-lg"></i>
+                                        خروج
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </div>
                         {% endif  %}
                         <a href="{% url 'orders:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                             <div class="indicator">
@@ -71,7 +97,7 @@
                             </div>
                         </a>
                         {% if not user.is_authenticated  %}
-                            <a href="{% url 'users:signup' %}" class="btn btn-sm text-xs btn-primary">عضویت/ورود</a>
+                        <a href="{% url 'users:signup' %}" class="btn btn-sm text-xs btn-primary">عضویت/ورود</a>
                         {% endif %}
                     </div>
                 </nav>
@@ -106,7 +132,7 @@
                             </a>
                             <a>
                                 <i class="bi-telegram"></i>
-    
+
                             </a>
                             <a>
                                 <i class="bi-whatsapp"></i>
@@ -135,7 +161,7 @@
         {% block scripts %}
 
         {% endblock %}
-       
+
     </body>
 
 </html>

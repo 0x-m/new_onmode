@@ -9,13 +9,14 @@
     <button onclick="openFilter();" class="btn btn-primary">فیلتر</button>
 </div>
 <div class="flex gap-2">
-    <section id="filter" class="md:basis-1/4 fixed hidden md:w-1/4 md:static  top-0 w-3/4 md:bg-stone-50  md:rounded-box md:mr-4  bg-white md:flex flex-col md:mt-6 z-50 overflow-auto h-screen md:h-full md:ml-2 md:shadow-none shadow-md"  >
+    <section id="filter"
+        class="md:basis-1/4 fixed hidden md:w-1/4 md:static  top-0 w-3/4 md:bg-stone-50  md:rounded-box md:mr-4  bg-white md:flex flex-col md:mt-6 z-50 overflow-auto h-screen md:h-full md:ml-2 md:shadow-none shadow-md">
         <section class=" p-3   flex flex-col gap-2">
-           <div class="md:hidden flex justify-end">
-            <button onclick="openFilter();">
-                <i class="bi-x text-2xl"></i>
-            </button>
-           </div>
+            <div class="md:hidden flex justify-end">
+                <button onclick="openFilter();">
+                    <i class="bi-x text-2xl"></i>
+                </button>
+            </div>
             <h2 class="text-center text-sm text-blue-500">دسته بندی</h2>
             <div class="p-2 rounded-md border border-gray-400 max-h-60 bg-white  overflow-auto">
                 <div class="form-control">
@@ -110,9 +111,8 @@
             </div>
             <div class="form-control p-1 pr-2">
                 <label class="label cursor-pointer w-fit">
-                    <input type="checkbox"
-                        class="checkbox checkbox-primary "
-                        name="discount" value="{{sub_4.id}}" id="">
+                    <input type="checkbox" class="checkbox checkbox-primary " name="discount" value="{{sub_4.id}}"
+                        id="">
                     <span class="label-text text-xs mr-2">تخفیف دار</span>
                 </label>
             </div>
@@ -155,7 +155,7 @@
         {% else %}
         {% endif %}
         <div class="flex flex-col gap-2">
-           
+
         </div>
         <div class="p-3 justify-center w-full">
             <button class="btn btn-primary w-full">فیلتر</button>
@@ -184,7 +184,8 @@
                     </div>
                 </div>
                 <div class="flex justify-between gap-4">
-                    {% if product.discount.is_valid %}
+                    {% if collection.discount.is_valid or product.discount.is_valid %}
+
                     <del
                         class="text-[0.6rem] md:text-sm text-gray-400">{% if product.has_sales %}{{product.sales_price}}{% else %}{{product.price}}{% endif %}</del>
                     <strong class="text-[0.6rem] md:text-sm text-red-400">{% compute_price product collection %}
@@ -196,14 +197,16 @@
                 </div>
                 <div class="flex items-center justify-center w-full gap-1 ">
                     {% if not product.shop == user.shops.first %}
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <button onclick="addToCart(this);" data-pid="{{product.id}}"
+                        class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-bag text-gray  text-xl"></i>
                     </button>
                     <button class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-heart text-gray  text-xl"></i>
                     </button>
                     {% else  %}
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                        class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-pencil text-gray  text-xl"></i>
                     </button>
                     <button class="btn btn-ghost btn-sm btn-circle text-md">
@@ -212,7 +215,12 @@
                     {% endif  %}
 
                 </div>
-                {% if product.discount and product.discount.is_valid %}
+                {% if collection.discount.is_valid  %}
+                {% if collection.prefer_collection_discount or not product.discount %}
+                <span
+                    class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>
+                {% endif %}
+                {% elif product.discount and product.discount.is_valid %}
                 <span
                     class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
                 {% endif %}
@@ -234,4 +242,5 @@
         filter.classList.toggle('hidden');
     }
 </script>
+<script defer src="{% static 'js/functinos.js' %}"></script>
 {% endblock %}

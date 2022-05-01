@@ -29,11 +29,11 @@ urlpatterns = [
     path('dashboard/shop/product/photo/add/<pid>', catalog.add_photo, name='add-photo'),
     path('dashboard/shop/product/photo/delete/<pid>', catalog.delete_photo, name='delete-photo'),
     path('dashboard/shop/product/photo/preview/<pid>', catalog.change_preview_photo, name='make-as-preview'),
-    path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
-    path('dashboard/shop/order', views.shop_order, name='shop_order'),
+    # path('dashboard/shop/orders', views.shop_orders, name='shop_orders'),
+    # path('dashboard/shop/order', views.shop_order, name='shop_order'),
     path('dashboard/shop/404', views.notfound, name='notfound'),
-    path('dashboard/shop/checkout_result', views.checkout_result, name='checkout_result'),
-    path('dashboard/shop/cart', views.cart, name='cart'),
+    # path('dashboard/shop/checkout_result', views.checkout_result, name='checkout_result'),
+    # path('dashboard/shop/cart', views.cart, name='cart'),
 
 
 

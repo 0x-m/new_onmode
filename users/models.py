@@ -55,7 +55,9 @@ class User(AbstractUser):
 
 
 
-    
+    @property
+    def paid_orders(self):
+        return self.orders.filter(paid=True).all()
 
     @property
     def shop(self):
@@ -171,6 +173,10 @@ class Wallet(models.Model):
 
         return t >= self.date_last_withdraw + timezone.timedelta(days=period)
 
+
+
+    
+    
     def inc_freeze(self, amount):
         self.freezed += amount
         self.save()

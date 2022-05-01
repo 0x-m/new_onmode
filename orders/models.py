@@ -1,6 +1,7 @@
 
 import string
 import secrets
+from tkinter.tix import Balloon
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
@@ -19,15 +20,18 @@ class Order(models.Model):
         alphabet = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(alphabet) for _ in range(5))
         return code
+    
+    class PAYSOURCE(models.TextChoices):
+        WALLET = 'wallet',
+        DIRECT = 'direct'
 
     class STATES(models.TextChoices):
         PENDING = 'pending'
         ACCEPTED = 'accepted'
         REJECTED = 'Rejected'
-        SENT = 'sent'
         VERIFYING = 'verifying',
-        VERIFIED = 'verified',
         NOTVERIFIED = 'notverified'
+        SENT = 'sent'
         CANCELED = 'canceled'
         FULFILLED = 'fulfilled'
         RETURNED = 'returned'
@@ -41,8 +45,11 @@ class Order(models.Model):
     state = models.CharField(
         max_length=20, choices=STATES.choices, default=STATES.PENDING)
     reject_msg = models.TextField(max_length=2000, blank=True)
+    order_msg = models.TextField(max_length=2000, blank=True)
+    invalid_tracking_code_msg = models.TextField(max_length=2000, blank=True)
     tracking_code = models.CharField(max_length=20, blank=True)
     tracking_code_msg = models.CharField(max_length=255, blank=True)
+    cancel_msg = models.TextField(max_length=2000, blank=True)
     verified = models.BooleanField(default=False)
     date_created = models.DateTimeField(default=timezone.now)
     date_fulfilled = models.DateTimeField(null=True, blank=True)
@@ -58,7 +65,7 @@ class Order(models.Model):
     ref_id = models.CharField(max_length=255, blank=True)
     authority = models.CharField(max_length=50, blank=True)
     paid = models.BooleanField(default=False)
-
+    pay_source  = models.CharField(max_length=20, choices=PAYSOURCE.choices, null=True)
     @property
     def quantity(self):
         q = 0
@@ -78,6 +85,9 @@ class Order(models.Model):
         self.save()
 
 
+    @property
+    def description(self):
+        return  'مبلغ پرداختی:' + str(self.final_price) + '  ' + '\n' + 'گیرنده:' + str(self.address)
         
     def delete_coupon(self):
         if not self.coupon:
@@ -169,9 +179,7 @@ class Order(models.Model):
                 count += len(item)
 
         return count
-
-    def get_absolute_url(self):
-        return reverse('orders:order', order_code=self.code)
+    
 
     # TODO: use meaningful exceptions...
 
@@ -206,7 +214,8 @@ class Order(models.Model):
 
     def verify(self):
         if self.state == self.STATES.VERIFYING:
-            self.state = self.STATES.VERIFIED
+            self.state = self.STATES.SENT
+            self.verified = True
             self.save()
         else:
             raise Exception()
@@ -218,9 +227,10 @@ class Order(models.Model):
         else:
             raise Exception()
 
-    def cancel(self):
+    def cancel(self, msg):
         if self.state == self.STATES.PENDING:
             self.state = self.STATES.CANCELED
+            self.cancel_msg = msg
             # back money to buyer
             self.user.deposit(self.final_price)
             self.shop.user.dec_freeze(self.final_price)

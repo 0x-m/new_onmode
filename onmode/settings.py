@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_quill',
+    'sslserver',
     'django_filters',
     'jalali_date',
     'users',

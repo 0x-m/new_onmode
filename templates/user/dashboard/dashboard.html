@@ -47,11 +47,37 @@
                     </div>
                 </div>
                 <div class="flex-none">
-                    <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
-                        <i class="bi-person text-xl md:text-3xl "></i>
-                    </a>
+                    {% if user.is_authenticated %}
+                        <div tabindex="0" dir="ltr" class="dropdown  dropdown-hover">
+                            <a tabindex="0" class="btn btn-ghost btn-circle ">
+                                <i class="bi-person text-xl md:text-3xl "></i>
+                            </a>
+                            <ul tabindex="0" dir="rtl"
+                                class="dropdown-content menu menu-vertical menu-compact w-48 p-2 rounded-box shadow bg-base-100">
+                                <li>
+                                    <a href="{% url 'users:profile' %}" class="text-xs">
+                                        <i class="bi-person text-lg"></i>
+                                        ویرایش مشخصات
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'users:messages' %}" class="text-xs">
+                                        <i class="bi-bell text-lg"></i>
+                                        پیامها
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="" class="text-xs text-error">
+                                        <i class="bi-box-arrow-in-right text-lg"></i>
+                                        خروج
+                                    </a>
+                                </li>
 
-                    <a href="{% url 'users:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
+                            </ul>
+                        </div>
+                        {% endif  %}
+
+                    <a href="{% url 'orders:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                         <div class="indicator">
                             <i class="bi-bag text-xl md:text-2xl "></i>
                             <span class="badge badge-primary badge-sm indicator-item">10</span>
@@ -106,7 +132,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'users:shop_orders' %}">
+                                <a href="{% url 'orders:shop_orders' %}">
                                     <i class="bi-box"></i>
                                     <span>سفارشها</span>
                                 </a>
@@ -141,7 +167,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'users:orders' %}">
+                        <a href="{% url 'orders:user_orders' %}">
                             <i class="bi-bag-check md:text-xl"></i>
                             <span class="hidden md:block">سفارشها</span>
                         </a>
