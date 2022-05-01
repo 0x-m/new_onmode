@@ -14,6 +14,7 @@ def index(request: HttpRequest):
     product = Product.objects.first()
     collections = Collection.objects.filter(index_view=True)
     print(collections)
+    
     return render(request, 'index.html', {
         'slides': slides,
         'posts': posts,
@@ -31,12 +32,8 @@ def cert(request: HttpRequest):
     return render(request, 'certs.html')
 
 def add_p(request: HttpRequest):
-    if request.method == 'POST':
-        print(request.POST.get('a',None))
-        print(request.POST.getlist('a', None))
-
-        return HttpResponse('fff')
-    return render(request, 'shop/add_product.html')
+    
+    return render(request, 'shop/product.html')
 
 
 def shop(request: HttpRequest):
@@ -60,7 +57,7 @@ urlpatterns = [
     path('cert/', cert, name='cert' ),
     path('collection/', collection, name='col' ),
     path('shop/', shop, name='shop' ),
-    path('add/', add_p, name='add' ),
+    path('pp/', add_p, name='pp' ),
     path('admin/', admin.site.urls),
     path('users/', include('users.urls', namespace='users'), ),
     path('catalogue/', include('catalogue.urls', namespace='catalogue')),
