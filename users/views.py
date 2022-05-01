@@ -3,13 +3,15 @@ from audioop import minmax
 from mimetypes import common_types
 from pickletools import read_uint1
 from wsgiref.handlers import read_environ
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from httpx import RequestError
+
+from promotions.models import GiftCard
 
 #from catalog.models import Product
 
@@ -209,7 +211,19 @@ def wallet_checkout(request: HttpRequest):
 
 @login_required
 def wallet_deposit(request: HttpRequest):
-    pass
+    if request.method == 'POST':
+        amount = request.POST.get('amount')
+        if not amount:
+            return redirect('users:wallet')
+        if amount.startswith('gift_'):
+            try:
+                gift = GiftCard.objects.get(code=amount)
+                gift.apply(request.user)
+                return redirect('users:wallet')
+            except:
+                return HttpResponse('not found....')
+        
+    return HttpResponseNotAllowed(['POST'])
 
 # @login_required
 # def set_password(request):

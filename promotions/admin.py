@@ -5,4 +5,8 @@ from .models import Coupon, Discount, GiftCard
 
 admin.site.register(Discount)
 admin.site.register(Coupon)
-admin.site.register(GiftCard)
+
+
+@admin.register(GiftCard)
+class GiftCardAdmin(admin.ModelAdmin):
+    readonly_fields = ['code', 'date_created', 'date_used']

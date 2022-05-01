@@ -274,14 +274,14 @@ def accept(request: HttpRequest):
         shop = request.user.shop
         order_id = request.POST.get('order_id')
         order = get_object_or_404(Order, shop=shop, pk=order_id, paid=False)
-        order.accep()
-        return redirect('orders:shop_order', kwargs={'order_code': order.code})
+        order.accept()
+        return redirect('orders:shop_order', order_code=order.code)
     
     return HttpResponseNotAllowed(['POST'])
 
 
 @login_required
-def tarcking_code(request: HttpRequest):
+def tracking_code(request: HttpRequest):
 
     if request.method == 'GET':
         return HttpResponseNotAllowed(['POST'])
@@ -292,10 +292,9 @@ def tarcking_code(request: HttpRequest):
         order = get_object_or_404(
             Order, paid=False, shop=request.user.shop, pk=order_id)
 
-        order.tracking_code = tracking_code
-        order.save()
-        
-        return redirect('orders:shop_order', kwargs={'order_code': order.code})
+        order.set_tracking_code(tracking_code)
+        return redirect('orders:shop_order', order_code = order.code)
+
 
 
 @login_required
@@ -310,11 +309,11 @@ def reject(request: HttpRequest):
             Order, pk=order_id, shop=request.user.shop, paid=False)
 
         order.reject(msg)
-        return redirect('orders:shop_order', kwargs={'order_code': order.code})
+        return redirect('orders:shop_order', order_code=order.code)
 
 
 @login_required
-def canceled(request: HttpRequest):
+def cancel(request: HttpRequest):
     if request.method == 'GET':
         return HttpResponseNotAllowed(['POST'])
 
@@ -324,9 +323,9 @@ def canceled(request: HttpRequest):
         cancel_msg = request.POST.get('cancel_msg', '')
         order = get_list_or_404(
             Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=False)
-        order.canceled()
+        order.cancel()
 
-        return redirect('orders:shop_order', kwargs={'order_code': order.code})
+        return redirect('orders:shop_order', order_code=order.code)
 
 
 @login_required
@@ -338,10 +337,10 @@ def fulfill(request: HttpRequest):
         order_id = request.POST.get('order_id')
         shop_id = request.POST.get('shop_id')
 
-        order = get_list_or_404(
+        order = get_object_or_404(
             Order, pk=order_id, user=request.user, shop__pk=shop_id)
         order.fulfill()
-        return redirect('orders:shop_order', kwargs={'order_code': order.code})
+        return redirect('orders:shop_order', order_code=order.code)
 
 
 @login_required
@@ -359,7 +358,7 @@ def user_orders(request: HttpRequest):
     })
 
 @login_required
-def seller_order(request: HttpRequest, order_code):
+def shop_order(request: HttpRequest, order_code):
     order = get_object_or_404(Order, code=order_code, shop=request.user.shop)
     return render(request, 'shop/order.html', {
         'order':order
@@ -367,7 +366,7 @@ def seller_order(request: HttpRequest, order_code):
     
 @login_required
 def shop_orders(request: HttpRequest):
-    return render(requests.request, 'shop/orders.html', {
+    return render(request, 'shop/orders.html', {
         'orders': request.user.shop.orders.all()
     })
 

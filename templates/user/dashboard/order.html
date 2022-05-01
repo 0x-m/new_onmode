@@ -113,40 +113,41 @@
                 <span>{{order.address.postal_code}}</span>
             </div>
             <p class="text-xs text-gray-400 mt-2 pr-2">
-               {{order.address.description}}
+                {{order.address.description}}
             </p>
         </div>
         <div class="divider"></div>
-        <form class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box" action="{% url 'users:profile' %}" method="post">
-            {% if order.state == 'pending' %}
-            <textarea name="" class="textarea textarea-bordered" placeholder="علت لغو" id="" cols="30"
-                rows="2"></textarea>
-            {% endif %}
-            <div class="flex gap-1 w-full">
-                <!-- <button type="submit" class="btn basis-1/2 btn-primary mt-4">ارسال میکنم</button> -->
-                {% with order.state as state %}
-                    {% if state == 'pending' %}
+        <div class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box">
+            {% with order.state as state %}
+                {% if state == 'pending' %}
+                <form action="{% url 'orders:cancel' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{order.id}}">
+                    <textarea name="cancel_msg" class="textarea textarea-bordered" placeholder="علت لغو" id="" cols="30"
+                        rows="2"></textarea>
                     <button type="submit" class="btn btn-outline basis-1/2 btn-error mt-4">لغو</button>
-                    {% elif state == 'Rejected'  %}
-                        <h2 class="text-md text-error text-center">سفارش توسط فروشنده لغو شده است</j2>                    
-                    {% elif state == 'accepted' %}
-                    <h2 class="text-md text-success text-center">فروشنده درحال آماده سازی سفارش میباشد</j2>                    
-                    {% elif state == 'sent' %}
-                    <div class="flex flex-col gap-2 justify-center">
-                        <h2 class="text-md text-blue-400 text-center w-full">سفارش ارسال شده است</j2>  
-                            <h2 class="text-xs text-gray-700">کد مرسوله:{{order.tracking_code}}</h2>                  
-                            <button type="submit" class="btn btn-primary basis-1/2  mt-4">دریافت کرده ام</button>
-                    </div>
-                    {% elif state == 'canceled' %}
-                    <h2 class="text-md text-error text-center">سفارش توسط مشتری لغو شده است</j2>                    
-
-                    {% elif state == 'fulfilled' %}
-                        <h2 class="text-md text-success w-full text-center">سفارش موفق!</j2>                    
+                </form>
+                {% elif state == 'Rejected'  %}
+                    <h2 class="text-md text-error text-center">سفارش توسط فروشنده لغو شده است</j2>
+                {% elif state == 'accepted' or state == 'verifying' or state == 'notverified' %}
+                <h2 class="text-md text-success text-center">فروشنده درحال آماده سازی سفارش میباشد</j2>
+                {% elif state == 'sent' %}
+                    <form method="post" action="{% url 'orders:fulfill' %}" class="flex flex-col gap-2 p-2 w-full justify-center">
+                        {% csrf_token %}
+                        <input type="hidden" name="shop_id" value="{{order.shop.id}}">
+                        <input type="hidden" name="order_id" value="{{order.id}}">
+                        <h2 class="text-md text-blue-400 text-center w-full">سفارش ارسال شده است</j2>
+                        <h2 class="text-xs text-center mt-2 text-gray-700">کد مرسوله :{{order.tracking_code}}</h2>
+                        <button type="submit" class="btn btn-primary basis-1/2  mt-4">دریافت کرده ام</button>
+                    </form>
+                {% elif state == 'canceled' %}
+                    <h2 class="text-md text-error text-center">سفارش توسط مشتری لغو شده است</j2>
+                {% elif state == 'fulfilled' %}
+                        <h2 class="text-md text-success w-full text-center">سفارش موفق!</j2>
                         <i class="bi-emoji-smile text-lg text-success"></i>
-                    {% endif %}
-                {% endwith %}
-            </div>
-        </form>
+                {% endif %}
+            {% endwith %}
+        </div>
     </section>
 </div>
 {% endblock %}

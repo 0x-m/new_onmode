@@ -137,7 +137,7 @@ class Order(models.Model):
     def pay(self, ref_id, authority):
         amount = self.final_price
         self.user.wallet.withdraw(amount)
-        self.shop.user.inc_freeze(amount)
+        self.shop.owner.wallet.inc_freeze(amount)
 
         if self.coupon:
             self.coupon.set_used()
@@ -189,7 +189,7 @@ class Order(models.Model):
             self.reject_msg = msg
             # decrease seller freezed and increase buyer available
             self.user.deposit(self.final_price)
-            self.shop.user.dec_freeze(self.final_price)
+            self.shop.owner.wallet.dec_freeze(self.final_price)
             # ----------------------------------------------------
             self.save()
         else:
@@ -199,7 +199,7 @@ class Order(models.Model):
         if self.state == self.STATES.SENT and self.verified:
             self.state = self.STATES.FULFILLED
             # move seller freezed to available and remove buyer freezed
-            self.shop.user.release(self.final_price)
+            self.shop.owner.wallet.release(self.final_price)
             self.save()
         else:
             raise Exception()
@@ -233,7 +233,7 @@ class Order(models.Model):
             self.cancel_msg = msg
             # back money to buyer
             self.user.deposit(self.final_price)
-            self.shop.user.dec_freeze(self.final_price)
+            self.shop.owner.wallet.dec_freeze(self.final_price)
 
             self.save()
         else:
