@@ -247,16 +247,3 @@ class DepositTransaction(models.Model):
         self.save()
     
     
-# class Comment(models.Model):
-#     product = models.ForeignKey(to='Product', related_name='comments', on_delete=models.CASCADE)
-#     customer = models.ForeignKey(to=User, related_name='comments', on_delete=models.CASCADE)
-#     title = models.CharField(max_length=255)
-#     body = models.TextField()
-#     published = models.BooleanField(default=False)
-#     rate = models.PositiveBigIntegerField()
-    
-   
-# class Favourite(models.Model):
-#     product = models.ForeignKey(to='Product', related_name='likes', on_delete=models.CASCADE)
-#     customer = models.ForeignKey(to=User, related_name='favourites', on_delete=models.CASCADE)
-    

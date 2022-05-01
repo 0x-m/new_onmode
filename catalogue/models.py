@@ -323,6 +323,7 @@ class ProductStats(models.Model):
     @property
     def rate_complement(self):
         return range(5 - len(self.rate))
+        
 
     def inc_views(self):
         self.views += 1
@@ -333,8 +334,10 @@ class ProductStats(models.Model):
             self.views -= 1
             self.save()
 
-    def inc_comments(self):
+    def inc_comments(self, rate):
+        new_rate_avg = (self.comments * self.rates_avg + rate) / (self.comments + 1)
         self.comments += 1
+        self.rates_avg = new_rate_avg
         self.save()
 
     def dec_comments(self):
@@ -427,3 +430,40 @@ class Photo(models.Model):
     img = models.ImageField(upload_to=generate_path)
     url = models.URLField(null=True)
     alt = models.CharField(max_length=255, blank=True)
+
+
+
+class Comment(models.Model):
+    product = models.ForeignKey(to=Product, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, related_name='comments', on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    published = models.BooleanField(default=False)
+    rate = models.PositiveBigIntegerField()
+    
+
+@receiver(post_save, sender=Comment)
+def increase_comments(sender, instance: Comment, created, **kwargs):
+    if created:
+        instance.product.stats.inc_comments(instance.rate)
+
+@receiver(pre_delete, sender=Comment)
+def decrease_comment(sender, instance, **kwargs):
+    instance.product.stats.dec_comments()
+    
+    
+   
+class Favourite(models.Model):
+    product = models.ForeignKey(to=Product, related_name='likes', on_delete=models.CASCADE)
+    user = models.ForeignKey(to=User, related_name='favourites', on_delete=models.CASCADE)
+
+@receiver(post_save, sender=Favourite)
+def increase_comments(sender, instance: Comment, created, **kwargs):
+    if created:
+        instance.product.stats.inc_likes()
+
+@receiver(pre_delete, sender=Favourite)
+def decrease_comment(sender, instance, **kwargs):
+    instance.product.stats.dec_likes()
+    
+    

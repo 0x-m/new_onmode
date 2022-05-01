@@ -12,7 +12,6 @@ from users.models import Address
 
 from users.models import User
 from catalogue.models import Shop, Product, Collection
-from cart.models import Cart, CartItem
 
 
 class Order(models.Model):
