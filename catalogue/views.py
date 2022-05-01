@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render, get_object_or_404, get_list_or_40
 from django.contrib.auth.decorators import login_required
 from httpx import delete
 
-from .models import CreateShopRequest, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
+from .models import Collection, CreateShopRequest, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
 from .forms import CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
@@ -303,4 +303,11 @@ def create_shop_request(request: HttpRequest):
     return render(request, 'shop/create_shop.html', {
         'status': '',
         'shop_req': shop_req
+    })
+
+
+def collection(requeset: HttpRequest, collection_name):
+    collection = get_object_or_404(Collection, en_name=collection_name)
+    return render(requeset, 'shop/collection.html', {
+        'collection': collection
     })

@@ -3,6 +3,7 @@
 
 {% block content %}
 {% if cart %}
+{% csrf_token %}
 <section
     class="flex flex-col md:flex-row md:mt-8 items-center md:items-start justify-center gap-4 p-2 w-full min-h-screen">
     <section class="flex flex-col justify-start gap-2 md:basis-1/3">
@@ -24,28 +25,48 @@
             <span class="absolute top-2 left-4 text-gray-600 text-xs">{{item.price}} تومان</span>
         </article>
         {% endfor %}
+        <template id="delete_coupon_template">
+            <button data-order="{{cart.id}}" onclick="deleteCoupon(this);"
+                class="btn mx-auto w-1/2 text-white btn-error">حذف کوپن</button>
+        </template>
+        <template id="add_coupon_template">
+            <div class="flex gap-2">
+                <input placeholder="کوپن تخفیف" name="code" type="text" id="coupon_code"
+                    class="input input-bordered p-2 basis-full">
+                <button data-order="{{cart.id}}" onclick="applyCoupon(this);" class="btn btn-primary">اعمال</button>
+            </div>
+            <span class="hidden text-xs text-error p-1 text-center" id="coupon_error_text">کوپن معتبر نمیباشد.</span>
+        </template>
 
         <div class="divider"></div>
-        <form action="" method="post" class="bg-base-100 p-2 w-full rounded-box shadow-md flex  gap-2">
+        <div class="bg-base-100 p-2 w-full rounded-box shadow-md flex flex-col gap-2">
             {% if not cart.coupon %}
-            <input placeholder="کوپن تخفیف" name="coupon" type="text" class="input input-bordered p-2 basis-full">
-            <button class="btn btn-primary">اعمال</button>
+            <div class="flex gap-2">
+                <input placeholder="کوپن تخفیف" name="code" type="text" id="coupon_code"
+                    class="input input-bordered p-2 basis-full">
+                <button data-order="{{cart.id}}" onclick="applyCoupon(this);" class="btn btn-primary">اعمال</button>
+            </div>
+            <span class="hidden text-xs text-error p-1 text-center" id="coupon_error_text">کوپن معتبر نمیباشد.</span>
             {% else %}
-            <button class="btn mx-auto w-1/2 text-white btn-error">حذف کوپن</button>
+            <button data-order="{{cart.id}}" onclick="deleteCoupon(this);"
+                class="btn mx-auto w-1/2 text-white btn-error">حذف کوپن</button>
+            {% if not cart.coupon.is_valid %}
+            <span class="text-xs text-error p-1 text-center" >کوپن منقضی شده است.</span>
+            {% endif %}
             {%  endif %}
-        </form>
+        </div>
         <div class="bg-white p-4 rounded-box flex flex-col gap-3 ">
             <div class="flex justify-between">
                 <span>جمع کل:</span>
-                <span>{{cart.total}}تومان</span>
+                <span id="total_price">{{cart.total}}تومان</span>
             </div>
             <div class="flex justify-between">
                 <span>کوپن تخفیف:</span>
-                <span>{% if cart.coupon.is_valid  %}دارد{% else %}ندارد{% endif %}</span>
+                <span id="has_coupon">{% if cart.coupon.is_valid  %}دارد{% else %}ندارد{% endif %}</span>
             </div>
             <div class="flex justify-between">
                 <span>جمع کل با تخفیف:</span>
-                <span>{{cart.final_price}}تومان</span>
+                <span id="final_price">{{cart.final_price}}تومان</span>
             </div>
             <div class="flex justify-between">
                 <span>نام بوتیک:</span>
@@ -58,18 +79,7 @@
         </div>
     </section>
     <section class="bg-base-100 p-3 w-full md:w-1/3  rounded-box shadow-md flex flex-col gap-2 mb-20">
-        <h2 class="text-center text-gray-700 text-md">آدرس گیرنده</h2>
-        <div class="flex flex-col gap-1">
-            {% for address in user.addresses.all %}
-            <div class="form-control">
-                <label class="label cursor-pointer justify-start gap-2">
-                    <input type="radio" name="address" value="{{ address.id }}" class="radio checked:bg-blue-500"
-                        id="man">
-                    <span class="label-text p-1">{{ address }}</span>
-                </label>
-            </div>
-            {% endfor %}
-        </div>
+       
         <div tabindex="0" class="collapse collapse-plus">
             <input type="checkbox" name="" id="">
             <div class="collapse-title text-sm">
@@ -79,7 +89,7 @@
                 <form class="flex flex-col basis-1/2 gap-2" action="{% url 'users:addresses' %}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="shop_name" value="{{ cart.shop.name }}">
-                    <h4 class="text-center text-md text-gray-600 mb-2">آدرسها</h4>
+                    <h4 class="text-center text-md text-gray-600 mb-2">آدرس</h4>
                     <input name="full_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1"
                         type="text">
                     <input name="phone_number" placeholder="شماره تماس" class="input input-bordered p-1" type="text">
@@ -120,9 +130,24 @@
                 </form>
             </div>
         </div>
-
+        {% if  status == 'invalid address' %}
+        <h2 class="mt-2 text-center text-error text-sm">لطفا آدرس گیرنده را مشخص کنید</h2>
+        {% endif  %}
         <div class="divider"></div>
-        <form class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box" action="{% url 'users:profile' %}" method="post">
+        <form class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box" action="{% url 'orders:checkout' %}" method="post">
+            <h2 class="text-gray-700 text-sm p-2">آدرس گیرنده:</h2>
+            {% csrf_token %}
+            <div class="flex flex-col gap-1">
+                {% for address in user.addresses.all %}
+                <div class="form-control">
+                    <label class="label cursor-pointer justify-start gap-2">
+                        <input type="radio" name="address" value="{{ address.id }}" class="radio checked:bg-blue-500"
+                            id="man">
+                        <span class="label-text p-1">{{ address }}</span>
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
             <textarea name="" class="textarea textarea-bordered" placeholder="توضیحات سفارش" id="" cols="30"
                 rows="2"></textarea>
 
@@ -145,28 +170,13 @@
             <button type="submit" class="btn w-full btn-primary">پرداخت</button>
         </form>
     </section>
+    
     {% endif %}
 
 </section>
 
 {% endblock %}
 
-<!DOCTYPE html>
-<html dir="rtl" class="w-full min-h-screen bg-stone-50" lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'css/main.css' %}">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-        <title>Document</title>
-    </head>
-
-    <body
-        class="flex flex-col md:flex-row md:mt-8 items-center md:items-start justify-center gap-4 p-2 w-full min-h-screen">
-
-
-    </body>
-
-</html>
+{% block scripts %}
+<script defer src="{% static 'js/functions.js' %}"></script>
+{% endblock %}

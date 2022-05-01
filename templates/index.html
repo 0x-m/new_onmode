@@ -6,6 +6,7 @@
 https://source.unsplash.com/p-I9wV811qk/1920x1047
 
 -->
+{% csrf_token %}
 <div class="swiper flex items-center w-full justify-center p-0">
     <div class="swiper-wrapper w-full">
         {% for slide in slides %}
@@ -92,7 +93,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 <h2 class="text-sm md:text-xl text-gray-500 drop-shadow">{{collection.name}}</h2>
                 <h4 class="text-xs mt-1 md:text-md text-gray-400">{{collection.slogan}}</h4>
             </div>
-            <h2 class="text-xs">مشاهده همه</h2>
+            <a href="{{collection.get_absolute_url}}" class="text-xs">مشاهده همه</a>
         </div>
     </div>
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-6">
@@ -124,14 +125,14 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             </div>
             <div class="flex items-center justify-center w-full gap-1 ">
                 {% if not product.shop == user.shops.first %}
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                <button onclick="addToCart(this);" data-pid="{{product.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-bag text-gray  text-xl"></i>
                 </button>
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-heart text-gray  text-xl"></i>
                 </button>
                 {% else  %}
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-pencil text-gray  text-xl"></i>
                 </button>
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
@@ -223,5 +224,6 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         },
     });
 </script>
+<script defer src="{% static 'js/functions.js' %}"></script>
 
 {% endblock %}

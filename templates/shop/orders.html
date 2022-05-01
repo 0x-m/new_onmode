@@ -7,7 +7,7 @@
 
 {% block content  %}
 <div class="grid grid-cols-1 content-start md:grid-cols-4 md:mt-8  w-full h-full gap-2 p-2">
-    {% for order in user.shop.orders %}
+    {% for order in user.shop.orders.all %}
         <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
             <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
                 <span>کد سفارش:</span>

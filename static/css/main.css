@@ -4724,6 +4724,11 @@ body[dir="rtl"] .checkbox:checked,
   background-color: rgb(254 226 226 / var(--tw-bg-opacity));
 }
 
+.bg-red-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity));
+}
+
 .fill-current {
   fill: currentColor;
 }

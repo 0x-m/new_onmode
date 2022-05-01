@@ -73,7 +73,7 @@ class Coupon(models.Model):
             if amount < 0:
                 amount = 0
         else:
-            diff = round(amount * (1 - self.percent / 100))
+            diff = round(amount * (self.percent / 100))
             if diff > self.max_amount:
                 diff = self.max_amount
             amount -= diff

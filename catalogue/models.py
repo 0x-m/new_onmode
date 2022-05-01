@@ -1,5 +1,4 @@
 
-from cgitb import lookup
 import os
 from attr import field
 from django.db import models
@@ -12,6 +11,7 @@ import secrets
 import string
 from users.models import User
 from promotions.models import Discount
+from django.urls.base import reverse
 import django_filters
 
 
@@ -167,8 +167,8 @@ class Product(models.Model):
     sold_individually = models.BooleanField(default=False)
     price = models.PositiveBigIntegerField(default=0)
     has_sales = models.BooleanField(default=False)
-    sales_price = models.PositiveIntegerField(default=0)
-    shipping_cost = models.PositiveIntegerField(default=0)
+    sales_price = models.PositiveBigIntegerField(default=0)
+    shipping_cost = models.PositiveBigIntegerField(default=0)
     description = models.TextField(max_length=5000, blank=True)
     attributes = models.JSONField(default=dict, null=True, blank=True)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
@@ -189,15 +189,24 @@ class Product(models.Model):
         pass
 
     def dec_quantity(self, count=1):
-        pass
-
-    def has_qunatity(self, q):
+        if self.has_quantity(count):
+            self.quantity -= count
+        self.save()
+    
+    def force_dec_quantity(self, count):
+        c = self.quantity - count
+        if c < 0:
+            c = 0
+        self.quantity = c
+        self.save()    
+        
+    def has_quantity(self, q):
         return self.quantity >= q
 
     def get_discount(self, collection=None):
         discount = self.discount
-        if collection and self in collection.products.all():
-            if collection.discount:
+        if collection and collection.discount:
+            if self in collection.products.all():
                 if collection.prefer_collection_discount or not discount:
                     discount = collection.discount
         return discount
@@ -207,10 +216,6 @@ class Product(models.Model):
     def compute_price(self, collection=None):
 
         discount = self.get_discount(collection)
-        if collection:
-            if collection.discount:
-                if collection.prefer_collection_discount or not discount:
-                    discount = collection.discount
 
         price = self.price
         if self.has_sales:
@@ -218,8 +223,7 @@ class Product(models.Model):
 
         if discount:
             if discount.is_valid():
-                print('here')
-                difference = round(price * (1 - (discount.percent / 100)))
+                difference = round(price * (discount.percent / 100))
                 if difference <= discount.max_amount:
                     price -= difference
                 else:
@@ -372,8 +376,8 @@ class ProductStats(models.Model):
 class Collection(models.Model):
     products = models.ManyToManyField(to=Product, related_name='collections')
     featureds = models.CharField(max_length=1000, blank=True)
-    name = models.CharField(max_length=40)
-    en_name = models.CharField(max_length=40)
+    name = models.CharField(max_length=40, unique=True)
+    en_name = models.CharField(max_length=40, unique=True)
     slug = models.SlugField(editable=False, blank=True)
     en_slug = models.SlugField(editable=False, blank=True)
     slogan = models.CharField(max_length=1000, blank=True)
@@ -399,6 +403,9 @@ class Collection(models.Model):
             ids = self.featureds.split(',')
             featureds = self.products.filter(id__in=ids)
         return featureds
+    
+    def get_absolute_url(self):
+        return reverse('catalogue:collection', kwargs={'collection_name':self.en_name})
 
 
 class ProductOptionValue(models.Model):

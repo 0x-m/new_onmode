@@ -39,13 +39,21 @@ class AcceptOrderForm(forms.Form):
 
 
 class AddOrderItemForm(forms.ModelForm):
-    # quantity = forms.IntegerField(initial=1, min_value=1)
-    # options = forms.JSONField(required=False)
+    quantity = forms.IntegerField(min_value=1, initial=1)
+    options = forms.JSONField(required=False)
     class Meta:
         model = OrderItem
         fields = ['product', 'collection', 'quantity', 'options']
     # product = forms.ModelChoiceField(queryset=Product.objects.filter(deleted=False))
     # collection = forms.ModelChoiceField(queryset=Collection.objects.all(), required=False)
     
-        
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        product = self.cleaned_data.get('product')
+        if not product:
+            raise forms.ValidationError('product does not found')
     
+        if not product.has_quantity(quantity):
+            raise forms.ValidationError('unavailable quantity')
+
+        return quantity

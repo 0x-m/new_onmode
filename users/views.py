@@ -148,7 +148,7 @@ def addresses(request: HttpRequest):
 
         shop_name = request.POST.get('shop_name')
         if shop_name:
-            return redirect('cart:checkout',shop_name=shop_name)
+            return redirect('orders:checkout',shop_name=shop_name)
         
         return render(request, 'user/dashboard/address.html', {
             'errors': form.cleaned_data
