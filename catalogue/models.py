@@ -436,7 +436,6 @@ class Photo(models.Model):
 class Comment(models.Model):
     product = models.ForeignKey(to=Product, related_name='comments', on_delete=models.CASCADE)
     user = models.ForeignKey(to=User, related_name='comments', on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
     body = models.TextField()
     published = models.BooleanField(default=False)
     rate = models.PositiveBigIntegerField()

@@ -1,12 +1,13 @@
 
+from logging import LogRecord
 from math import prod
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from httpx import delete
 
-from .models import Collection, CreateShopRequest, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
-from .forms import CreateShopForm, ProductForm, ShopForm
+from .models import Collection, Comment, CreateShopRequest, Favourite, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
+from .forms import CommentForm, CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
 
@@ -311,3 +312,41 @@ def collection(requeset: HttpRequest, collection_name):
     return render(requeset, 'shop/collection.html', {
         'collection': collection
     })
+    
+
+@login_required
+def comment(request: HttpRequest):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            product = form.cleaned_data['product']
+            
+            comment, created = Comment.objects.update_or_create(user=user, 
+                                                                product=product,
+                                                                defaults=form.cleaned_data)
+            if not created:
+                comment.published = False
+                
+            form.save()
+            return redirect(comment.product)
+            
+        else:
+            return HttpResponseBadRequest()
+       
+    
+    return HttpResponseNotAllowed(['POST'])
+    
+
+@login_required
+def like(request: HttpRequest, product_id):
+    user = request.user
+    product = get_object_or_404(Product, pk=product_id, deleted=False)
+    fav, created = Favourite.objects.get_or_create(user=user, product=product)
+    if not created:
+        fav.delete()
+        
+    return JsonResponse({
+        'status': 'liked' if created else 'unliked'
+    })
+

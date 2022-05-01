@@ -1,6 +1,21 @@
 
-function like() {
+function like(elem) {
+    const product_id = elem.dataset['pid'];
+    fetch('/product/' + product_id + '/' + 'like').then(res => {
+        if (res.status == 200) {
+            res.json().then(data => {
+                if (data['status'] == 'liked'){
+                    
+                }
+                else if(data['status'] == 'unliked') {
 
+                }
+            });
+        }   
+        else {
+
+        }
+    });
 }
 
 function addToCart(elem) {

@@ -4,7 +4,7 @@ from xml.dom import ValidationErr
 from attr import fields
 from django import forms
 
-from .models import CreateShopRequest, Product, Shop
+from .models import Comment, CreateShopRequest, Product, Shop
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
 
@@ -86,3 +86,8 @@ class CreateShopForm(forms.ModelForm):
         
         
         
+        
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['product', 'body', 'rate']
