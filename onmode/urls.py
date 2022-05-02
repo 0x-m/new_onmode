@@ -31,23 +31,13 @@ def contact_us(request: HttpRequest):
 def cert(request: HttpRequest):
     return render(request, 'certs.html')
 
-def add_p(request: HttpRequest):
-    
-    return render(request, 'shop/product.html')
-
-
 def shop(request: HttpRequest):
     shop = Shop.objects.first()
     return render(request, 'shop/shop.html', {
         'shop': shop
     })
     
-def collection(request: HttpRequest):
-    collection = Collection.objects.first()
 
-    return render(request, 'shop/collection.html', {
-        'collection': collection
-    })
 
 urlpatterns = [
     path('', index, name='index'),
@@ -55,9 +45,7 @@ urlpatterns = [
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
     path('cert/', cert, name='cert' ),
-    path('collection/', collection, name='col' ),
     path('shop/', shop, name='shop' ),
-    path('pp/', add_p, name='pp' ),
     path('admin/', admin.site.urls),
     path('users/', include('users.urls', namespace='users'), ),
     path('catalogue/', include('catalogue.urls', namespace='catalogue')),

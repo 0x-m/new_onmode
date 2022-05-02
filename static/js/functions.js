@@ -1,14 +1,17 @@
 
 function like(elem) {
     const product_id = elem.dataset['pid'];
-    fetch('/product/' + product_id + '/' + 'like').then(res => {
+    fetch('/catalogue/product/' + product_id + '/' + 'like').then(res => {
         if (res.status == 200) {
             res.json().then(data => {
                 if (data['status'] == 'liked'){
-                    
+                    elem.classList.add('bg-red-500');
+                    elem.classList.add('text-white');
                 }
                 else if(data['status'] == 'unliked') {
-
+                    elem.classList.remove('bg-red-500');
+                    elem.classList.remove('text-white')
+                    
                 }
             });
         }   
@@ -21,6 +24,7 @@ function like(elem) {
 function addToCart(elem) {
     const product_id = elem.dataset['pid'];
     const collection = elem.dataset['collection'];
+    const options = document.getElementById('product_options')?.value;
     const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     console.log(csrf_token);
     elem.disabled = true
@@ -29,7 +33,8 @@ function addToCart(elem) {
         body: new URLSearchParams({
             product: product_id,
             quantity: 1,
-            collection: collection
+            collection: collection,
+            options: options
         }),
         headers: {
             'X-CSRFToken': csrf_token,
@@ -37,7 +42,7 @@ function addToCart(elem) {
         }
     }).then((res) => {
         if (res.status == 200) {
-            //TODO: ....
+            elem.disabled = false;
         }
         console.log(res)
     });

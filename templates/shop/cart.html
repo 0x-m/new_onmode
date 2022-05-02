@@ -35,7 +35,7 @@
                     <h2 class="text-[0.7rem] text-gray-500">{{item.final_price}}تومان</h2>
                 </div>
                 <div class="flex gap-3">
-                    {% for key,val in product.options.items %}
+                    {% for key,val in item.options.items %}
                     <div class="flex gap-1 text-xs text-gray-400">
                         <span>{{key}}:</span>
                         <span>{{val}}</span>

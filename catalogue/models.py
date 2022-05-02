@@ -1,6 +1,8 @@
 
+from audioop import ratecv
 from email.policy import default
 import os
+from turtle import RawTurtle
 from attr import field
 from django.db import models
 from django.dispatch import receiver
@@ -94,7 +96,8 @@ class Option(models.Model):
         Boolean = 'BOL', 'Boolean'
         Choices = 'CHO', 'Choices'
         MultiChoices = 'CHS', 'MultiChoices'
-
+    
+    fa_name = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=20, unique=True)
     type = models.CharField(max_length=3,
                             choices=TYPES.choices,
@@ -192,7 +195,6 @@ class Product(models.Model):
             for color in colors:
                 if str(color['id']) in product_colors:
                     res.append(color)
-            print(colors, product_colors, res)
             return res
         except:
             pass
@@ -472,13 +474,22 @@ class Photo(models.Model):
     alt = models.CharField(max_length=255, blank=True)
 
 
-
 class Comment(models.Model):
     product = models.ForeignKey(to=Product, related_name='comments', on_delete=models.CASCADE)
     user = models.ForeignKey(to=User, related_name='comments', on_delete=models.CASCADE)
     body = models.TextField()
     published = models.BooleanField(default=False)
     rate = models.PositiveBigIntegerField()
+    date_created = models.DateTimeField(default=timezone.now)
+    
+    @property
+    def prod_rate(self):
+        return range(self.rate)
+    
+    @property
+    def prod_rate_complement(self):
+        return range(5 - self.rate)
+    
     
 
 @receiver(post_save, sender=Comment)

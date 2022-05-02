@@ -327,12 +327,11 @@ def comment(request: HttpRequest):
                                                                 defaults=form.cleaned_data)
             if not created:
                 comment.published = False
-                
-            form.save()
-            return redirect(comment.product)
+                comment.save()
+            return redirect('catalogue:product_detail', product_code=product.prod_code)
             
         else:
-            return HttpResponseBadRequest()
+            return HttpResponseBadRequest('bad request...')
        
     
     return HttpResponseNotAllowed(['POST'])
@@ -340,9 +339,11 @@ def comment(request: HttpRequest):
 
 @login_required
 def like(request: HttpRequest, product_id):
+    print('liek product...')
     user = request.user
     product = get_object_or_404(Product, pk=product_id, deleted=False)
     fav, created = Favourite.objects.get_or_create(user=user, product=product)
+    
     if not created:
         fav.delete()
         
@@ -354,6 +355,16 @@ def like(request: HttpRequest, product_id):
 
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code =product_code)
+    liked = product.likes.filter(user=request.user).exists()
+    
+    comment = None
+    try:
+        comment = request.user.comments.get(product=product)
+    except:
+        pass
+    
     return render(request, 'shop/product.html', {
-        'product': product
+        'product': product,
+        'comment': comment,
+        'liked': liked
     })

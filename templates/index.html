@@ -107,7 +107,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
                 <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
                     {% for i in product.stats.rate %}
-                    <i class="bi-star-fill "></i>
+                    <i class="bi-star-fill text-yellow-500 "></i>
                     {% endfor %}
                     {% for i in product.stats.rate_complement %}
                     <i class="bi-star "></i>
@@ -132,7 +132,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                     <i class="bi-heart text-gray  text-xl"></i>
                 </button>
                 {% else  %}
-                <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
+                <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-pencil text-gray  text-xl"></i>
                 </button>
                 <button class="btn btn-ghost btn-sm btn-circle text-md">
