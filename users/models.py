@@ -129,7 +129,7 @@ class Address(models.Model):
 
 
 class Wallet(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         to=User, related_name='wallet', on_delete=models.CASCADE)
     available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)

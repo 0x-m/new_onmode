@@ -9,84 +9,73 @@
 
 <div class="bg-base-100 w-full md:w-4/5 flex flex-col gap-2 rounded-box shadow-md p-2  mt-4 mx-auto">
     <div class="flex flex-col md:flex-row gap-2">
-        <div class="shadow-md  w-full rounded-box">
-            <img src="https://source.unsplash.com/p-I9wV811qk/1920x1047"
-                class="w-full rounded-box object-cover h-[70vh]" alt="">
+        <div class="swiper shadow-md  w-full h-[70vh] rounded-box">
+            <div class="swiper-wrapper w-full h-full">
+                {% for photo in product.photos.all %}
+                <div class="swiper-slide">
+                    <img src="{{photo.img.url}}" class="w-full rounded-box object-cover h-[70vh]" alt="{{photo.alt}}">
+                </div>
+                {% endfor%}
+            </div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
         </div>
         <div class="w-full flex flex-col gap-2">
-            <h1 class="text-center text-xl mt-8 text-gray-500">نام محصول</h1>
-            <div class="flex gap-2 justify-center">
-                <i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                    class="bi-star"></i>
+            <div class="p-2 w-full flex gap-1 justify-end">
+                {% with product.get_discount as discount %}
+                {% if discount and discount.is_valid %}
+                <span class="rounded-md bg-error p-2 text-center text-white text-sm">15%</span>
+                {% endif %}
+                {% endwith %}
+                {% if product.has_sales %}
+                <span class="rounded-md bg-gray-700 p-2 text-center text-white text-sm">حراج</span>
+                {% endif %}
             </div>
+            <h1 class="text-center text-xl mt-8 text-gray-500">{{product.name}}</h1>
+            <div class="flex gap-2 justify-center">
+                {% for i in product.stats.rate %}
+                <i class="bi-star-fill "></i>
+                {% endfor %}
+                {% for i in product.stats.rate_complement %}
+                <i class="bi-star "></i>
+                {% endfor%}
+
+            </div>
+
             <p class="w-11/12 md:w-4/5 mt-4 mx-auto text-sm text-gray-400">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores et delectus eligendi accusantium enim
-                accusamus sequi? Quisquam ipsa quos dolor nam repellendus odio, tempora harum sapiente inventore quod
-                repellat et!
+                {{product.description}}
             </p>
             <div class="flex items-center mt-4 pr-5 pl-5 justify-between">
                 <div class="flex gap-2">
+                    {% for color in product.colors %}
                     <div class="form-control">
                         <label class="rounded-full   group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div style="background-color:red"
+                            <input name="color" type="radio" value="{{color.name}}" class="appearance-none peer">
+                            <div style="background-color:{{color.code}}"
                                 class="rounded-full w-8 h-8 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
                             </div>
                         </label>
                     </div>
-                    <div class="form-control">
-                        <label class="rounded-full   group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div style="background-color:green"
-                                class="rounded-full w-8 h-8 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                            </div>
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="rounded-full   group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div style="background-color:gray"
-                                class="rounded-full w-8 h-8 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                            </div>
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="rounded-full   group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div style="background-color:yellow"
-                                class="rounded-full w-8 h-8 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
-                            </div>
-                        </label>
-                    </div>
+                    {% endfor %}
                 </div>
                 <div class="flex gap-2">
-                    <div class="form-control">
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div class="text-center  peer-checked:bg-primary peer-checked:text-white p-1">
-                                XL
-                            </div>
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div class="text-center  peer-checked:bg-primary peer-checked:text-white p-1">
-                                XXL
-                            </div>
-                        </label>
-                    </div>
-                    <div class="form-control">
-                        <label class="rounded-full p-1 group cursor-pointer">
-                            <input name="value" type="radio" value="" class="appearance-none peer">
-                            <div class="text-center  peer-checked:bg-primary peer-checked:text-white p-1">
-                                SM
-                            </div>
-                        </label>
-                    </div>
+                    {% for size in product.sizes %}
+                        <div class="form-control">
+                            <label class="rounded-full p-1 group cursor-pointer">
+                                <input name="size" type="radio" value="{{size.code}}" class="appearance-none peer">
+                                <div class="text-center  peer-checked:bg-primary peer-checked:text-white p-1">
+                                    {{size.code}}
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
+                    
                 </div>
             </div>
-
+            <div class="flex gap-12 p-2 mt-2 justify-center items-center">
+                <del>12000 تومان</del>
+                <strong>1000 تومان</strong>
+            </div>
             <div class="flex justify-center mt-8 gap-2">
                 <button class="btn text-xs btn-primary">افزودن به سبد خرید</button>
                 <button
@@ -123,11 +112,13 @@
                 <h3 class="text-sm text-gray-500">نام کاربر</h3>
                 <div class="flex justify-end text-sm gap-2">
                     <i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                    class="bi-star"></i>
+                        class="bi-star"></i>
                 </div>
             </div>
             <p class="w-full p-2 text-xs text-gray-500 mt-2">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est autem et natus ut voluptatibus culpa, laborum harum saepe esse ullam voluptatem excepturi quos neque reiciendis! Sint eveniet unde perferendis facilis.
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est autem et natus ut voluptatibus culpa,
+                laborum harum saepe esse ullam voluptatem excepturi quos neque reiciendis! Sint eveniet unde perferendis
+                facilis.
             </p>
             <div class="flex justify-end p-1">
                 <span class="text-[0.6rem] mt-1 text-gray-400">نوشته شده در تاریخ:00/00/00</span>
@@ -138,11 +129,13 @@
                 <h3 class="text-sm text-gray-500">نام کاربر</h3>
                 <div class="flex justify-end text-sm gap-2">
                     <i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                    class="bi-star"></i>
+                        class="bi-star"></i>
                 </div>
             </div>
             <p class="w-full p-2 text-xs text-gray-500 mt-2">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est autem et natus ut voluptatibus culpa, laborum harum saepe esse ullam voluptatem excepturi quos neque reiciendis! Sint eveniet unde perferendis facilis.
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Est autem et natus ut voluptatibus culpa,
+                laborum harum saepe esse ullam voluptatem excepturi quos neque reiciendis! Sint eveniet unde perferendis
+                facilis.
             </p>
             <div class="flex justify-end p-1">
                 <span class="text-[0.6rem] mt-1 text-gray-400">نوشته شده در تاریخ:00/00/00</span>
@@ -152,5 +145,27 @@
     </div>
 </div>
 
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+<script defer>
+    const swiper = new Swiper('.swiper', {
+        // Optional parameters
+
+        // If we need pagination
+        pagination: {
+            el: '.swiper-pagination',
+        },
+
+        // Navigation arrows
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+</script>
+<script defer src="{% static 'js/functions.js' %}"></script>
 
 {% endblock %}

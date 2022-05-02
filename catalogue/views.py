@@ -350,3 +350,10 @@ def like(request: HttpRequest, product_id):
         'status': 'liked' if created else 'unliked'
     })
 
+
+
+def product_detail(request: HttpRequest, product_code):
+    product = get_object_or_404(Product, prod_code =product_code)
+    return render(request, 'shop/product.html', {
+        'product': product
+    })

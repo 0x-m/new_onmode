@@ -1,4 +1,5 @@
 
+from email.policy import default
 import os
 from attr import field
 from django.db import models
@@ -182,6 +183,38 @@ class Product(models.Model):
                                  null=True, blank=True)
 
     @property
+    def colors(self):
+        try:
+            colors = Option.objects.get(name='color').choices
+            product_colors = self.options.get(
+                option__name='color').value.split(',')
+            res = []
+            for color in colors:
+                if str(color['id']) in product_colors:
+                    res.append(color)
+            print(colors, product_colors, res)
+            return res
+        except:
+            pass
+
+
+    @property
+    def sizes(self):
+        try:
+            sizes = Option.objects.get(name='size').choices
+            product_colors = self.options.get(option__name='size').value.split(',')
+            res = []
+            for size in sizes:
+                if str(size['id']) in product_colors:
+                    res.append(size)
+            
+            return res
+        except:
+            pass       
+    
+    
+
+    @property
     def is_available(self) -> bool:
         pass
 
@@ -303,7 +336,7 @@ def create_stats(sender, instance, created, **kwargs):
 
 
 class ProductStats(models.Model):
-    product = models.ForeignKey(to=Product,
+    product = models.OneToOneField(to=Product,
                                    on_delete=models.CASCADE,
                                    related_name='stats')
     views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
@@ -371,6 +404,13 @@ class ProductStats(models.Model):
         if (self.fails > 0):
             self.fails -= 1
             self.save()
+
+
+@receiver(post_save, sender=Product)
+def create_stats(sender, instance, created, **kwargs):
+    if created:
+        ProductStats.objects.get_or_create(product=instance)
+
 
 
 # TODO: create a stats for shop
