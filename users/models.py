@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 import secrets
 import string
-
+from annoying.fields import AutoOneToOneField
 
 # from catalogue.models import Product
 
@@ -21,8 +21,6 @@ class CustomUserManager(UserManager):
         u.is_staff = True
         u.is_superuser = True
         u.save(using=self._db)
-        w = Wallet.objects.create(user=u)
-        w.save()
 
 
 class User(AbstractUser):
@@ -132,7 +130,7 @@ class Address(models.Model):
 
 
 class Wallet(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         to=User, related_name='wallet', on_delete=models.CASCADE)
     available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)

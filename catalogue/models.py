@@ -26,7 +26,7 @@ class Category(models.Model):
     parent = models.ForeignKey(to='self',
                                related_name='childs',
                                on_delete=models.CASCADE,
-                               null=True)
+                               null=True, blank=True)
 
     # photo = models.ForeignKey(to='Photo',
     #   on_delete=models.DO_NOTHING,
@@ -303,7 +303,7 @@ def create_stats(sender, instance, created, **kwargs):
 
 
 class ProductStats(models.Model):
-    product = models.OneToOneField(to=Product,
+    product = models.ForeignKey(to=Product,
                                    on_delete=models.CASCADE,
                                    related_name='stats')
     views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
