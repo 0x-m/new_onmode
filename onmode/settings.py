@@ -26,10 +26,7 @@ INSTALLED_APPS = [
     'django_filters',
     'jalali_date',
     'users',
-    'catalogue',
-    'promotions',
-    'index',
-    'orders'
+    
     
 ]
 

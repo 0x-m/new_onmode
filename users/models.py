@@ -133,7 +133,7 @@ class Address(models.Model):
 
 class Wallet(models.Model):
     user = models.OneToOneField(
-        to=User, related_name='wallet', on_delete=models.CASCADE)
+        to=User, related_name='wallet', on_delete=models.CASCADE, primary_key=True)
     available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date_last_withdraw = models.DateTimeField(null=True, blank=True)
