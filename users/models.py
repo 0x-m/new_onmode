@@ -8,7 +8,6 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 import secrets
 import string
-from annoying.fields import AutoOneToOneField
 
 # from catalogue.models import Product
 
