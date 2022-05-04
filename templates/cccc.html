@@ -1,0 +1,56 @@
+<section class="bg-base-100 p-3 w-80 text-gray-500   shadow-md flex flex-col gap-0 overflow-y-auto">
+    {% for category in categories %}
+    <div tabindex="0" class="collapse collapse-plus  -mt-2 border-base-300 ">
+        <input type="checkbox"> 
+        <div  class="collapse-title pointer-events-auto  text-blue-400 text-xs">{{category.name}}</div>
+        {% if category.childs %}
+        <div tabindex="0" class="collapse-content  -mt-6">
+            <a  class="text-[0.5rem] text-blue-500 pr-16 " href="#">همه موارد این دسته</a>
+            {% for sub_1 in category.childs.all %}
+            <div tabindex="0" class="collapse -mt-2">
+                <input type="checkbox"> 
+                <div class="collapse-title text-gray-800 text-[0.7rem]">{{sub_1.name}}</div>
+                {% if sub_1.childs %}
+                <div class="collapse-content -mt-6">
+                    <a  class="text-[0.5rem] text-blue-500 pr-16 " href="#">همه موارد این دسته</a>
+                    {% for sub_2 in sub_1.childs.all %}
+                    <div tabindex="0" class="collapse -mt-2 collapse-plus">
+                        <input type="checkbox"> 
+                        <div class="collapse-title text-[0.65rem]">{{ sub_2.name }}</div>
+                        {% if sub_2.childs %}
+                        <div tabindex="0" class="collapse-content -mt-6">
+                            <a  class="text-[0.5rem] text-blue-500 pr-16" href="#">همه موارد این دسته</a>
+                            {% for sub_3 in sub_2.childs.all %}
+                            <div tabindex="0" class="collapse -mt-2 collapse-plus">
+                                <input type="checkbox"> 
+                                <div class="collapse-title text-[0.6rem]">{{sub_3.name}}</div>
+                                {%  if sub_3.childs %}
+                                <div tabindex="0" class="collapse-content -mt-6">
+                                    <a  class="text-[0.5rem] text-blue-500 pr-16" href="#">همه موارد این دسته</a>
+                                    {% for sub_4 in sub_3.childs.all %}
+                                    <div tabindex="0" class="collapse -mt-2 collapse-plus">
+                                        <div class="collapse-title text-[0.55rem]">{{ sub_4.name }}</div>
+                                        <div class="collapse-content -mt-6">
+                                            <a  class="text-[0.5rem] text-blue-500 pr-16 " href="#">همه موارد این دسته</a>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</section>

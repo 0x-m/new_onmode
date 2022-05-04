@@ -1,12 +1,12 @@
 
 from logging import LogRecord
 from math import prod
+from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
-from httpx import delete
-
-from .models import Collection, Comment, CreateShopRequest, Favourite, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
+from django.core.paginator import Page, PageNotAnInteger, Paginator, EmptyPage
+from .models import Category, Collection, Comment, CreateShopRequest, Favourite, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
 from .forms import CommentForm, CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
@@ -307,10 +307,24 @@ def create_shop_request(request: HttpRequest):
     })
 
 
-def collection(requeset: HttpRequest, collection_name):
+def collection(request: HttpRequest, collection_name):
+
     collection = get_object_or_404(Collection, en_name=collection_name)
-    return render(requeset, 'shop/collection.html', {
-        'collection': collection
+
+    paginator = Paginator(collection.products.all(), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    
+    return render(request, 'shop/collection.html', {
+        'collection': collection,
+        'page': page 
     })
     
 
@@ -368,3 +382,90 @@ def product_detail(request: HttpRequest, product_code):
         'comment': comment,
         'liked': liked
     })
+    
+
+def search(request: HttpRequest):
+    keywords = request.GET.get('keywords', None)
+    if not keywords:
+        return render(request, 'search.html', {
+            'page': None
+        })
+    print('here.....search')
+    # products = Product.objects.filter(name__search=keywords) full text-search...
+    #MYSQL has limitted support....
+    
+    #needs cache...!
+    products = Product.objects.filter(Q(name__icontains=keywords) |
+                                      Q(meta_keywords__icontains=keywords) |
+                                      Q(meta_description__icontains=keywords))
+
+
+    paginator = Paginator(products, 20)
+    pg = request.GET.get('page')
+
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+        
+    return render(request, 'search.html', {
+        'page': page,
+        'keywords': keywords
+    })
+    
+def shop(request: HttpRequest, shop_name):
+    shop = get_object_or_404(Shop, name=shop_name, active=True)
+    paginator = Paginator(shop.products.all(), 20)
+    pg = request.GET.get('page')
+
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+        
+    return render(request, 'shop/shop.html', {
+        'shop': shop,
+        'page': page
+    })
+        
+    
+def category(request:HttpRequest, id):
+    category = get_object_or_404(id=id)
+
+    #tree traverse..............
+    categories = {category.id}
+    stack = [category]
+    while(len(stack)):
+        curr = stack.pop()
+        if not curr.childs:
+            continue
+        for c in curr.childs:
+            categories.add(c.id)
+            stack.add(c)
+    #...........................
+    
+    products = Product.objects.filter(id__in=list(categories))
+
+    paginator = Paginator(products, 20)
+    pg = request.GET.get('page')
+
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+        
+    return render(request, 'shop/category.html', {
+        'page': page
+    })
+  
+
+    

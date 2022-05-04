@@ -165,7 +165,7 @@
 
     <section class="w-full md:basis-3/4">
         <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
-            {% for product in shop.products.all %}
+            {% for product in page.object_list %}
             <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
                 method="post">
                 <a href="">
@@ -227,7 +227,19 @@
             </article>
             {% endfor %}
         </section>
-
+        <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
+            <div class="text-sm flex gap-2">
+                {% if  page.has_previous %}
+                <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+                {% endif %}
+                {% for p in page.paginator.page_range %}
+                    <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+                {% endfor %}
+                {% if  page.has_next %}
+                <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+                {% endif %}
+            </div>
+        </section>
     </section>
 </div>
 {% endblock %}

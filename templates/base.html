@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html dir="rtl" class="min-h-full w-full" lang="en">
+<html  dir="rtl" class="min-h-full w-full" lang="en">
 
     <head>
         <meta charset="UTF-8">
@@ -52,11 +52,14 @@
                                     <i class="bi-list pr-1"></i>
                                     <span class="text-xs hidden md:block">محصولات</span>
                                 </label>
-                                <div class="bg-white flex justify-between w-full rounded-l-box">
-                                    <input type="text" placeholder="جستجو..."
+                                <form action="{% url 'search'  %}"
+                                    class="bg-white flex justify-between w-full rounded-l-box">
+                                    <input type="text" name="keywords" placeholder="جستجو..."
                                         class="text-xs w-full p-2 outline-none basis-full ">
-                                    <i class="bi-search p-2"></i>
-                                </div>
+                                    <button>
+                                        <i class="bi-search p-2"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -106,6 +109,7 @@
                 {% block content %}
 
                 {% endblock %}
+
                 <footer class="footer footer-center p-2 bg-gray-100 text-gray-600 mt-4">
                     <ul class="menu menu-horizontal text-xs  w-full justify-center  gap-2">
                         <li><a href="">درباره ما</a></li>
@@ -113,7 +117,7 @@
                         <li><a href="">قوانین</a></li>
                         <li><a href="">وبلاگ</a></li>
                     </ul>
-                  
+
                     <div>
                         <div class="grid grid-flow-col gap-3 text-xl">
                             <a>
@@ -143,17 +147,49 @@
 
         <div class="drawer-side">
             <label for="my-drawer" class="drawer-overlay"></label>
-            <ul class="menu p-4 overflow-y-auto w-80 bg-base-100 text-base-content">
-                <!-- Sidebar content here -->
-                <li><a>Sidebar Item 1</a></li>
-                <li><a>Sidebar Item 2</a></li>
+            <div class="bg-base-100 p-0 flex flex-col  overflow-x-hidden w-80 text-gray-500  shadow-md">
+                <div class="mt-4"></div>
+                <list-menu>
+                    {% for category in categories %}
+                        <menu-group caption="{{category.name}}">
+                            <menu-item link="www.google.com" caption="همه موارد این دسته"></menu-item>
+                            {% if category.childs %}
+                                {% for sub_1 in category.childs.all %}
+                                    <menu-group caption="{{sub_1.name}}">
+                                        {% if sub_1.childs %}
+                                            {% for sub_2 in sub_1.childs.all %}
+                                                <menu-group caption="{{sub_2.name}}">
+                                                        {% if sub_2.childs %}
+                                                            {% for sub_3 in sub_2.childs.all %}
+                                                                <menu-group caption="{{sub_3.name}}">
+                                                                    {%  if sub_3.childs %}
+                                                                        {% for sub_4 in sub_3.childs.all %}
+                                                                            <menu-group caption="{{sub_4.caption}}">
+                                                                            
+                                                                            </menu-group>
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                </menu-group>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                </menu-group>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </menu-group>
+                                {% endfor %}
+                            {% endif %}
+                        </menu-group>
+                    {% endfor %}
+                </list-menu>
+            </div>
+          
 
-            </ul>
         </div>
+
         {% block scripts %}
 
         {% endblock %}
-
+        <script defer src="{% static 'js/menu.js' %}"></script>
     </body>
 
 </html>

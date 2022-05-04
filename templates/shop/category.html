@@ -1,4 +1,4 @@
-{% extends '../base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load options  %}
 
@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block content %}
+
+{% comment %}
 {% if collection.page_poster_url %}
 <img src="{{collection.page_poster_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
     alt="{{collectin.page_poster_alt}}">
@@ -15,12 +17,19 @@
 <img src="{{collection.page_poster.url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
     alt="{{collectin.page_poster_alt}}">
 {% endif %}
-
-
-
+{% endcomment %}
 <section class=" w-full  md:w-3/4 md:basis-3/4 mx-auto">
+    {% comment %}
     <h2 class="p-2 mt-8 text-2xl text-center">{{collection.name}}</h2>
     <h4 class="p-1 text-center text-xs">{{collection.slogan}}</h4>
+    {% endcomment %}
+    {% if not page.object_list %}
+
+    <div class="flex h-screen w-full gap-4 items-center justify-center">
+        <i class="bi-emoji-frown text-4xl text-gray-500"></i>
+        <h1>دراین دسته هنوز محصولی ثبت نشده است!</h1>
+    </div>
+    {% endif  %}
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
         {% for product in page.object_list %}
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
@@ -84,16 +93,17 @@
         </article>
         {% endfor %}
     </section>
+   
     <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
         <div class="text-sm flex gap-2">
             {% if  page.has_previous %}
-            <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+            <a href="?page={{page.previous_page_number}}&keywords={{keywords}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
             {% endif %}
             {% for p in page.paginator.page_range %}
-                <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+                <a href="?page={{p}}&keywords={{keywords}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
             {% endfor %}
             {% if  page.has_next %}
-            <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+            <a href="?page={{page.next_page_number}}&keywords={{keywords}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
             {% endif %}
 
         </div>

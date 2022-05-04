@@ -2,6 +2,7 @@
 from audioop import ratecv
 from email.policy import default
 import os
+from re import T
 from turtle import RawTurtle
 from attr import field
 from django.db import models
@@ -155,13 +156,13 @@ class Product(models.Model):
         max_length=20, default=generate_code, editable=False)
     category = models.ForeignKey(
         to=Category, related_name='products', on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=50, blank=False, null=False)
-    en_name = models.CharField(max_length=50, blank=True, null=False)
+    name = models.CharField(max_length=50, blank=False, null=False, db_index=True)
+    en_name = models.CharField(max_length=50, blank=True, null=False, db_index=True)
     slug = models.SlugField(blank=True, null=True)
     en_slug = models.SlugField(null=True, blank=True)
-    meta_title = models.CharField(max_length=255, blank=True)
-    meta_description = models.CharField(max_length=255, blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True, db_index=True)
+    meta_description = models.CharField(max_length=255, blank=True, db_index=True)
+    meta_keywords = models.CharField(max_length=255, blank=True, db_index=True)
     sku = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField(default=0, blank=False)
     stock_low_threshold = models.IntegerField(default=1)

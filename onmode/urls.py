@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from index.models import BlogPost, SliderPhoto
+from index.models import BlogPost, ShopSet, SliderPhoto
 from catalogue.models import Collection, Product, Shop
 
 def index(request: HttpRequest):
@@ -14,12 +14,14 @@ def index(request: HttpRequest):
     product = Product.objects.first()
     collections = Collection.objects.filter(index_view=True)
     print(collections)
+    shopset = ShopSet.objects.first()
     
     return render(request, 'index.html', {
         'slides': slides,
         'posts': posts,
         'product': product,
-        'collections': collections
+        'collections': collections,
+        'shopset': shopset
     })
 
 def about_us(request: HttpRequest):
@@ -37,16 +39,18 @@ def shop(request: HttpRequest):
         'shop': shop
     })
     
-
+from catalogue.views import shop, search, category
 
 urlpatterns = [
     path('', index, name='index'),
     path('', include('orders.urls', namespace='orders')),
+    path('admin/', admin.site.urls),
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),
+    path('search/', search, name='search' ),
+    path('category/<category_name>', category, name='category' ),
     path('cert/', cert, name='cert' ),
-    path('shop/', shop, name='shop' ),
-    path('admin/', admin.site.urls),
+    path('<shop_name>/', shop , name='shop'),
     path('users/', include('users.urls', namespace='users'), ),
     path('catalogue/', include('catalogue.urls', namespace='catalogue')),
 ]
