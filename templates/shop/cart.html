@@ -24,6 +24,7 @@
             <p class=" p-2 rounded-box text-md text-center w-fit bg-blue-600 text-white">نام بوتیک:
                 {{cart.shop.name}}
             </p>
+            
         </div>
         {% for item in cart.items.all %}
         <article class="relative bg-white rounded-box shadow-md p-2 w-full flex gap-2">
@@ -76,7 +77,14 @@
                 <span id="final_price">{{ cart.final_price }}تومان</span>
             </div>
         </div>
+        {% if not cart.is_expired %}
         <a href="{% url 'orders:checkout' cart.shop.name %}" class="btn btn-primary">پرداخت</a>
+        {% else %}
+        <a href="{% url 'orders:checkout' cart.shop.name %}" class="btn btn-primary">به روز رسانی</a>
+        {% endif %}
+        <p class="text-xs text-error text-center">
+            قیمت برخی اقلام این سفارش تغییر کرده است!
+        </p>
     </section>
     {% endfor %}
 
