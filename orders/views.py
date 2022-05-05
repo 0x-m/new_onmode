@@ -1,3 +1,4 @@
+from cmath import pi
 from email import header
 import json
 from os import stat
@@ -23,15 +24,14 @@ def cart(request: HttpRequest):
 
 
 @login_required
-def refresh_order(request: HttpRequest):
-    order_id = request.GET.get('id')
+def refresh_order(request: HttpRequest, order_id):
     order = get_object_or_404(
         Order, id=order_id, paid=False, user=request.user)
     order.refresh()
-    # return redirect('orders:cart')
-    return JsonResponse({
-        'status': 'refereshed'
-    })
+    return redirect('orders:cart')
+    # return JsonResponse({
+    #     'status': 'refereshed'
+    # })
 
 
 def test(request: HttpRequest):
@@ -62,6 +62,7 @@ def add_item(request: HttpRequest):
 
             # users can not buy form theirselves
             if user.shop == shop:
+                print('invalid')
                 return JsonResponse({
                     'status': 'invalid action'
                 })
@@ -75,7 +76,8 @@ def add_item(request: HttpRequest):
             order_item.quantity = form.cleaned_data['quantity']
             order_item.options = form.cleaned_data['options']
             order_item.refresh()  # ambiguous this method updates prices fields and save the model
-
+            print(order_item.final_price)
+            print('added....')
             return JsonResponse({
                 'status': 'added',
                 'final_price': order.final_price,
@@ -89,7 +91,7 @@ def add_item(request: HttpRequest):
 
 @login_required
 def delete_item(request: HttpRequest, order_item_id):
-
+    print('delete issued')
     order_item = get_object_or_404(
         OrderItem, pk=order_item_id, order__user=request.user)
 

@@ -23,8 +23,9 @@ function like(elem) {
 
 function addToCart(elem) {
     const product_id = elem.dataset['pid'];
-    const collection = elem.dataset['collection'];
-    const options = document.getElementById('product_options')?.value;
+    const collection = elem.dataset['collection'] ?? '';
+    const obj = document.getElementById('product_options');
+    const options = obj == null ? '': obj.value;
     const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
     console.log(csrf_token);
     elem.disabled = true
@@ -33,7 +34,7 @@ function addToCart(elem) {
         body: new URLSearchParams({
             product: product_id,
             quantity: 1,
-            collection: collection,
+            collection:  collection ,
             options: options
         }),
         headers: {
@@ -52,12 +53,12 @@ function addToCart(elem) {
 function deleteFromCart(elem) {
     const order_item_id = elem.dataset['itemid'];
     const final_price = document.getElementById('final_price');
-    fetch('/cart/delete/' + order_item_id + '/').then((res) => {
+    fetch('/cart/delete/' + order_item_id).then((res) => {
         if (res.status == 200) {
-            const final_price = document.getElementById('');
             res.json().then(json => {
                 final_price.innerText = json['final_price'];
             });
+            elem.parentNode.remove();
         }
     });
 
@@ -103,7 +104,7 @@ function applyCoupon(elem) {
 function deleteCoupon(elem) {
     const order_id = elem.dataset['order'];
     const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-    const final_price = document.getElementById('final_price');
+    const final_price = document.getElementById(elem.dataset['final_price']);
     const add_coupon_template = document.getElementById('add_coupon_template');
     const has_coupon = document.getElementById('has_coupon');
     fetch('/cart/coupon/delete', {
@@ -134,7 +135,7 @@ function deleteCoupon(elem) {
 
 function incrementQuantity(elem) {
     const order_item_id = elem.dataset['itemid'];
-    const final_price = document.getElementById('final_price');
+    const final_price = document.getElementById(elem.dataset['total']);
     const num_box = elem.nextElementSibling;
     elem.disabled = true;
     fetch('/cart/increment/' + order_item_id).then((res) => {
@@ -142,7 +143,6 @@ function incrementQuantity(elem) {
             res.json().then((json) => {
                 final_price.innerText = json['final_price'];
                 num_box.value = parseInt(num_box.value) + 1
-                console.log(num_box);
             });
             elem.disabled = false;
         }
@@ -151,7 +151,7 @@ function incrementQuantity(elem) {
 
 function decrementQuantity(elem) {
     const order_item_id = elem.dataset['itemid'];
-    const final_price = document.getElementById('final_price');
+    const final_price = document.getElementById(elem.dataset['total']);
     const num_box = elem.previousElementSibling;
     elem.disabled = true;
     fetch('/cart/decrement/' + order_item_id).then((res) => {

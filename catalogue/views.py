@@ -46,9 +46,13 @@ def product(request: HttpRequest, pid=None):
         # NOTE: any better way?
         if not product:
             # create a new product
-            product = form.save(commit=False)
-            product.shop = shop
-            product.save()
+            try:
+                shop.inc_product_count()
+                product = form.save(commit=False)
+                product.shop = shop
+                product.save()
+            except:
+                return HttpResponseBadRequest('max allowed product restriction...!') #TODO: needs a conceptual exception...
         else:
             form.save() #update the product
 
@@ -370,7 +374,6 @@ def like(request: HttpRequest, product_id):
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code =product_code)
     liked = product.likes.filter(user=request.user).exists()
-    
     comment = None
     try:
         comment = request.user.comments.get(product=product)
@@ -436,7 +439,7 @@ def shop(request: HttpRequest, shop_name):
         
     
 def category(request:HttpRequest, id):
-    category = get_object_or_404(id=id)
+    category = get_object_or_404(Category, id=id)
 
     #tree traverse..............
     categories = {category.id}
@@ -445,9 +448,9 @@ def category(request:HttpRequest, id):
         curr = stack.pop()
         if not curr.childs:
             continue
-        for c in curr.childs:
+        for c in curr.childs.all():
             categories.add(c.id)
-            stack.add(c)
+            stack.append(c)
     #...........................
     
     products = Product.objects.filter(id__in=list(categories))

@@ -178,18 +178,22 @@
                 <list-menu>
                     {% for category in categories %}
                         <menu-group caption="{{category.name}}">
-                            <menu-item link="www.google.com" caption="همه موارد این دسته"></menu-item>
+                            <menu-item link="{% url 'catalogue:category' category.id %}" caption="همه موارد این دسته"></menu-item>
                             {% if category.childs %}
                                 {% for sub_1 in category.childs.all %}
                                     <menu-group caption="{{sub_1.name}}">
+                                        <menu-item link="{% url 'catalogue:category' sub_1.id %}" caption="همه موارد این دسته"></menu-item>
                                         {% if sub_1.childs %}
                                             {% for sub_2 in sub_1.childs.all %}
                                                 <menu-group caption="{{sub_2.name}}">
+                                                    <menu-item link="{% url 'catalogue:category' sub_2.id %}" caption="همه موارد این دسته"></menu-item>
                                                         {% if sub_2.childs %}
                                                             {% for sub_3 in sub_2.childs.all %}
                                                                 <menu-group caption="{{sub_3.name}}">
+                                                                    <menu-item link="{% url 'catalogue:category' sub_3.id %}" caption="همه موارد این دسته"></menu-item>
                                                                     {%  if sub_3.childs %}
                                                                         {% for sub_4 in sub_3.childs.all %}
+                                                                        <menu-item link="{% url 'catalogue:category' sub_4.id %}" caption="همه موارد این دسته"></menu-item>
                                                                             <menu-group caption="{{sub_4.caption}}">
                                                                             
                                                                             </menu-group>

@@ -3,8 +3,9 @@ from audioop import ratecv
 from email.policy import default
 import os
 from re import T
-from turtle import RawTurtle
+from turtle import RawTurtle, back
 from attr import field
+from click import edit
 from django.db import models
 from django.dispatch import receiver
 from django.http import HttpRequest
@@ -46,12 +47,12 @@ class Shop(models.Model):
     owner = models.ForeignKey(
         to=User, related_name='shops', on_delete=models.SET_NULL, null=True,)
     name = models.CharField(max_length=40)  # TODO: make it unique
-    meta_title = models.CharField(max_length=100)
-    meta_description = models.CharField(max_length=400)
+    meta_title = models.CharField(max_length=100, blank=True)
+    meta_description = models.CharField(max_length=400, blank=True)
     # baner = models.ForeignKey(to='Photos', on_delete=models.SET_NULL)
     # logo = models.ForeignKey(to='Photo', on_delete=models.SET_NULL)
-    address_description = models.TextField(max_length=1000)
-    phone = models.CharField(max_length=20)
+    address_description = models.TextField(max_length=1000, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
     product_capacity = models.PositiveIntegerField(default=100)
     product_count = models.PositiveIntegerField(default=0)
     fee = models.PositiveIntegerField(default=9)
@@ -69,7 +70,7 @@ class Shop(models.Model):
 
     def inc_product_count(self):
         if not self.has_capacity():
-            return  # NOTE: raising Exception..??
+            return Exception('max allowd product restriction')  # NOTE: raising Exception..??
 
         self.product_count += 1
         self.save()

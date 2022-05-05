@@ -10,7 +10,7 @@
     <div class="flex flex-col gap-1">
         <span class="p-1 text-gray-700 text-lg">سبد خرید</span>
         <p class="text-xs text-gray-400 mr-4">
-            توجه کنید که ..
+            جهت تغییر مشخصات هر محصول روی تصویر آن کلیک کنید.
         </p>
     </div>
     <a href="#" class="btn btn-ghost text-sm">ادامه خرید</a>
@@ -24,15 +24,19 @@
             <p class=" p-2 rounded-box text-md text-center w-fit bg-blue-600 text-white">نام بوتیک:
                 {{cart.shop.name}}
             </p>
-            
+
         </div>
         {% for item in cart.items.all %}
         <article class="relative bg-white rounded-box shadow-md p-2 w-full flex gap-2">
-            <img src="{{item.product.preview.img.url}}" class="rounded-box h-20 w-20 object-cover"
-                alt="{{item.product.preview.alt}}">
+            <a href="{% url 'catalogue:product_detail' item.product.prod_code %}">
+                <img src="{{item.product.preview.img.url}}" class="rounded-box h-20 w-20 object-cover"
+                    alt="{{item.product.preview.alt}}">
+            </a>
             <div class="flex flex-col gap-1 w-full ">
                 <div class="flex  flex-col gap-2  w-full p-1">
-                    <h2 class="text-sm">{{item.product.name}}</h2>
+                    <a href="{% url 'catalogue:product_detail' item.product.prod_code %}">
+                        <h2 class="text-sm">{{item.product.name}}</h2>
+                    </a>
                     <h2 class="text-[0.7rem] text-gray-500">{{item.final_price}}تومان</h2>
                 </div>
                 <div class="flex gap-3">
@@ -45,21 +49,19 @@
                 </div>
             </div>
             <div class="flex w-16 absolute left-1 bottom-2">
-               {% if item.available %}
-                    <button onclick="incrementQuantity(this);" data-itemid="{{item.id}}"
-                        class="basis-1/4 text-gray-400 hover:text-gray-600">+</button>
-                    <input class="basis-1/2 w-1/2 text-xs text-center" type="text" name="" value="{{item.quantity}}"
-                        id="" disabled>
-                    <button onclick="decrementQuantity(this);"  data-itemid="{{item.id}}"
-                        class="basis-1/4 text-gray-400 hover:text-gray-600">-</button>
+                {% if item.available %}
+                <button data-total="final_price_{{cart.id}}" onclick="incrementQuantity(this);"
+                    data-itemid="{{item.id}}" class="basis-1/4 text-gray-400 hover:text-gray-600">+</button>
+                <input class="basis-1/2 w-1/2 text-xs text-center" type="text" name="" value="{{item.quantity}}" id=""
+                    disabled>
+                <button data-total="final_price_{{cart.id}}" onclick="decrementQuantity(this);"
+                    data-itemid="{{item.id}}" class="basis-1/4 text-gray-400 hover:text-gray-600">-</button>
                 {% else %}
-                    <span class="text-whtie bg-red-500 text-xs rounded-box">ناموجود</span>
+                <span class="text-whtie bg-red-500 text-xs rounded-box">ناموجود</span>
                 {% endif %}
             </div>
             <input type="number" min="1" value="1" class="w-16 p-2 hidden absolute bottom-2 text-xs left-1 rounded-box">
-            <form action="{% url 'orders:delete' item.product.id %}">
-                <button class="absolute top-1 left-2 text-gray-600 text-md bi-x"></button>
-            </form>
+            <button onclick="deleteFromCart(this);" data-itemid="{{item.id}}" class="absolute top-1 left-2 text-gray-600 text-md bi-x"></button>
         </article>
         {% endfor %}
 
@@ -73,18 +75,18 @@
             </div>
 
             <div class="flex justify-between rounded-box mt-2">
-                <span  >جمع کل:</span>
-                <span id="final_price">{{ cart.final_price }}تومان</span>
+                <span>جمع کل:</span>
+                <div><span id="final_price_{{cart.id}}">{{ cart.final_price }}</span> تومان</div>
             </div>
         </div>
         {% if not cart.is_expired %}
         <a href="{% url 'orders:checkout' cart.shop.name %}" class="btn btn-primary">پرداخت</a>
         {% else %}
-        <a href="{% url 'orders:checkout' cart.shop.name %}" class="btn btn-primary">به روز رسانی</a>
-        {% endif %}
+        <a href="{% url 'orders:refresh' cart.id %}" class="btn btn-primary">به روز رسانی</a>
         <p class="text-xs text-error text-center">
             قیمت برخی اقلام این سفارش تغییر کرده است!
         </p>
+        {% endif %}
     </section>
     {% endfor %}
 
@@ -98,5 +100,5 @@
 {% endblock %}
 
 {% block scripts %}
- <script defer src="{% static 'js/functions.js' %}"></script>
+<script defer src="{% static 'js/functions.js' %}"></script>
 {% endblock %}

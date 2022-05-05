@@ -155,11 +155,11 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 </div>
                 <div class="flex items-center justify-center w-full gap-1 ">
                     {% if not product.shop == user.shops.first %}
-                    <button onclick="addToCart(this);" data-pid="{{product.id}}"
+                    <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
                         class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-bag text-gray  text-xl"></i>
                     </button>
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-heart text-gray  text-xl"></i>
                     </button>
                     {% else  %}

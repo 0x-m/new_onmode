@@ -156,6 +156,12 @@ class Order(models.Model):
 
         self.save()
 
+    @property
+    def is_expired(self):
+        for item in self.items.all():
+            if item.is_expired():
+                return True
+            
     def refresh(self):
         for item in self.items.all():
             if item.is_expired():
