@@ -6,7 +6,7 @@ from wsgiref.handlers import read_environ
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-
+from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from httpx import RequestError
@@ -254,9 +254,29 @@ def wallet_deposit(request: HttpRequest):
 def comments(request: HttpRequest):
     # needs pagination
     # comments = request.user.comments.all()
+    state = request.GET.get('state', 'published')
+
+    published = True
+    if state != 'published':
+        published = False
+  
+    paginator = Paginator(request.user.comments.filter(published =published), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    
     return render(request, 'user/dashboard/comments.html', {
-        'comments': 'comments'
+        'page': page,
+        'state': state
     })
+    
+
 
 
 def messages(request: HttpRequest):

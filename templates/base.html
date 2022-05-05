@@ -42,9 +42,9 @@
             <header class="w-full bg-white shadow">
                 <nav class="navbar bg-base-100 gap-1 ">
                     <div class="flex-1 gap-2 p-1 basis-12">
-                        <a href="{% url 'index'  %}">
-                            <img src="{{siteinfo.logo}}"
-                                class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full" alt="">
+                        <a href="{% url 'index:index'  %}">
+                            <img src="{{siteinfo.logo.url}}"
+                                class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full" alt="logo">
                         </a>
                         <div class="form-control w-full mr-2">
                             <div class="border items-center p-0 rounded-box bg-stone-50 flex gap-2 ">
@@ -113,9 +113,9 @@
 
                 <footer class="footer footer-center p-2 bg-gray-100 text-gray-600 mt-4">
                     <ul class="menu menu-horizontal text-xs  w-full justify-center  gap-2">
-                        <li><a href="{{siteinfo.blog}}">درباره ما</a></li>
-                        <li><a href="{% url 'contactus' %}">تماس با ما</a></li>
-                        <li><a href="">قوانین</a></li>
+                        <li><a href="{% url 'index:aboutus' %}">درباره ما</a></li>
+                        <li><a href="{% url 'index:contactus' %}">تماس با ما</a></li>
+                        <li><a href="{% url 'index:policies' %}">قوانین</a></li>
                         <li><a href="{{siteinfo.blog}}">وبلاگ</a></li>
                     </ul>
                     <div class="flex items-center flex-col text-gray-700 justify-center text-xs">
@@ -136,6 +136,17 @@
                         </p>
 
                     </div>
+                    <a  href="{% url 'index:certifications' %}">
+                        <div class="flex w-fll gap-1">
+                            {% for cert in certs %}
+                            {% if cert.symbol_url %}
+                                 <img src="{cert.symbol_url}" class="w-8 h-8 object-contain" alt="">
+                            {% elif cert.symbol %}
+                                <img src="{cert.symbol.url}" class="w-8 h-8 object-contain" alt="">
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </a>
                     <div>
                         <div class="grid grid-flow-col gap-3 text-xl">
                             <a href="{{siteinfo.instgram}}">

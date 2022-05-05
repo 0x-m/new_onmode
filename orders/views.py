@@ -1,5 +1,6 @@
 from email import header
 import json
+from os import stat
 from typing import get_origin
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
@@ -11,6 +12,7 @@ from promotions.models import Coupon
 import requests
 from .models import Order, OrderItem, ReturnRequest
 from .forms import AcceptOrderForm, AddOrderItemForm
+from django.core.paginator import *
 
 
 def cart(request: HttpRequest):
@@ -58,7 +60,12 @@ def add_item(request: HttpRequest):
             product = form.cleaned_data['product']
             shop = product.shop
 
-            # TODO: users can not buy form theirselves
+            # users can not buy form theirselves
+            if user.shop == shop:
+                return JsonResponse({
+                    'status': 'invalid action'
+                })
+                
             order, _ = Order.objects.get_or_create(
                 shop=shop, user=user, paid=False)
 
@@ -75,7 +82,6 @@ def add_item(request: HttpRequest):
 
             })
         else:
-            print(form.errors, '////////////////')
             return HttpResponseBadRequest()
 
     return HttpResponseNotAllowed(['POST'])
@@ -198,7 +204,14 @@ def checkout(request: HttpRequest, shop_name):
             return HttpResponse(req_result.status_code)
 
         elif pay_via == 'wallet':
-            pass
+            if wallet_has_balance:
+                cart.pay('site wallet', cart.code)
+                return render('shop/checkout_result.html', {
+                    'ref_id': cart.code,
+                    'status': 'success'
+                })
+            else:
+                return Http404()
 
         return redirect('https://www.google.com')
         # if not cart.paid:
@@ -353,8 +366,20 @@ def user_order(request: HttpRequest, order_code):
 
 @login_required
 def user_orders(request: HttpRequest):
+    state = request.GET.get('state', 'pending')
+    paginator = Paginator(request.user.orders.filter(state=state).all(), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
     return render(request, 'user/dashboard/orders.html', {
-        'orders': request.user.orders.filter(paid=True).all()
+        'page': page,
+        'state': state
     })
 
 @login_required
@@ -366,9 +391,24 @@ def shop_order(request: HttpRequest, order_code):
     
 @login_required
 def shop_orders(request: HttpRequest):
+    state = request.GET.get('state', 'pending')
+
+    paginator = Paginator(request.user.shop.orders.filter(state=state).all(), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    
     return render(request, 'shop/orders.html', {
-        'orders': request.user.shop.orders.all()
+        'page': page,
+        'state': state
     })
+
 
 
 

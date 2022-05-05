@@ -243,4 +243,16 @@ class DepositTransaction(models.Model):
         self.succeeded = True
         self.save()
     
+
+class Message(models.Model):
+    class TYPES(models.TextChoices):
+        Normal = 'Normal',
+        Warning = 'Warning',
+        Success = 'Success'
+        
     
+    user = models.ForeignKey(to=User, related_name='messages', on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=TYPES.choices, default=TYPES.Normal)
+    title = models.CharField(max_length=255,blank=True)
+    body = models.CharField(max_length=255, blank=True)
+    visited = models.BooleanField(default=False)

@@ -14,7 +14,7 @@
         <main class="bg-white flex flex-col items-center justify-self-center  rounded-box shadow p-4 ">
             <div class="avatar mb-2">
                 <div class="w-24 rounded-full">
-                    <img src="https://i.pravatar.cc/300"  alt="">
+                    <img src="{{siteinfo.logo.url}}"  alt="">
                 </div>
             </div>
             <form class="flex flex-col gap-2 " method="post" action="{% url 'users:verify' %}">

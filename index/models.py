@@ -1,3 +1,5 @@
+from asyncio import FastChildWatcher
+from ftplib import MAXLINE
 from turtle import title
 from django.db import models
 from django.dispatch import receiver
@@ -5,7 +7,7 @@ from django.dispatch import receiver
 from catalogue.models import  Shop
 from django_quill.fields import QuillField
 from django.db.models.signals import pre_delete
-
+from tinymce.models import HTMLField
 
 class SliderPhoto(models.Model):
     photo = models.ImageField(blank=True)
@@ -20,13 +22,20 @@ def delet_photo(sender, instance, **kwargs):
         instance.photo.delete()
 
 
+class Certificate(models.Model):
+    name = models.CharField(max_length=255, blank=True)
+    symbol = models.ImageField(blank=True, null=True)
+    description = models.TextField(max_length=1000)
+    related_link = models.URLField(blank=True, null=True)
+    show_on_index = models.BooleanField(default=False)
+    
+
 class About(models.Model):
-    content = QuillField()
+    content = HTMLField()
 
 
 class Law(models.Model):
-    content = QuillField()
-
+    content = HTMLField()
 
 class SiteInfo(models.Model):
     logo = models.ImageField(null=True, blank=True)
@@ -39,7 +48,7 @@ class SiteInfo(models.Model):
     pinned_url = models.URLField(null=True, blank=True)
     jumbo_message = models.TextField(max_length=1000, blank=True)
     jumbo_button_text = models.CharField(max_length=50, blank=True)
-    jumb_button_url = models.URLField(null=True, blank=True)
+    jumbo_button_url = models.URLField(null=True, blank=True)
     show_jumbo_to = models.CharField(choices=[
         ('All', 'All'),
         ('ShopKeeprs', 'ShopKeepers'),
@@ -78,3 +87,10 @@ class ShopSet(models.Model):
     title = models.CharField(max_length=255, blank=True)
     slogan = models.CharField(max_length=255, blank=True)
 
+
+class ContactUsMessages(models.Model):
+    full_name = models.CharField(max_length=255, blank=True)
+    email = models.EmailField()
+    title = models.CharField(max_length=255, blank=True)
+    body = models.TextField(max_length=5000, blank=True)
+    read = models.BooleanField(default=False)

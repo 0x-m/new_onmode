@@ -3,18 +3,13 @@
 
 {% block title %}legals{% endblock %}
 {% block head %}
-{% include 'django_quill/media.html' %}
 {% endblock %}
 
 {% block content  %}
-<section class="w-full min-h-screen flex flex-col gap-2 justify-center items-center">
-    <h1 class="text-gray-700 text-xl">قوانین</h1>
-    <div class="divider w-1/4 mx-auto"></div>
-    <div class="w-3/4 bg-white shadow rounded-sm p-2">
-        <p class="text-gray-500 text-sm  p-2">
-            {{laws.content.html|safe}}
-        </p>
-    </div>
+<section class="w-full min-h-screen p-10">
+    <section class="w-full min-h-screen p-10">
+        {{law.content|safe}}
+    </section>
 </section>
 {% endblock  %}
 

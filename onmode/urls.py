@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from index.models import BlogPost, ShopSet, SliderPhoto
+from index.models import About, BlogPost, Certificate, ShopSet, SliderPhoto, Law
 from catalogue.models import Collection, Product, Shop
 
 def index(request: HttpRequest):
@@ -21,11 +21,13 @@ def index(request: HttpRequest):
         'posts': posts,
         'product': product,
         'collections': collections,
-        'shopset': shopset
+        'shopset': shopset,
     })
 
 def about_us(request: HttpRequest):
-    return render(request, 'aboutus.html')
+    return render(request, 'aboutus.html', {
+        'law': Law.objects.first()
+    })
 
 def contact_us(request: HttpRequest):
     return render(request, 'contactus.html')
@@ -33,17 +35,14 @@ def contact_us(request: HttpRequest):
 def cert(request: HttpRequest):
     return render(request, 'certs.html')
 
-def shop(request: HttpRequest):
-    shop = Shop.objects.first()
-    return render(request, 'shop/shop.html', {
-        'shop': shop
-    })
+
     
 from catalogue.views import shop, search, category
 
 urlpatterns = [
-    path('', index, name='index'),
+    path('', include('index.urls', namespace='index')),
     path('', include('orders.urls', namespace='orders')),
+    path('tinymce/', include('tinymce.urls')),
     path('admin/', admin.site.urls),
     path('aboutus/', about_us, name='aboutus' ),
     path('contactus/', contact_us, name='contactus' ),

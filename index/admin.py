@@ -1,6 +1,6 @@
 import site
 from django.contrib import admin
-from .models import BlogPost, ShopSet, SiteInfo, SliderPhoto
+from .models import About, BlogPost, Law, ShopSet, SiteInfo, SliderPhoto
 
 @admin.register(SliderPhoto)
 class SlidePhotoAdmin(admin.ModelAdmin):
@@ -18,3 +18,5 @@ class ShopSet(admin.ModelAdmin):
     filter_horizontal = ['shops']
 
 admin.site.register(SiteInfo)
+admin.site.register(About)
+admin.site.register(Law)

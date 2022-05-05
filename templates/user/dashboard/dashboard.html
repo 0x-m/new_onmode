@@ -27,9 +27,9 @@
         <header class="w-full bg-white shadow">
             <nav class="navbar bg-base-100 gap-1 ">
                 <div class="flex-1 gap-2 p-1 basis-12">
-                    <a href="{% url 'index' %}">
-                        <img src="https://i.pravatar.cc/300" class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full"
-                            alt="">
+                    <a href="{% url 'index:index' %}">
+                        <img src="{{siteinfo.logo.url}}" class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full"
+                            alt="logo">
                     </a>
                     <div class="form-control w-full mr-2">
                         <div class="border items-center p-0 rounded-box bg-stone-50 flex gap-2 ">
@@ -181,7 +181,7 @@
 
                 </ul>
             </section>
-            <section class="md:basis-5/6 p-2">
+            <section class="md:basis-5/6 p-2 h-full">
                 {% block content %}
                 <section class="flex flex-col gap-2 w-full h-full justify-center  p-1">
                     <div class="md:w-3/4 flex flex-col md:flex-row gap-2">
@@ -219,7 +219,6 @@
                 {% endblock %}
             </section>
         </main>
-        <footer></footer>
         {% block scripts %}
         {% endblock %}
     </body>

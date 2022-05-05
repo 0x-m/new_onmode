@@ -14,14 +14,16 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+
 INSTALLED_APPS = [
+
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.auth',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_quill',
+    'tinymce',
     'sslserver',
     'django_filters',
     'jalali_date',
@@ -44,7 +46,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'onmode.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -56,7 +57,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'catalogue.context_processors.CategoryContextProcessor'
+                'catalogue.context_processors.CategoryContextProcessor',
+                'index.context_processors.info'
             ],
         },
     },
@@ -101,7 +103,10 @@ AUTH_USER_MODEL = 'users.user'
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
+LANGUAGES = [
+    ('en-us', 'english'),
+    ('fa-ir', 'persian')
+]
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -152,4 +157,19 @@ JALALI_DATE_DEFAULTS = {
             ]
         }
     },
+}
+
+TINYMCE_DEFAULT_CONFIG = {
+    "theme": "silver",
+    "height": 400,
+    "menubar": True,
+    "language": "fa_ir",
+    "directionality": "rtl",
+    "plugins": "advlist,autolink,lists,directionality,link,image,charmap,print,preview,anchor"
+    "searchreplace,visualblocks,code,fullscreen,insertdatetime,media,table,paste,"
+    "code,help,wordcount",
+    "toolbar": "undo redo | formatselect |ltr rtl" 
+    "bold italic backcolor | alignleft aligncenter " 
+    "alignright alignjustify | bullist numlist outdent indent | " 
+    "removeformat | help |  "
 }
