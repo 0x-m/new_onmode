@@ -13,10 +13,11 @@
         <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Harmattan&family=Lemonada&display=swap"
             rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
-
+        <link rel="icon"  href="{{siteinfo.favicon}}">
         {% block head %}
 
         {% endblock %}
+
         <title>{% block title %}{% endblock %}</title>
         <style>
             * {
@@ -42,7 +43,7 @@
                 <nav class="navbar bg-base-100 gap-1 ">
                     <div class="flex-1 gap-2 p-1 basis-12">
                         <a href="{% url 'index'  %}">
-                            <img src="https://i.pravatar.cc/300"
+                            <img src="{{siteinfo.logo}}"
                                 class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full" alt="">
                         </a>
                         <div class="form-control w-full mr-2">
@@ -112,28 +113,42 @@
 
                 <footer class="footer footer-center p-2 bg-gray-100 text-gray-600 mt-4">
                     <ul class="menu menu-horizontal text-xs  w-full justify-center  gap-2">
-                        <li><a href="">درباره ما</a></li>
-                        <li><a href="">تماس با ما</a></li>
+                        <li><a href="{{siteinfo.blog}}">درباره ما</a></li>
+                        <li><a href="{% url 'contactus' %}">تماس با ما</a></li>
                         <li><a href="">قوانین</a></li>
-                        <li><a href="">وبلاگ</a></li>
+                        <li><a href="{{siteinfo.blog}}">وبلاگ</a></li>
                     </ul>
+                    <div class="flex items-center flex-col text-gray-700 justify-center text-xs">
+                        <div class="flex gap-2">
+                            <span>شماره تماس:</span>
+                            <span>{{siteinfo.tel_line_1}}</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <span>خط دوم:</span>
+                            <span>{{siteinfo.tel_line_2}}</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <span>ایمیل:</span>
+                            <span>{{siteinfo.email}}</span>
+                        </div>
+                        <p class="text-xs w-3/4 md:w-1/3 text-gray-600">
+                            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestias repellat odio labore, at modi quibusdam quam iste beatae, inventore necessitatibus reiciendis maxime deleniti expedita consequatur nesciunt quas atque natus dolor.
+                        </p>
 
+                    </div>
                     <div>
                         <div class="grid grid-flow-col gap-3 text-xl">
-                            <a>
+                            <a href="{{siteinfo.instgram}}">
                                 <i class="bi-instagram"></i>
                             </a>
-                            <a>
+                            <a href="{{siteinfo.telegram}}">
                                 <i class="bi-telegram"></i>
 
                             </a>
-                            <a>
+                            <a href="{{siteinfo.whatsapp}}">
                                 <i class="bi-whatsapp"></i>
                             </a>
-                            <a>
-                                <i class="bi-linkedin"></i>
-                            </a>
-                            <a>
+                            <a href="{{siteinfo.twitter}}">
                                 <i class="bi-twitter"></i>
                             </a>
                         </div>

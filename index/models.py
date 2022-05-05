@@ -40,13 +40,19 @@ class SiteInfo(models.Model):
     jumbo_message = models.TextField(max_length=1000, blank=True)
     jumbo_button_text = models.CharField(max_length=50, blank=True)
     jumb_button_url = models.URLField(null=True, blank=True)
-
+    show_jumbo_to = models.CharField(choices=[
+        ('All', 'All'),
+        ('ShopKeeprs', 'ShopKeepers'),
+        ('Customers', 'Customers'),
+        ('GuestUser', 'GeustUser'),
+        ('NoOne', 'NoOne')
+    ], max_length=20, default='All')
     tel_line_1 = models.CharField(max_length=20, blank=True)
     tel_line_2 = models.CharField(max_length=20, blank=True)
     mobile_phone = models.CharField(max_length=20, blank=True)
     address = models.TextField(max_length=1000, blank=True)
     email = models.EmailField(blank=True, null=True)
-
+    blog = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
     linkedin = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
