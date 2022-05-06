@@ -65,7 +65,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'onmode.wsgi.application'
-
+ALLOW_UNICODE_SLUGS = True
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

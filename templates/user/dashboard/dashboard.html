@@ -57,8 +57,21 @@
                             <li>
                                 <a href="{% url 'users:dashboard' %}" class="text-xs">
                                     <i class="bi-person text-lg"></i>
-                                    داشبورد
+                                    {{user.phone_num}}
                                 </a>
+                            </li>
+                            <li>
+                                {% if user.shop %}
+                                <a href="{% url 'shop' user.shop.name %}" class="text-xs">
+                                    <i class="bi-shop text-lg"></i>
+                                    بوتیک من
+                                </a>
+                                {% else %}
+                                <a href="{% url 'users:create-shop' user.shop.name %}" class="text-xs">
+                                    <i class="bi-shop text-lg"></i>
+                                    ساخت بوتیک
+                                </a>
+                                {% endif %}
                             </li>
                             <li>
                                 <a href="{% url 'users:messages' %}" class="text-xs">
@@ -103,6 +116,7 @@
                                     <span>ویرایش مشخصات</span>
                                 </a>
                             </li>
+
                             <li>
                                 <a href="{% url 'users:wallet' %}">
                                     <i class="bi-wallet"></i>

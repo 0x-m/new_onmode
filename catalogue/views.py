@@ -1,4 +1,5 @@
 
+from asyncio import ensure_future
 from logging import LogRecord
 from math import prod
 from django.db.models import Q
@@ -72,19 +73,26 @@ def delete_product(request: HttpRequest, pid):
     Mark a product as deleted if the product with id=pid
     exists otherwise return http 404
     '''
-    # Does the user have any active shop ?
-    user = request.user
-    shop = get_object_or_404(Shop, owner=user, active=True)
-    product = get_object_or_404(Product,pk=pid, shop=shop, deleted=False)
-    product.deleted = True
-    product.save()
-    return render(request, '')  # TODO
+    if not request.user.shop:
+        return Http404()
+
+    product = get_object_or_404(Product,pk=pid, shop=request.user.shop, shop__active=True, deleted=False)
+    if request.method == 'POST':
+        product.deleted = True
+        product.save()
+        return render(request,  'shop/delete_product_consent.html', {
+            'status': 'success'
+        })  # TODO
+    
+    return render(request, 'shop/delete_product_consent.html', {
+        'product': product
+    })
 
 
 
-def filter(requeset: HttpRequest):
+def filter(requeset: HttpRequest, shop_name):
     form = ProductFilter(data=requeset.GET, 
-                         queryset=Product.objects.filter(deleted=False).all(),
+                         queryset=Product.objects.filter(deleted=False, shop__name=shop_name).all(),
                          request=requeset)
 
     return render(requeset, 'shop/filter.html', {
@@ -346,6 +354,9 @@ def comment(request: HttpRequest):
             if not created:
                 comment.published = False
                 comment.save()
+            else:
+                product.stats.inc_comments()
+                
             return redirect('catalogue:product_detail', product_code=product.prod_code)
             
         else:
@@ -361,9 +372,12 @@ def like(request: HttpRequest, product_id):
     user = request.user
     product = get_object_or_404(Product, pk=product_id, deleted=False)
     fav, created = Favourite.objects.get_or_create(user=user, product=product)
-    
+
     if not created:
         fav.delete()
+        product.stats.dec_likes() #TODO: use F object
+    else:
+        product.stats.inc_likes()
         
     return JsonResponse({
         'status': 'liked' if created else 'unliked'
@@ -421,7 +435,7 @@ def search(request: HttpRequest):
     
 def shop(request: HttpRequest, shop_name):
     shop = get_object_or_404(Shop, name=shop_name, active=True)
-    paginator = Paginator(shop.products.all(), 20)
+    paginator = Paginator(shop.products.filter(deleted=False).all(), 20)
     pg = request.GET.get('page')
 
     page = None
@@ -471,4 +485,24 @@ def category(request:HttpRequest, id):
     })
   
 
+def shop_products(request: HttpRequest):
     
+    
+    if not request.user.shop:
+        return Http404()
+
+    paginator = Paginator(request.user.shop.products.filter(deleted=False), 20)
+    pg = request.GET.get('page')
+
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+        
+
+    return render(request, 'shop/products.html', {
+        'page': page
+    })

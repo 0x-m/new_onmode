@@ -4203,6 +4203,10 @@ body[dir="rtl"] .checkbox:checked,
   z-index: 50;
 }
 
+.col-span-4 {
+  grid-column: span 4 / span 4;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -4286,6 +4290,10 @@ body[dir="rtl"] .checkbox:checked,
 
 .-mt-16 {
   margin-top: -4rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
 }
 
 .block {
@@ -4514,6 +4522,10 @@ body[dir="rtl"] .checkbox:checked,
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
+}
+
+.grid-flow-row {
+  grid-auto-flow: row;
 }
 
 .grid-flow-col {
@@ -4769,6 +4781,16 @@ body[dir="rtl"] .checkbox:checked,
 .bg-red-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 226 226 / var(--tw-bg-opacity));
+}
+
+.bg-red-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(252 165 165 / var(--tw-bg-opacity));
+}
+
+.bg-red-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 202 202 / var(--tw-bg-opacity));
 }
 
 .object-contain {

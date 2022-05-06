@@ -225,6 +225,12 @@
                     class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
                 {% endif %}
             </article>
+            {% empty %}
+            <div class="flex h-screen w-full gap-4 col-span-4 items-center justify-center">
+                <i class="bi-emoji-frown text-4xl text-gray-500"></i>
+                <h1 class="text-sm">این بوتیک هنوز هیچ محصولی ندارد!</h1>
+            </div>
+        
             {% endfor %}
         </section>
         <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">

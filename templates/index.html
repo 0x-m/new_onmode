@@ -124,6 +124,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         </div>
         <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mt-6">
             {% for product in collection.get_featureds %}
+            {% if not product.deleted %}
             <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
                 method="post">
                 <a href="{% url 'catalogue:product_detail' product.prod_code %}">
@@ -163,13 +164,13 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                         <i class="bi-heart text-gray  text-xl"></i>
                     </button>
                     {% else  %}
-                    <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                    <a href="{% url 'users:edit-product' product.id %}"
                         class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-pencil text-gray  text-xl"></i>
-                    </button>
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    </a>
+                    <a href="{% url 'users:delete-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-trash text-gray  text-xl"></i>
-                    </button>
+                    </a>
                     {% endif  %}
 
                 </div>
@@ -183,6 +184,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                     class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
                 {% endif %}
             </article>
+            {% endif %}
             {% endfor %}
         </section>
     </div>

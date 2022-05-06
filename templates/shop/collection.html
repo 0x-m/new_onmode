@@ -23,6 +23,7 @@
     <h4 class="p-1 text-center text-xs">{{collection.slogan}}</h4>
     <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
         {% for product in page.object_list %}
+        {% if not product.deleted %}
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
             method="post">
             <a href="">
@@ -82,6 +83,7 @@
                 class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
             {% endif %}
         </article>
+        {% endif %}
         {% endfor %}
     </section>
     <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">

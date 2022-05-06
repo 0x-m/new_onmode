@@ -22,6 +22,7 @@ urlpatterns = [
     path('dashboard/wallet/checkout', views.wallet_checkout, name='wallet_checkout'),
     path('dashboard/shop/create-shop', catalog.create_shop_request,name='create-shop' ),
     path('dashboard/shop/edit', catalog.edit_shop, name='edit-shop'),
+    path('dashboard/shop/products', catalog.shop_products, name='products'),
     path('dashboard/shop/product', catalog.product, name='add-product'),
     path('dashboard/shop/product/edit/<pid>', catalog.product, name='edit-product'),
     path('dashboard/shop/product/options/add/<pid>', catalog.add_option, name='add-option'),

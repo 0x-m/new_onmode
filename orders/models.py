@@ -152,8 +152,9 @@ class Order(models.Model):
                 item.product.force__dec_quantity(item.product.quantity)
             else:
                 item.product.dec_quantity(item.quantity)
+            item.product.inc_sales()
         # -----------------------
-
+        
         self.save()
 
     @property

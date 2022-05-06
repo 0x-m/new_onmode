@@ -18,12 +18,22 @@ from users.models import User
 from promotions.models import Discount
 from django.urls.base import reverse
 import django_filters
+from django.utils.text import slugify
 
+
+#TODO: move it to utils
+def persian_slugify(txt: str):
+    slug = ''
+    for c in txt:
+        if c not in [' ', ' ', '?', '(', ')', '%', '٪']:
+            slug += c
+        else:
+            slug += '-'
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     en_name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, allow_unicode=True)
     en_slug = models.SlugField(blank=True)
     meta_title = models.CharField(max_length=90, blank=True)
     meta_keywords = models.CharField(max_length=100, blank=True)
@@ -40,7 +50,19 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __str__(self) -> str:
-        return self.name
+        name = self.name
+        if self.parent:
+            name = self.parent.name + '/' + self.name
+        return name
+    
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+        
+            
 
 
 class Shop(models.Model):
@@ -82,7 +104,7 @@ class Shop(models.Model):
         self.save()
 
     def __str__(self) -> str:
-        return self.meta_title
+        return self.name
 
 
 @receiver(pre_delete, sender=Shop)
@@ -187,6 +209,16 @@ class Product(models.Model):
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True)
 
+
+
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+
+
     @property
     def colors(self):
         try:
@@ -270,6 +302,9 @@ class Product(models.Model):
 
         return price
 
+    def __str__(self) -> str:
+        return self.name
+
 def get_brand(request: HttpRequest):
     if request is None:
         return Product.objects.none()
@@ -288,7 +323,6 @@ class ProductFilter(django_filters.FilterSet):
     brands = django_filters.CharFilter(method='brand_filter')
     colors = django_filters.CharFilter(method='color_filter')
     sizes = django_filters.CharFilter(method='filter_size')
-
 
     def brand_filter(self, queryset, name, value):
         ls = self.request.GET.getlist('brands')
@@ -327,11 +361,6 @@ class ProductFilter(django_filters.FilterSet):
         }
 
 
-
-@receiver(post_save, sender=Product)
-def create_stats(sender, instance, created, **kwargs):
-    if created:
-        ProductStats.objects.get_or_create(product=instance)
 
 
 # TODO: stores similarity between products....
@@ -408,6 +437,8 @@ class ProductStats(models.Model):
         if (self.fails > 0):
             self.fails -= 1
             self.save()
+    
+    
 
 
 @receiver(post_save, sender=Product)
@@ -453,7 +484,17 @@ class Collection(models.Model):
     
     def get_absolute_url(self):
         return reverse('catalogue:collection', kwargs={'collection_name':self.en_name})
+    
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+        
 
+
+    
 
 class ProductOptionValue(models.Model):
     product = models.ForeignKey(
