@@ -323,7 +323,8 @@ class ProductFilter(django_filters.FilterSet):
     brands = django_filters.CharFilter(method='brand_filter')
     colors = django_filters.CharFilter(method='color_filter')
     sizes = django_filters.CharFilter(method='filter_size')
-
+    has_sales = django_filters.BooleanFilter(field_name='has_sales')
+    orderby = django_filters.CharFilter(method='order_by')
     def brand_filter(self, queryset, name, value):
         ls = self.request.GET.getlist('brands')
         return queryset.filter(options__option__name='brand', options__value__in=ls)
@@ -353,6 +354,20 @@ class ProductFilter(django_filters.FilterSet):
         return queryset.filter(options__option__name='size', options__option__regex=rx)
         
     
+    def order_by(self, queryset, name, value):
+        if value == 'newest':
+            return queryset.order_by('-date_created')
+        elif value == 'popular':
+            return queryset.order_by('-stats__likes')
+        elif value == 'bestselling':
+            return queryset.order_by('-stats__sales')
+        elif value == 'hot':
+            return queryset.order_by('-stats__comments')
+            
+        return queryset
+
+        
+        
     
     class Meta:
         model = Product

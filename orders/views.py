@@ -208,7 +208,7 @@ def checkout(request: HttpRequest, shop_name):
         elif pay_via == 'wallet':
             if wallet_has_balance:
                 cart.pay('site wallet', cart.code)
-                return render('shop/checkout_result.html', {
+                return render(request,'shop/checkout_result.html', {
                     'ref_id': cart.code,
                     'status': 'success'
                 })

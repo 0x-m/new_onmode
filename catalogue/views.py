@@ -90,13 +90,26 @@ def delete_product(request: HttpRequest, pid):
 
 
 
-def filter(requeset: HttpRequest, shop_name):
-    form = ProductFilter(data=requeset.GET, 
+def filter(request: HttpRequest, shop_name):
+    shop = get_object_or_404(Shop, name=shop_name, active=True)
+    form = ProductFilter(data=request.GET, 
                          queryset=Product.objects.filter(deleted=False, shop__name=shop_name).all(),
-                         request=requeset)
+                         request=request)
 
-    return render(requeset, 'shop/filter.html', {
-        'filter': form
+    paginator = Paginator(form.qs, 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    
+    return render(request, 'shop/shop.html', {
+        'page': page,
+        'shop': shop
     })
 
 

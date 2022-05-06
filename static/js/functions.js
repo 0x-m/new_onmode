@@ -62,7 +62,6 @@ function deleteFromCart(elem) {
         }
     });
 
-
 }
 
 function applyCoupon(elem) {

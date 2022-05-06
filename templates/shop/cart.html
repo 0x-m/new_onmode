@@ -50,12 +50,14 @@
             </div>
             <div class="flex w-16 absolute left-1 bottom-2">
                 {% if item.available %}
+                {% if not item.product.sold_individually %}
                 <button data-total="final_price_{{cart.id}}" onclick="incrementQuantity(this);"
                     data-itemid="{{item.id}}" class="basis-1/4 text-gray-400 hover:text-gray-600">+</button>
                 <input class="basis-1/2 w-1/2 text-xs text-center" type="text" name="" value="{{item.quantity}}" id=""
                     disabled>
                 <button data-total="final_price_{{cart.id}}" onclick="decrementQuantity(this);"
                     data-itemid="{{item.id}}" class="basis-1/4 text-gray-400 hover:text-gray-600">-</button>
+                {% endif %}
                 {% else %}
                 <span class="text-whtie bg-red-500 text-xs rounded-box">ناموجود</span>
                 {% endif %}
