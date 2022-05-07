@@ -2,6 +2,7 @@
 import string
 import secrets
 from django.db import models
+from django.forms import ModelFormMetaclass
 from django.utils import timezone
 from promotions.models import Coupon
 from users.models import Address
@@ -47,7 +48,7 @@ class Order(models.Model):
         RETURNED = 'returned'
 
     code = models.CharField(
-        max_length=20, default=generate_code, editable=False)
+        max_length=20, default=generate_code, editable=False, db_index=True)
     user = models.ForeignKey(
         to=User, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
     shop = models.ForeignKey(
@@ -72,7 +73,7 @@ class Order(models.Model):
     coupon_amount = models.PositiveBigIntegerField(default=0)
     address = models.ForeignKey(
         to=Address, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
-    ref_id = models.CharField(max_length=255, blank=True)
+    ref_id = models.CharField(max_length=255, blank=True, db_index=True)
     authority = models.CharField(max_length=50, blank=True)
     paid = models.BooleanField(default=False)
     pay_source  = models.CharField(max_length=20, choices=PAYSOURCE.choices, null=True)
@@ -212,7 +213,7 @@ class Order(models.Model):
             try:
                 send_notification(cus_sms_client, 'ORDER_REJECTED_SMS_CODE', {
                     'name': self.user.first_name,
-                    'id': self.id
+                    'id': self.code
                 }, self.user.phone_num)
             except:
                 pass #TODO
@@ -254,7 +255,7 @@ class Order(models.Model):
             try:
                 send_notification(sel_sms_client, 'ORDER_NOT_VERIFIED_SMS_CODE', {
                     'name': self.shop.owner.first_name,
-                    'id': self.id,
+                    'id': self.code,
                     
                 }, self.shop.owner.phone_num)
             except:
@@ -274,7 +275,7 @@ class Order(models.Model):
             try:
                 send_notification(sel_sms_client, 'ORDER_CANCELED_SMS_CODE', {
                     'name': self.shop.owner.first_name,
-                    'id': self.id,
+                    'id': self.code,
                     
                 }, self.user.phone_num)
             except:
@@ -353,6 +354,7 @@ class ReturnRequest(models.Model):
     description = models.TextField(max_length=5000, blank=True)
     proccessed = models.BooleanField(default=False)
     fulfilled = models.BooleanField(default=False)
+    description = models.TextField(max_length=5000,blank=True)
 
 
 class ReturnRequestItem(models.Model):
@@ -360,4 +362,3 @@ class ReturnRequestItem(models.Model):
         to=ReturnRequest, related_name='items', on_delete=models.CASCADE)
     order_item = models.ForeignKey(
         to=OrderItem, related_name='returns', on_delete=models.SET_NULL, null=True)
-    description = models.TextField(max_length=1000)
