@@ -53,3 +53,7 @@ class CheckoutForm(forms.ModelForm):
 #             except Product.DoesNotExist:
 #                 raise forms.ValidationError('Product does not exists.')
     
+
+
+class EmailCheckerForm(forms.Form):
+    email = forms.EmailInput()

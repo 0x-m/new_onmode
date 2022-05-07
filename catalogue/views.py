@@ -1,12 +1,12 @@
 
-from asyncio import ensure_future
-from logging import LogRecord
 from math import prod
 from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Page, PageNotAnInteger, Paginator, EmptyPage
+
+from  index.models import CreateShopGuide
 from .models import Category, Collection, Comment, CreateShopRequest, Favourite, Option, Photo, Product, ProductFilter, ProductOptionValue, Shop
 from .forms import CommentForm, CreateShopForm, ProductForm, ShopForm
 
@@ -79,6 +79,7 @@ def delete_product(request: HttpRequest, pid):
     product = get_object_or_404(Product,pk=pid, shop=request.user.shop, shop__active=True, deleted=False)
     if request.method == 'POST':
         product.deleted = True
+        product.shop.dec_product_count()
         product.save()
         return render(request,  'shop/delete_product_consent.html', {
             'status': 'success'
@@ -290,6 +291,7 @@ def create_shop_request(request: HttpRequest):
     except CreateShopRequest.DoesNotExist:
         pass
 
+    guide = CreateShopGuide.objects.first()
     if request.method == 'POST':
         form = None
         if shop_req:
@@ -305,12 +307,14 @@ def create_shop_request(request: HttpRequest):
                 shop_req = form.save()
                 return render(request, 'shop/create_shop.html', {
                     'status': 'edited',
-                    'shop_req': shop_req
+                    'shop_req': shop_req,
+                    'guide': guide
                 })
             else:
                 return render(request, 'shop/create_shop.html', {
                     'status': 'invalid name',
-                    'shop_req': shop_req
+                    'shop_req': shop_req,
+                    'guide': guide
                 })
 
         else:
@@ -322,13 +326,15 @@ def create_shop_request(request: HttpRequest):
                 shop_req.save()
                 return render(request, 'shop/create_shop.html', {
                     'status': 'created',
-                    'shop_req': shop_req
+                    'shop_req': shop_req,
+                    'guide': guide
                 })
 
     # Handle Get request.
     return render(request, 'shop/create_shop.html', {
         'status': '',
-        'shop_req': shop_req
+        'shop_req': shop_req,
+        'guide' : guide 
     })
 
 
@@ -519,3 +525,11 @@ def shop_products(request: HttpRequest):
     return render(request, 'shop/products.html', {
         'page': page
     })
+    
+
+def check_shop_name(request: HttpRequest, shop_name):
+    exists = Shop.objects.filter(name=shop_name).exists()
+    return JsonResponse({
+        'status': 'unavailable' if exists else 'available'
+    })
+    

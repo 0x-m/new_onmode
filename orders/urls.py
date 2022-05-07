@@ -13,7 +13,6 @@ urlpatterns = [
     path('cart/coupon/delete', views.delete_coupon, name='delete_coupon'),
     path('cart/refresh/<order_id>', views.refresh_order, name='refresh'),
     path('cart/checkout/<shop_name>', views.checkout, name='checkout'),
-    path('orders/test', views.test, name='test'),
     path('order/accept/', views.accept, name='accept' ),
     path('order/reject/', views.reject, name='reject' ),
     path('order/cancel/', views.cancel, name='cancel' ),

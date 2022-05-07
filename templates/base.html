@@ -94,7 +94,7 @@
                                             بوتیک من
                                         </a>
                                     {% else %}
-                                        <a href="{% url 'users:create-shop' user.shop.name %}" class="text-xs">
+                                        <a href="{% url 'users:create-shop' %}" class="text-xs">
                                             <i class="bi-shop text-lg"></i>
                                             ساخت بوتیک
                                         </a>
@@ -108,7 +108,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="" class="text-xs text-error">
+                                    <a href="{% url 'users:signout' %}" class="text-xs text-error">
                                         <i class="bi-box-arrow-in-right text-lg"></i>
                                         خروج
                                     </a>

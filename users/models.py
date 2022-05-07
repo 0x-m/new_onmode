@@ -1,4 +1,5 @@
 
+from anyio import fail_after
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -8,7 +9,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 import secrets
 import string
-
+from decouple import config
 # from catalogue.models import Product
 
 
@@ -23,7 +24,8 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractUser):
-    MAX_STORAGE_SIZE = 20 * 1024  * 1024 #move to env
+    MAX_STORAGE_SIZE = config('MAX_STORAGE', 20)
+    
     def generate_usecode():
         alphabet = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(alphabet) for _ in range(8))
@@ -48,9 +50,10 @@ class User(AbstractUser):
 
     objects = CustomUserManager()
     has_password = models.BooleanField(default=False)
-    consumed_storage = models.FloatField(default=0) #in MB
-
-
+    use_custom_storage_capcity = models.BooleanField(default=False, help_text='check if you want arbitrary storage capacity for this user')
+    custom_storage_capacity = models.FloatField(default=20, help_text='custom storage in mega bytes') #in MB
+    consumed_storage = models.FloatField(default=0, help_text='consumed storage in mega bytes') #in MB
+    
 
     @property
     def paid_orders(self):
@@ -81,13 +84,17 @@ class User(AbstractUser):
         '''
         Get user consumed storage size in bytes
         '''
-        return self.consumed_storage * 1024 *1024
+        return self.consumed_storage * 1024 * 1024
     
     def storage_has_capacity(self, size):
         '''
         size: in bytes
         '''
-        return self.storage + size < self.MAX_STORAGE_SIZE
+        max_capacity = self.MAX_STORAGE_SIZE
+        if self.use_custom_storage_capcity:
+            max_capacity = self.custom_storage_capacity
+
+        return self.storage + size < max_capacity * 1024 * 1024
     
     def consume_storage(self, size):
         '''

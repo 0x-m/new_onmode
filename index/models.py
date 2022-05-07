@@ -96,3 +96,8 @@ class ContactUsMessages(models.Model):
     title = models.CharField(max_length=255, blank=True)
     body = models.TextField(max_length=5000, blank=True)
     read = models.BooleanField(default=False)
+    
+
+class CreateShopGuide(models.Model):
+    content = HTMLField()
+    

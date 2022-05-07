@@ -1,6 +1,6 @@
 import site
 from django.contrib import admin
-from .models import About, BlogPost, Law, ShopSet, SiteInfo, SliderPhoto
+from .models import About, BlogPost, CreateShopGuide, Law, ShopSet, SiteInfo, SliderPhoto
 
 @admin.register(SliderPhoto)
 class SlidePhotoAdmin(admin.ModelAdmin):
@@ -20,3 +20,4 @@ class ShopSet(admin.ModelAdmin):
 admin.site.register(SiteInfo)
 admin.site.register(About)
 admin.site.register(Law)
+admin.site.register(CreateShopGuide)

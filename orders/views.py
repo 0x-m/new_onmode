@@ -14,13 +14,14 @@ import requests
 from .models import Order, OrderItem, ReturnRequest
 from .forms import AcceptOrderForm, AddOrderItemForm
 from django.core.paginator import *
-
-
+from decouple import config
+from ippanel import Client
 def cart(request: HttpRequest):
     orders = request.user.orders.filter(paid=False)
     return render(request, 'shop/cart.html', {
         'carts': orders
     })
+
 
 
 @login_required
@@ -34,20 +35,6 @@ def refresh_order(request: HttpRequest, order_id):
     # })
 
 
-def test(request: HttpRequest):
-
-    if request.method == 'POST':
-        form = AddOrderItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-
-            return HttpResponse('correct')
-        else:
-            return HttpResponse(form.errors)
-
-    return render(request, 'shop/test.html', {
-        'form': AddOrderItemForm()
-    })
 
 
 @login_required
@@ -175,8 +162,9 @@ def checkout(request: HttpRequest, shop_name):
         cart.save()
 
         if pay_via == 'direct':
+            merchant_id = config('MERCHANT_ID', '')
             params = {
-                'merchant_id': '1344b5d4-0048-11e8-94db-005056a205be',
+                'merchant_id': merchant_id,
                 'amount': cart.final_price,
                 'callback_url': 'https://localhost:800/orders/verify',
                 'currency': 'IRT',
@@ -234,8 +222,9 @@ def verify_payment(request: HttpRequest, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
     if request.GET.get('Status') == 'OK':
         authority = request.GET.get('Authority')
+        merchant_id = config('MERCHANT_ID', '')
         params = {
-            'merchant_id': '1344b5d4-0048-11e8-94db-005056a205be',
+            'merchant_id': merchant_id,
             'authority': authority,
             'amount': order.final_price,
         }

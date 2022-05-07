@@ -67,7 +67,7 @@
                                     بوتیک من
                                 </a>
                                 {% else %}
-                                <a href="{% url 'users:create-shop' user.shop.name %}" class="text-xs">
+                                <a href="{% url 'users:create-shop' %}" class="text-xs">
                                     <i class="bi-shop text-lg"></i>
                                     ساخت بوتیک
                                 </a>
@@ -80,7 +80,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="" class="text-xs text-error">
+                                <a href="{% url 'users:signout' %}" class="text-xs text-error">
                                     <i class="bi-box-arrow-in-right text-lg"></i>
                                     خروج
                                 </a>
@@ -104,11 +104,11 @@
                 class="md:basis-1/6  md:mt-8 p-2 flex justify-center z-50 items-center w-full md:h-screen fixed bottom-2 md:static">
                 <ul
                     class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md text-sm  rounded-box">
-                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <label tabindex="0">
+                    <li   class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a id="profile"  tabindex="0">
                             <i class="bi-person md:text-xl"></i>
-                            <span class="hidden md:block">مشخصات</span>
-                        </label>
+                            <span  class="hidden md:block">مشخصات</span>
+                        </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             <li>
                                 <a href="{% url 'users:profile' %}">
@@ -132,15 +132,15 @@
 
                         </ul>
                     </li>
-                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <label tabindex="0">
+                    <li  class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a id="shop"  tabindex="0">
                             <i class="bi-shop md:text-xl"></i>
-                            <span class="hidden md:block">فروشگاه</span>
-                        </label>
+                            <span  class="hidden md:block">فروشگاه</span>
+                        </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             {% if user.has_shop %}
-                            <li>
-                                <a href="{% url 'users:edit-shop' %}">
+                            <li >
+                                <a  href="{% url 'users:edit-shop' %}">
                                     <i class="bi-info-circle"></i>
                                     <span>مشخصات بوتیک</span>
                                 </a>
@@ -168,26 +168,26 @@
 
                         </ul>
                     </li>
-                    <li>
-                        <a href="{% url 'users:favourites' %}" class="active">
+                    <li >
+                        <a id="favourites" href="{% url 'users:favourites' %}">
                             <i class="bi-heart md:text-xl"></i>
                             <span class="hidden md:block">علایق</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{% url 'users:comments' %}">
+                    <li >
+                        <a id="comments" href="{% url 'users:comments' %}">
                             <i class="bi-chat md:text-xl"></i>
                             <span class="hidden md:block">دیدگاهها</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{% url 'orders:user_orders' %}">
+                    <li >
+                        <a id="orders" href="{% url 'orders:user_orders' %}">
                             <i class="bi-bag-check md:text-xl"></i>
                             <span class="hidden md:block">سفارشها</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'users:messages' %}">
+                        <a  id="messages" href="{% url 'users:messages' %}">
                             <i class="bi-envelope md:text-xl"></i>
                             <span class="hidden md:block">پیامها</span>
                         </a>
@@ -233,7 +233,16 @@
                 {% endblock %}
             </section>
         </main>
+        <script>
+            function selectMenu(id) {
+                let list = document.getElementById(id).classList;
+                list.add('active');
+                console.log(id, 'aaa');
+            }
+    
+        </script>
         {% block scripts %}
+
         {% endblock %}
     </body>
 

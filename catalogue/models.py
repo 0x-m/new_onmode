@@ -19,7 +19,7 @@ from promotions.models import Discount
 from django.urls.base import reverse
 import django_filters
 from django.utils.text import slugify
-
+from decouple import config
 
 #TODO: move it to utils
 def persian_slugify(txt: str):
@@ -66,6 +66,7 @@ class Category(models.Model):
 
 
 class Shop(models.Model):
+    MAX_PRODUCTS = config('SHOP_MAX_PRODUCT', 100)
     owner = models.ForeignKey(
         to=User, related_name='shops', on_delete=models.SET_NULL, null=True,)
     name = models.CharField(max_length=40)  # TODO: make it unique
@@ -75,6 +76,7 @@ class Shop(models.Model):
     # logo = models.ForeignKey(to='Photo', on_delete=models.SET_NULL)
     address_description = models.TextField(max_length=1000, blank=True)
     phone = models.CharField(max_length=20, blank=True)
+    user_custom_product_capacity = models.BooleanField(default=False)
     product_capacity = models.PositiveIntegerField(default=100)
     product_count = models.PositiveIntegerField(default=0)
     fee = models.PositiveIntegerField(default=9)
@@ -83,7 +85,10 @@ class Shop(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def has_capacity(self):
-        return self.product_capacity > self.product_count
+        capacity = self.MAX_PRODUCTS
+        if self.user_custom_product_capacity:
+            capacity = self.product_capacity
+        return capacity > self.product_count
 
     @property
     def owner_phone(self):
@@ -106,6 +111,11 @@ class Shop(models.Model):
     def __str__(self) -> str:
         return self.name
 
+
+@receiver(post_save, sender=Shop)
+def set_has_shop(sender, instance, created, **kwawrgs):
+    if created:
+        instance.owner.has_shop = True
 
 @receiver(pre_delete, sender=Shop)
 def has_shop_hadler(sender, instance, **kwargs):

@@ -8,7 +8,7 @@ app_name = 'users'
 urlpatterns = [
     path('signup/', views.signup , name='signup'),
     path('verify/', views.verify_code, name='verify'),
-    path('signout/', views.signout, name='singout'),
+    path('signout/', views.signout, name='signout'),
 
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/profile/', views.profile, name='profile'),
@@ -31,7 +31,7 @@ urlpatterns = [
     path('dashboard/shop/product/photo/add/<pid>', catalog.add_photo, name='add-photo'),
     path('dashboard/shop/product/photo/delete/<pid>', catalog.delete_photo, name='delete-photo'),
     path('dashboard/shop/product/photo/preview/<pid>', catalog.change_preview_photo, name='make-as-preview'),
-    path('dashboard/shop/404', views.notfound, name='notfound'),
+    path('check_email/', views.check_email, name='check_email')
 
 
     

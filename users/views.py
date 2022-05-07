@@ -3,22 +3,41 @@ from audioop import minmax
 from mimetypes import common_types
 from pickletools import read_uint1
 from wsgiref.handlers import read_environ
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
+from wsgiref.util import request_uri
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from httpx import RequestError
-
+from ippanel import Client
+from decouple import config
 from promotions.models import GiftCard
 
-#from catalog.models import Product
+# from catalog.models import Product
 
 from .models import User, Wallet
 
-from .forms import AddressForm, CheckoutForm, SignUpForm, VerificationCodeForm, ProfileForm
+from .forms import AddressForm, CheckoutForm, EmailCheckerForm, SignUpForm, VerificationCodeForm, ProfileForm
 from .OTP import OTP, InvalidCodeException, ExpiredCodeException
+
+
+
+
+#helper functions--------------------
+def send_verification_code(phone, code):
+    api_key = config('VERIFICATION_SMS_API_KEY')
+    sms = Client(api_key)
+    pattern_values ={
+    "verification_code": code
+    }
+    pattern_code = config('VERIFICATION_CODE_SMS_CODE')
+    num = config('SMS_NUMBER')
+    is_sent = sms.send_pattern(pattern_code,num, phone, pattern_values)
+    return is_sent
+#------------------------------------
+    
 
 
 def signup(request: HttpRequest):
@@ -34,10 +53,12 @@ def signup(request: HttpRequest):
 
             OTP(request).clear()
             code = OTP(request).code
-            # send verification code
-            print(code)
-
-            return redirect('users:verify')
+            res = send_verification_code(phone_num, code)
+            
+            if res:
+                return redirect('users:verify')
+            else:
+                return HttpResponseBadRequest() #TODO: make a decent error page
 
         else:
             return render(request, 'user/signup.html', {
@@ -68,12 +89,11 @@ def verify_code(request: HttpRequest):
             otp = OTP(request)
             otp.check(code)
             user, _ = User.objects.get_or_create(phone_num=phone_num)
-            # wallet,_ = Wallet.objects.get_or_create(user=user)
 
             login(request=request, user=user)
             del request.session['phone_num']
             request.session.save()
-            return redirect('index')
+            return redirect('index:index')
 
         except InvalidCodeException:
             return render(request, 'user/verify.html', {
@@ -89,31 +109,6 @@ def verify_code(request: HttpRequest):
     return render(request, 'user/verify.html', {
         'form': VerificationCodeForm()
     })
-
-
-# temp
-def cart(request: HttpRequest):
-    return render(request, 'shop/cart.html')
-
-
-def notfound(request: HttpRequest):
-    return render(request, '404.html')
-
-
-def product(request: HttpRequest):
-    return render(request, 'shop/product.html')
-
-
-def store(request: HttpRequest):
-    return render(request, 'shop/store.html')
-
-
-def checkout_result(request: HttpRequest):
-    return render(request, 'shop/checkout_result.html')
-
-
-# def checkout(request: HttpRequest):
-#     return render(request, 'shop/checkout.html')
 
 
 @login_required
@@ -150,8 +145,8 @@ def addresses(request: HttpRequest):
 
         shop_name = request.POST.get('shop_name')
         if shop_name:
-            return redirect('orders:checkout',shop_name=shop_name)
-        
+            return redirect('orders:checkout', shop_name=shop_name)
+
         return render(request, 'user/dashboard/address.html', {
             'errors': form.cleaned_data
         })
@@ -167,7 +162,7 @@ def dashboard(request: HttpRequest):
 @login_required
 def signout(request: HttpRequest):
     logout(request)
-    return HttpResponse('loggedout')
+    return redirect('index:index')
 
 
 @login_required
@@ -192,7 +187,7 @@ def wallet_checkout(request: HttpRequest):
 
         if not wallet.has_balance(amount):
             status = 'wallet_has_no_enough_money'
-            
+
         if status:
             return render(request, 'user/dashboard/wallet.html', {
                 'checkout_status': status
@@ -222,32 +217,8 @@ def wallet_deposit(request: HttpRequest):
                 return redirect('users:wallet')
             except:
                 return HttpResponse('not found....')
-        
+
     return HttpResponseNotAllowed(['POST'])
-
-# @login_required
-# def set_password(request):
-#     pass
-
-
-# def comment(request: HttpRequest):
-#     if request.method == 'POST':
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             data = form.cleaned_data
-#             product = data['product']
-#             customer = request.user
-#             data['customer'] = customer
-
-#             _, created = Comment.objects.update_or_create(product=product, customer=customer,defaults=data)
-#             response = 'comment updated successfully'
-#             if created:
-#                 response = 'comment added successfully'
-#             return JsonResponse({'status': response})
-
-
-#     # Handle get request.
-#     return HttpResponseNotAllowed('POST')
 
 
 @login_required
@@ -259,8 +230,9 @@ def comments(request: HttpRequest):
     published = True
     if state != 'published':
         published = False
-  
-    paginator = Paginator(request.user.comments.filter(published =published), 20)
+
+    paginator = Paginator(
+        request.user.comments.filter(published=published), 20)
     pg = request.GET.get('page')
     page = None
     try:
@@ -270,13 +242,10 @@ def comments(request: HttpRequest):
     except EmptyPage:
         page = paginator.get_page(paginator.num_pages)
 
-    
     return render(request, 'user/dashboard/comments.html', {
         'page': page,
         'state': state
     })
-    
-
 
 
 def messages(request: HttpRequest):
@@ -302,17 +271,6 @@ def shop_orders(request: HttpRequest):
 def shop_order(request: HttpRequest):
     return render(request, 'shop/order.html')
 
-# @login_required
-# def like(request: HttpRequest):
-#     customer = request.user
-#     fav, created = Favourite.objects.get_or_create(customer=customer)
-#     if created:
-#         fav.delete()
-
-#     return JsonResponse({
-#         'status': 'liked' if created else 'unliked'
-#     })
-
 
 @login_required
 def favourites(request: HttpRequest):
@@ -322,5 +280,18 @@ def favourites(request: HttpRequest):
     })
 
 
-# def chekc_email(request: HttpRequest):
-#     pass
+def check_email(request: HttpRequest):
+    if request.method == 'POST':
+        email_fom = EmailCheckerForm(request.POST)
+        status = 'invalid'
+        if email_fom.is_valid():
+            user = User.objects.filter(
+                email=email_fom.cleaned_data['email']).first()
+            if not user or user == request.user:
+                status = 'valid'
+                
+        return JsonResponse({
+                'status': status
+            })
+
+    return HttpResponseNotAllowed(['POST'])

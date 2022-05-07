@@ -16,8 +16,11 @@
          class="input input-bordered p-1" type="text">
         <input name="last_name" placeholder="نام خانوادگی" value="{%if user.last_name %}{{user.last_name}}{% endif %}"
         class="input input-bordered p-1" type="text">
-        <input name="email" placeholder="ایمیل" value="{%if user.email %}{{user.email}}{% endif %}"
+        <input onblur="check_email(this);" name="email" placeholder="ایمیل" value="{%if user.email %}{{user.email}}{% endif %}"
         class="input input-bordered p-1" type="email">
+        <p id="email_error" class=" hidden text-[0.6rem] text-error">
+        این ایمیل قبلا ثبت شده است.
+        </p>
         <div class="flex gap-8">
             <div class="form-control">
                 <label class="label cursor-pointer">
@@ -34,10 +37,49 @@
                 </label>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">ثبت</button>
+        <button id="submit_button" type="submit" class="btn btn-primary">ثبت</button>
     </form>
     <a href="{% url 'users:addresses' %}" class="mt-4 btn btn-outline text-lg">مدیریت آدرسها</a>
    
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    selectMenu('profile');
+    function check_email(sender) {
+        const email = sender.value;
+        const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        const error_box = document.getElementById('email_error');
+        const submit = document.getElementById('submit_button');
+        fetch('/users/check_email/', {
+            'method': 'POST',
+            'body': new URLSearchParams({
+                email: email
+            }),
+            'headers': {
+                'X-CSRFToken': csrf_token,
+                'Content-Type': 'application/x-www-form-urlencoded'    
+            }
+        } ).then(res => {
+            if (res.status == 200) {
+                res.json().then(data => {
+                    const status = data['status'];
+                    if (status == 'valid') {
+                        error_box.classList.add('hidden');
+                        submit.disabled = false;
+                    }
+                    else if (status == 'invalid') {
+                        submit.disabled = true;
+                        error_box.classList.remove('hidden');
+                    }
+                });
+            }
+            else {
+            }
+        })
+    }
+
+</script>
 {% endblock %}
