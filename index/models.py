@@ -68,6 +68,8 @@ class SiteInfo(models.Model):
     telegram = models.URLField(blank=True, null=True)
     whatsapp = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
+    enable_GTM = models.BooleanField(default=False)
+    GOOGLE_TAG_ID = models.CharField(max_length=255, blank=True)
 
 
 class BlogPost(models.Model):

@@ -14,7 +14,6 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-
 INSTALLED_APPS = [
 
     'django.contrib.admin',
@@ -24,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tinymce',
+    'gtm',
     'sslserver',
     'django_filters',
     'jalali_date',
