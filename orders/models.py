@@ -1,8 +1,9 @@
 
+from asyncio import FastChildWatcher
 import string
 import secrets
 from django.db import models
-from django.forms import ModelFormMetaclass
+from django.dispatch import receiver
 from django.utils import timezone
 from promotions.models import Coupon
 from users.models import Address
@@ -10,6 +11,7 @@ from users.models import User
 from catalogue.models import Shop, Product, Collection
 from decouple import config
 from ippanel import Client
+from django.db.models.signals import post_save
 
 SEL_API_KEY = config('SELLER_SMS_API_KEY')
 CUS_API_KEY = config('CUSTOMER_SMS_API_KEY')
@@ -263,7 +265,7 @@ class Order(models.Model):
         else:
             raise Exception()
 
-    def cancel(self, msg):
+    def cancel(self, msg=''):
         if self.state == self.STATES.PENDING:
             self.state = self.STATES.CANCELED
             self.cancel_msg = msg
@@ -283,6 +285,14 @@ class Order(models.Model):
 
         else:
             raise Exception()
+    
+    def make_returned(self):
+        self.state = self.STATES.RETURNED
+        self.save()
+        
+    def make_pending(self):
+        self.state = self.STATES.PENDING
+        self.save()
 
 
 class OrderItem(models.Model):
@@ -292,6 +302,8 @@ class OrderItem(models.Model):
 
     product = models.ForeignKey(
         to=Product, related_name='orders', on_delete=models.SET_NULL, null=True)
+    prod_name = models.CharField(max_length=255, blank=True)
+    prod_en_name = models.CharField(max_length=255, blank=True)
     price = models.PositiveBigIntegerField(default=0)
     sales_price = models.PositiveBigIntegerField(default=0)
     has_sales = models.BooleanField(default=False)
@@ -304,9 +316,11 @@ class OrderItem(models.Model):
     collection = models.ForeignKey(
         to=Collection, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
     raced = models.BooleanField(default=False)
-
+   
     def refresh(self):
         self.price = self.product.price
+        self.prod_name = self.product.name
+        self.prod_en_name = self.product.en_name
         self.sales_price = self.product.sales_price
         self.has_sales = self.product.has_sales
         self.final_price = self.product.compute_price(self.collection)
@@ -345,20 +359,50 @@ class OrderItem(models.Model):
     def __len__(self):
         return self.quantity
 
-
-class ReturnRequest(models.Model):
-    order = models.ForeignKey(
-        to=Order, related_name='return_requests', on_delete=models.SET_NULL, null=True)
-    date_created = models.DateTimeField(default=timezone.now)
-    date_fulfilled = models.DateTimeField(null=True)
+class WalletAlternation(models.Model):
+    intendant = models.ForeignKey(to=User, related_name='alternations', on_delete=models.CASCADE, null=True, editable=False)
+    creditor = models.ForeignKey(to=User, related_name='buyalternation', on_delete=models.CASCADE, help_text='...lends money', null=True, blank=True)
+    debtor = models.ForeignKey(to=User, related_name='sellalternation', on_delete=models.CASCADE, help_text='... borrows money', null=True, blank=True)
+    amount = models.PositiveIntegerField(default=0, help_text='tomans')
+    succeed = models.BooleanField(default=False, editable=False)
+    creditor_balance_type = models.CharField(max_length=20, choices=[
+        ('freezed', 'freezed'),
+        ('available', 'available')
+    ], default='freezed')
+    debtor_balance_type = models.CharField(max_length=20, choices=[
+        ('freezed', 'freezed'),
+        ('available', 'available')
+    ], default='freezed')
+    
     description = models.TextField(max_length=5000, blank=True)
-    proccessed = models.BooleanField(default=False)
-    fulfilled = models.BooleanField(default=False)
-    description = models.TextField(max_length=5000,blank=True)
+    date_created = models.DateTimeField(default=timezone.now)
+    
+    
+    def apply(self, intendant: User):
+        if self.succeed:
+            return
+        res = True
+        if self.creditor:
+            if self.creditor_balance_type == 'freezed':
+                res = self.creditor.wallet.dec_freezed(self.amount)
+            elif self.creditor_balance_type == 'available':
+                res = self.creditor.wallet.withdraw(self.amount)
+            if not res:
+                return False
+      
+        if self.debtor:
+            if self.debtor_balance_type == 'freezed':
+                self.debtor.wallet.inc_freezed(self.amount)
+            elif self.debtor_balance_type == 'available':
+                self.debtor.wallet.deposit(self.amount)
+        
+        self.intendant = intendant 
+        self.succeed = True  
+        self.save()
+        return True
+
+        
+    
 
 
-class ReturnRequestItem(models.Model):
-    retutrn_request = models.ForeignKey(
-        to=ReturnRequest, related_name='items', on_delete=models.CASCADE)
-    order_item = models.ForeignKey(
-        to=OrderItem, related_name='returns', on_delete=models.SET_NULL, null=True)
+

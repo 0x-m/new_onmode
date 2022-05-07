@@ -1,8 +1,4 @@
-from cmath import pi
-from email import header
-import json
-from os import stat
-from typing import get_origin
+
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -11,11 +7,10 @@ from catalogue.models import Shop, Product
 from users.models import Address
 from promotions.models import Coupon
 import requests
-from .models import Order, OrderItem, ReturnRequest
+from .models import Order, OrderItem
 from .forms import AcceptOrderForm, AddOrderItemForm
 from django.core.paginator import *
 from decouple import config
-from ippanel import Client
 def cart(request: HttpRequest):
     orders = request.user.orders.filter(paid=False)
     return render(request, 'shop/cart.html', {

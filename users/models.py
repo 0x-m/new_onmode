@@ -1,4 +1,5 @@
 
+from operator import truediv
 from anyio import fail_after
 from django.db import models
 from django.db import models
@@ -148,12 +149,15 @@ class Wallet(models.Model):
     def deposit(self, amount):
         self.available += amount
         self.save()
+        return True
 
     def withdraw(self, amount):
         if self.available >= amount:
             self.available -= amount
             self.date_last_withdraw = timezone.now()
             self.save()
+            return True
+        return False
 
 
     def update_date_last_withdraw(self):
@@ -184,18 +188,22 @@ class Wallet(models.Model):
     def inc_freeze(self, amount):
         self.freezed += amount
         self.save()
+        return True
 
     def dec_freeze(self, amount):
         if self.freezed >= amount:
             self.freezed -= amount
             self.save()
+            return True
+        return False
     
     def release(self, amount):
         if self.freezed >= amount:
             self.freezed -= amount
             self.available += amount
             self.save()
-            
+            return True
+        return False
 
 
     
