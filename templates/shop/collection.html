@@ -26,7 +26,7 @@
         {% if not product.deleted %}
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
             method="post">
-            <a href="">
+            <a href="{% url 'catalogue:product_detail' product.prod_code %}">
                 <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
                     alt="{{product.preview.img.alt}}">
             </a>
@@ -34,7 +34,7 @@
                 <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
                 <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
                     {% for i in product.stats.rate %}
-                    <i class="bi-star-fill "></i>
+                    <i class="bi-star-fill text-yellow-500 "></i>
                     {% endfor %}
                     {% for i in product.stats.rate_complement %}
                     <i class="bi-star "></i>
@@ -55,21 +55,21 @@
             </div>
             <div class="flex items-center justify-center w-full gap-1 ">
                 {% if not product.shop == user.shops.first %}
-                <button onclick="addToCart(this);" data-pid="{{product.id}}"
+                <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
                     class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-bag text-gray  text-xl"></i>
                 </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                    class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-heart text-gray  text-xl"></i>
                 </button>
                 {% else  %}
-                <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
-                    class="btn btn-ghost btn-sm btn-circle text-md">
+                <a href="{% url 'users:edit-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-pencil text-gray  text-xl"></i>
-                </button>
-                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                </a>
+                <a href="{% url 'users:delete-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
                     <i class="bi-trash text-gray  text-xl"></i>
-                </button>
+                </a>
                 {% endif  %}
 
             </div>
@@ -89,13 +89,16 @@
     <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
         <div class="text-sm flex gap-2">
             {% if  page.has_previous %}
-            <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+            <a href="?page={{page.previous_page_number}}"
+                class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
             {% endif %}
             {% for p in page.paginator.page_range %}
-                <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+            <a href="?page={{p}}"
+                class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
             {% endfor %}
             {% if  page.has_next %}
-            <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+            <a href="?page={{page.next_page_number}}"
+                class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
             {% endif %}
 
         </div>
