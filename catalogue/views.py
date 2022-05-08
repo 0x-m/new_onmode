@@ -1,7 +1,8 @@
 
 from math import prod
+from tkinter.tix import Tree
 from django.db.models import Q
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Page, PageNotAnInteger, Paginator, EmptyPage
@@ -33,18 +34,18 @@ def product(request: HttpRequest, pid=None):
     else:
         #request to add a new product
         if not shop.has_capacity():
-            return HttpResponseNotAllowed() #TODO
+            return HttpResponseForbidden('you reached max allowed number of products') #TODO
         
     if request.method == 'POST':
         form = ProductForm(request.POST, instance=product)
-
         if not form.is_valid():
             return render(request, 'shop/add_product.html/', {
-                'status':  form.errors,
+                'errors':  form.errors,
                 'product': product
             })
 
         # NOTE: any better way?
+        created = False
         if not product:
             # create a new product
             try:
@@ -52,13 +53,14 @@ def product(request: HttpRequest, pid=None):
                 product = form.save(commit=False)
                 product.shop = shop
                 product.save()
+                created = True
             except:
                 return HttpResponseBadRequest('max allowed product restriction...!') #TODO: needs a conceptual exception...
         else:
             form.save() #update the product
 
         return render(request, 'shop/add_product.html/', {
-            'status': 'edited' if prod else 'created',
+            'status': 'created' if created else 'edited',
             'product': product
         })
 

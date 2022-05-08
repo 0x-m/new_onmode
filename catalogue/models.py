@@ -4,6 +4,7 @@ from email.policy import default
 import os
 from re import T
 from turtle import RawTurtle, back
+from unittest import defaultTestLoader
 from attr import field
 from click import edit
 from django.db import models
@@ -66,7 +67,7 @@ class Category(models.Model):
 
 
 class Shop(models.Model):
-    MAX_PRODUCTS = config('SHOP_MAX_PRODUCT', 100)
+    MAX_PRODUCTS = config('SHOP_MAX_PRODUCT',default=100, cast=int)
     owner = models.ForeignKey(
         to=User, related_name='shops', on_delete=models.SET_NULL, null=True,)
     name = models.CharField(max_length=40)  # TODO: make it unique

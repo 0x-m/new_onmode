@@ -10,7 +10,7 @@
 
 <div class="flex justify-center items-center mt-8 p-2">
     <div class="tabs gap-4">
-        <a class="tab tab-bordered " href="{% if product %}{% url 'users:edit-product' product.id %}{% endif %}">مشخصات</a>
+        <a class="tab tab-bordered " href="{% if product %}{% url 'users:edit-product' product.id %}{% endif %}">مشخصات کلی</a>
         <a class="tab tab-bordered tab-active"  >سایر ویژگیها</a>
     </div>
 </div>
@@ -147,11 +147,7 @@
 
 {% endblock %}
 
-{% block scripts %}
-<script defer>
-   
-</script>
-{% endblock %}
+
 {% block scripts %}
 <script>
     selectMenu('shop')

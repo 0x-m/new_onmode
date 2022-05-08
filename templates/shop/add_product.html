@@ -6,7 +6,48 @@
 {% endblock %}
 
 {% block content  %}
-{{ status }}
+{% if errors %}
+<div class="w-full bg-red-500 text-xs text-white p-4 flex flex-col gap-2 rounded-box">
+{% for error in errors %}
+{% if error == 'name' %}
+<p>
+    نام محصول را باه انگلیسی و فارسی وارد کنید
+</p>
+{% elif error == 'price' %}
+<p>
+    قیمت محصول را به دردسی وارد کنید
+</p>
+{% elif error == 'quantity' %}
+<p>
+    موجودی (تعداد) محصول را به درستی وارد نمایید
+</p>
+
+{% elif error == 'stock_low_threshold' %}
+<p>
+    آستانه اتمام را مشخص کنید (در صورتی که تعداد محصول از این عدد کمتر شود فروشنده مطلع خواهد شد.)
+</p>
+{% elif error == 'shipping_cost' %}
+<p>
+    قیمت تقریبی ارسال را مشخص کنید
+</p>
+{% elif error  == 'category' %}
+<p>
+   دسته بندی محصول را مشخص کنید.
+</p>
+{% endif %}
+{% endfor  %}
+</div>
+{% elif status %}
+    {% if status == 'created' %}
+        <div class="w-full bg-success text-xs text-white p-2 rounded-box">
+            <p>محصول با موفقیت ثبت شد</p>
+        </div>
+    {% elif status == 'edited' %}
+        <div class="w-full bg-success text-xs text-white p-2 rounded-box">
+            <p>محصول با موفقیت ویرایش شد</p>
+        </div>
+    {% endif %}
+{% endif %}
 
 <div class="flex justify-center items-center text-sm md:text-md mt-8 p-2">
     <div class="tabs gap-4">
@@ -35,7 +76,7 @@
                     <textarea name="description" id="" class="textarea textarea-bordered" cols="30" rows="5"
                         placeholder="توضیحات"></textarea>
                     <div class="flex gap-2">
-                        <input name="price" placeholder="قیمت" min="0" step="1000"
+                        <input id="price" name="price" placeholder="قیمت" min="0" step="1000"
                             class="input input-bordered p-1  w-full" type="number" value="{{product.price}}">
                         <input name="quantity" placeholder="تعداد" class="input input-bordered p-1 w-full "
                             type="number" value="{{product.quantity}}">
@@ -50,9 +91,10 @@
                     </div>
                     <div class="form-control">
                         <label class="label text-xs">قیمت با تخفیف:</label>
-                        <input type="number" min="1000" step="500" name="sales_price" class="input input-bordered" placeholder="قیمت با تخفیف"
+                        <input onblur="check_sales_price(this);" type="number" min="1000" step="500" name="sales_price" class="input input-bordered" placeholder="قیمت با تخفیف"
                             value="{{product.sales_price}}">
                     </div>
+                    <span id="sales_error" class="text-xs mt-2 text-error hidden">قیمت با تخفیف باید کمتر از قیمت اصلی باشد!</span>
 
                     <h2 class="text-center text-blue-500 text-lg mt-2">SEO</h2>
                     <div class="divider w-1/2 mx-auto -mt-2"></div>
@@ -201,8 +243,12 @@
             </div>
         </section>
         <section aria-label="actins" class="flex w-full gap-2 justify-center items-center p-2 mt-2 mb-20">
-            <button class=" btn btn-primary w-1/2">ثبت</button>
-            <button class=" btn btn-outline w-1/2">لغو</button>
+            {% if product %}
+            <button id="submit" class=" btn btn-primary w-1/2">ویرایش</button>
+            {% else %}
+            <button id="submit" class=" btn btn-primary w-1/2">ثبت</button>
+            {% endif %}
+            <button formaction="{% url 'users:dashboard' %}" formmethod="get" class=" btn btn-outline w-1/2">لغو</button>
         </section>
 
         
@@ -222,7 +268,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script defer>
+<script>
+    selectMenu('shop')
     // holds attributes added to the product
     const attrs = document.getElementsByName('attributes')[0].value;
     let attributes = new Map();
@@ -267,10 +314,22 @@
         update_attrs();
         e.parentNode.remove();
     }
-</script>
-{% endblock %}
-{% block scripts %}
-<script>
-    selectMenu('shop')
+
+    function check_sales_price(e) {
+        const sales_price = e.value.trim();
+        const price = document.getElementById('price').value.trim();
+        const sales_error = document.getElementById('sales_error');
+        const submit = document.getElementById('submit');
+        if (price == '' || sales_price == '') return;
+        if (parseInt(sales_price) >= parseInt(price)) {
+            submit.disabled = true;
+            sales_error.classList.remove('hidden');
+        }
+        else{
+            submit.disabled = false;
+            sales_error.classList.add('hidden');
+        }
+
+    }
 </script>
 {% endblock %}

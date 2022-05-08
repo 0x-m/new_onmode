@@ -25,7 +25,7 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractUser):
-    MAX_STORAGE_SIZE = config('MAX_STORAGE', 20)
+    MAX_STORAGE_SIZE = config('MAX_STORAGE', default=20, cast=int)
     
     def generate_usecode():
         alphabet = string.ascii_letters + string.digits
