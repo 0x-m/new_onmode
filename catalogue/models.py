@@ -401,9 +401,9 @@ class ProductStats(models.Model):
     views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     comments = models.IntegerField(
         default=0, validators=[MinValueValidator(0)])
-    sales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    # sales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     likes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    fails = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    # fails = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     rates_avg = models.FloatField(default=0, validators=[
         MinValueValidator(0), MaxValueValidator(5)
     ])
@@ -417,6 +417,10 @@ class ProductStats(models.Model):
         return range(5 - len(self.rate))
         
 
+    @property
+    def number_of_sells(self):
+        return self.product.orders.filter(order__state='fulfilled').count()
+    
     def inc_views(self):
         self.views += 1
         self.save()
@@ -432,9 +436,11 @@ class ProductStats(models.Model):
         self.rates_avg = new_rate_avg
         self.save()
 
-    def dec_comments(self):
+    def dec_comments(self, rate):
         if (self.comments > 0):
+            new_rate_avg = (self.comments * self.rates_avg - rate) / (self.comments - 1)
             self.comments -= 1
+            self.rates_avg = new_rate_avg
             self.save()
 
     def inc_likes(self):
@@ -446,23 +452,23 @@ class ProductStats(models.Model):
             self.likes -= 1
             self.save()
 
-    def inc_sales(self):
-        self.sales += 1
-        self.save()
+    # def inc_sales(self):
+    #     self.sales += 1
+    #     self.save()
 
-    def dec_sales(self):
-        if (self.sales > 0):
-            self.sales -= 1
-            self.save()
+    # def dec_sales(self):
+    #     if (self.sales > 0):
+    #         self.sales -= 1
+    #         self.save()
 
-    def inc_fails(self):
-        self.fails += 1
-        self.save()
+    # def inc_fails(self):
+    #     self.fails += 1
+    #     self.save()
 
-    def dec_fails(self):
-        if (self.fails > 0):
-            self.fails -= 1
-            self.save()
+    # def dec_fails(self):
+    #     if (self.fails > 0):
+    #         self.fails -= 1
+    #         self.save()
     
     
 
@@ -568,7 +574,7 @@ def increase_comments(sender, instance: Comment, created, **kwargs):
 
 @receiver(pre_delete, sender=Comment)
 def decrease_comment(sender, instance, **kwargs):
-    instance.product.stats.dec_comments()
+    instance.product.stats.dec_comments(instance.rate)
     
     
    

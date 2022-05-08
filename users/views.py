@@ -49,6 +49,11 @@ def signup(request: HttpRequest):
         form = SignUpForm(request.POST)
         if form.is_valid():
             phone_num = form.cleaned_data.get('phone_num', None)
+            
+            user = User.objects.filter(phone_num=phone_num).first()
+            if not user.is_active:
+                return render(request, 'limited_access.html')
+            
             request.session['phone_num'] = phone_num
             request.session.save()
 

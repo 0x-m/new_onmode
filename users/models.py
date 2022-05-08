@@ -26,7 +26,7 @@ class CustomUserManager(UserManager):
 
 class User(AbstractUser):
     MAX_STORAGE_SIZE = config('MAX_STORAGE', default=20, cast=int)
-    
+    #TODO:....
     def generate_usecode():
         alphabet = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(alphabet) for _ in range(8))
@@ -56,6 +56,11 @@ class User(AbstractUser):
     consumed_storage = models.FloatField(default=0, help_text='consumed storage in mega bytes') #in MB
     
 
+
+    @property
+    def has_completed_profile(self):
+        return self.first_name and self.last_name
+    
     @property
     def paid_orders(self):
         return self.orders.filter(paid=True).all()

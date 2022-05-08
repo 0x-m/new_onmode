@@ -1,6 +1,5 @@
-import imp
-from multiprocessing.spawn import import_main_path
-from pickletools import read_uint1
+from importlib import import_module
+from itertools import count
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportMixin
@@ -8,6 +7,7 @@ from .models import Category, Collection, CreateShopRequest, Option, Photo, Prod
 from import_export.admin import ExportMixin
 from import_export.resources import ModelResource
 from import_export.fields import Field
+from django.db.models import Count
 
 @admin.register(CreateShopRequest)
 class CreateShopRequestAdmin(admin.ModelAdmin):
@@ -204,62 +204,62 @@ class ProductSalesFilter(admin.SimpleListFilter):
 
         value = self.value()
         if value == 'l20':
-            return queryset.filter(stats__sales__lte=20)
+            return queryset.annotate(c=Count('orders')).filter(c__lte=20)
         elif value == 'l50':
-            return queryset.filter(stats__sales__lte=50)
+            return queryset.annotate(c=Count('orders')).filter(c__lte=50)
         elif value == 'b100':
-            return queryset.filter(stats__sales__gte=50, stats__sales__lte=200)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=50, c__lte=200)
         elif value == 'b200':
-            return queryset.filter(stats__sales__gte=200, stats__sales__lte=300)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=201, c__lte=300)
         elif value == 'b300':
-            return queryset.filter(stats__sales__gte=300, stats__sales__lte=400)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=301, c__lte=400)
         elif value == 'b400':
-            return queryset.filter(stats__sales__gte=400, stats__sales__lte=500)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=401, c__lte=500)
         elif value == 'b500':
-            return queryset.filter(stats__sales__gte=500, stats__sales__lte=1000)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=500, c__lte=1000)
         elif value == 'g1000':
-            return queryset.filter(stats__sales__gte=1000)
+            return queryset.annotate(c=Count('orders')).filter(c__gte=1000)
         elif value == 'top':
-            return queryset.order_by('stats__sales')
+            return queryset.annotate(c=Count('orders')).order_by('c')
 
-class ProductFailsFilter(admin.SimpleListFilter):
-    title = 'returneds'
-    parameter_name = 'fails'
+# class ProductFailsFilter(admin.SimpleListFilter):
+#     title = 'returneds'
+#     parameter_name = 'fails'
 
-    def lookups(self, request, model_admin):
-        return (
-            ('top', 'top most'),
-            ('l20', 'less than 20s'),
-            ('l50', 'less than 50s'),
-            ('b100', 'between 50 and 200'),
-            ('b200', 'between 200 and 300'),
-            ('b300', 'between 300 and 400'),
-            ('b400', 'between 400 and 500'),
-            ('b500', 'between 500 and 1000'),
-            ('g1000', 'grather tan 1000s'),
-        )
+#     def lookups(self, request, model_admin):
+#         return (
+#             ('top', 'top most'),
+#             ('l20', 'less than 20s'),
+#             ('l50', 'less than 50s'),
+#             ('b100', 'between 50 and 200'),
+#             ('b200', 'between 200 and 300'),
+#             ('b300', 'between 300 and 400'),
+#             ('b400', 'between 400 and 500'),
+#             ('b500', 'between 500 and 1000'),
+#             ('g1000', 'grather tan 1000s'),
+#         )
 
-    def queryset(self, request, queryset):
+#     def queryset(self, request, queryset):
 
-        value = self.value()
-        if value == 'l20':
-            return queryset.filter(stats__fails__lte=20)
-        elif value == 'l50':
-            return queryset.filter(stats__fails__lte=50)
-        elif value == 'b100':
-            return queryset.filter(stats__fails__gte=50, stats__fails__lte=200)
-        elif value == 'b200':
-            return queryset.filter(stats__fails__gte=200, stats__likes__lte=300)
-        elif value == 'b300':
-            return queryset.filter(stats__fails__gte=300, stats__fails__lte=400)
-        elif value == 'b400':
-            return queryset.filter(stats__fails__gte=400, stats__fails__lte=500)
-        elif value == 'b500':
-            return queryset.filter(stats__fails__gte=500, stats__fails__lte=1000)
-        elif value == 'g1000':
-            return queryset.filter(stats__fails__gte=1000)
-        elif value == 'top':
-            return queryset.order_by('stats__fails')
+#         value = self.value()
+#         if value == 'l20':
+#             return queryset.filter(stats__fails__lte=20)
+#         elif value == 'l50':
+#             return queryset.filter(stats__fails__lte=50)
+#         elif value == 'b100':
+#             return queryset.filter(stats__fails__gte=50, stats__fails__lte=200)
+#         elif value == 'b200':
+#             return queryset.filter(stats__fails__gte=200, stats__likes__lte=300)
+#         elif value == 'b300':
+#             return queryset.filter(stats__fails__gte=300, stats__fails__lte=400)
+#         elif value == 'b400':
+#             return queryset.filter(stats__fails__gte=400, stats__fails__lte=500)
+#         elif value == 'b500':
+#             return queryset.filter(stats__fails__gte=500, stats__fails__lte=1000)
+#         elif value == 'g1000':
+#             return queryset.filter(stats__fails__gte=1000)
+#         elif value == 'top':
+#             return queryset.order_by('stats__fails')
 
 
 class ProductResource(ModelResource):
@@ -297,8 +297,13 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
     def get_rate(instance):
         return instance.stats.rates_avg
 
+    @admin.action(description='sells')
+    def get_sells_count(instance):
+        return instance.stats.number_of_sells
+
+
     list_display = ['name', 'price', 'shop',
-                    get_rate, 'quantity', 'published', 'deleted']
+                    get_rate,get_sells_count, 'quantity', 'published', 'deleted']
     list_editable = ['published', ]
     readonyl_fields = ['id', 'prod_code', 'date_created',
                        'slug', 'en_slug', 'last_updated']
@@ -307,7 +312,7 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
     list_filter = ['published', 'deleted', 'has_sales', 'date_created',
                    ProductRateFilter, ProductCommentFilter,ProductLikesFilter, 
                    ProductSalesFilter, 
-                   ProductFailsFilter, 
+                #    ProductFailsFilter, 
                    'category']
                    
     ordering = ['date_created']

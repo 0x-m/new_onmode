@@ -166,7 +166,7 @@ class Order(models.Model):
                 item.product.force__dec_quantity(item.product.quantity)
             else:
                 item.product.dec_quantity(item.quantity)
-            item.product.stats.inc_sales()
+            # item.product.stats.inc_sales()
         # -----------------------
         
         self.save()
@@ -358,6 +358,8 @@ class OrderItem(models.Model):
 
     def __len__(self):
         return self.quantity
+    
+
 
 class WalletAlternation(models.Model):
     intendant = models.ForeignKey(to=User, related_name='alternations', on_delete=models.CASCADE, null=True, editable=False)

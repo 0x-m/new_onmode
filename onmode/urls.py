@@ -13,7 +13,7 @@ from catalogue.views import shop, search, category
 
 
 def allp(request):
-    return render(request, 'shop/all_products.html')
+    return render(request, 'limited_access.html')
 
 urlpatterns = [
     path('', include('index.urls', namespace='index')),
