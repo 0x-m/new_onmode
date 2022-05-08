@@ -1,12 +1,44 @@
-from atexit import register
+from xmlrpc.server import resolve_dotted_attribute
 from django.contrib import admin
 from .models import Order, OrderItem, WalletAlternation
+from import_export import resources
+from import_export.admin import ExportMixin
+from import_export.fields import Field
 
 
+class OrderResource(resources.ModelResource):
+    shop = Field(attribute='shop__name', column_name='shop')
+    user = Field(attribute='user__phone_num', column_name='user')
+    final_price = Field()
+    
+    def dehydrate_final_price(self, order):
+        return order.final_price
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'code', 
+                  'final_price'
+                  , 'state', 'tracking_code', 
+                  'coupon_code', 'coupon_type', 
+                  'coupon_amount', 'coupon_percent', 
+                  'ref_id', 'authority', 'paid', 
+                  'pay_source', 'date_created', 
+                  'date_fulfilled', 'issue_return' ]
+        export_order = [
+            'id', 'code',
+            'shop', 'user',
+            'final_price', 'state',
+            'tracking_code', 'coupon_type',
+            'coupon_amount', 'coupon_percent',
+            'ref_id', 'authority', 'paid', 'pay_source',
+            'date_created', 'date_fulfilled', 'issue_return'
+        ]
 
 @admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(ExportMixin, admin.ModelAdmin):
     
+    resource_class = OrderResource
+
     @admin.action(description='accept order as seller')
     def accept(model, request, qs):
         for order in qs:
@@ -51,7 +83,7 @@ class OrderAdmin(admin.ModelAdmin):
     
     list_display = ['user', 'shop', 'final_price', 'tracking_code', 'state', 'issue_return']
     readonly_fields = ['code','state']
-    list_filter = ['state', 'issue_return']
+    list_filter = ['state', 'issue_return', 'date_created', 'date_fulfilled']
     search_fields = ['code', 'user__phone_num', 'id']
     actions = [accept, reject, 
                cancel, fulfill, 
@@ -59,8 +91,21 @@ class OrderAdmin(admin.ModelAdmin):
                reject_tracking_code, mark_returned, 
                mark_pending]
     
+    
+
+class OrderItemResource(resources.ModelResource):
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'product', 'prod_name', 'prod_en_name', 'price', 'sales_price',
+                  'has_sales','final_price','qunatity', 
+                  'discount_code', 'discount_percent', 
+                  'options', 'collection__name', 'raced' ]   
+        
+         
+
 @admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
+class OrderItemAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = OrderItemResource
     @admin.action(description='order code')
     def get_order_code(instance):
         return instance.order.code

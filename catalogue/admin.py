@@ -1,5 +1,7 @@
 from pickletools import read_uint1
 from django.contrib import admin
+from import_export import resources
+from import_export.admin import ImportExportMixin
 
 from .models import Category, Collection, CreateShopRequest, Option, Photo, Product, ProductOptionValue, ProductStats, ProductType, Shop, Comment
 
@@ -38,8 +40,16 @@ class OptionAdmin(admin.ModelAdmin):
     readonly_fields = ['id']
 
 
+class CategoryResource(resources.ModelResource):
+    class Meta:
+        model = Category
+        fields = ['id','parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
+        export_order = ['id', 'parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
+        
+
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ImportExportMixin, admin.ModelAdmin):
+    resource_class = CategoryResource
     list_display = ['id', 'name', 'parent']
     readonly_fields = ['id', 'slug', 'en_slug']
 

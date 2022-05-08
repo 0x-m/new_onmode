@@ -208,7 +208,6 @@ class Wallet(models.Model):
 
     
 class CheckoutRequest(models.Model):
-
     class STATES(models.TextChoices):
         InProgress = 'inp',
         Fulfilled = 'ful',
@@ -250,12 +249,12 @@ class DepositTransaction(models.Model):
     wallet = models.ForeignKey(to=Wallet, related_name='deposits', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date_committed = models.DateTimeField(default=timezone.now)
-    succeeded = models.BooleanField(default=False)
+    succeed = models.BooleanField(default=False)
     
     def apply(self):
         self.wallet.deposit(self.amount)
         self.date_committed = timezone.now()
-        self.succeeded = True
+        self.succeed = True
         self.save()
     
 

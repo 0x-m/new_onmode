@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tinymce',
     'gtm',
+    'import_export',
     'sslserver',
     'django_filters',
     'jalali_date',
