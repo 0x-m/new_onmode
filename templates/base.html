@@ -135,12 +135,13 @@
                 {% endblock %}
 
                 <footer class="footer footer-center p-2 bg-gray-100 text-gray-600 mt-4">
-                    <ul class="menu menu-horizontal text-xs  w-full justify-center  gap-2">
+                    <ul class="menu menu-horizontal text-xs  w-full justify-center  gap-1">
                         <li><a href="{% url 'index:aboutus' %}">درباره ما</a></li>
                         <li><a href="{% url 'index:contactus' %}">تماس با ما</a></li>
                         <li><a href="{% url 'index:policies' %}">قوانین</a></li>
                         <li><a href="{{siteinfo.blog}}">وبلاگ</a></li>
                     </ul>
+                    <a href="{% url 'index:return_terms' %}" class="text-xs btn btn-ghost">رویه بازگرداندن کالا</a>
                     <div class="flex items-center flex-col text-gray-700 justify-center text-xs">
                         <div class="flex gap-2">
                             <span>شماره تماس:</span>

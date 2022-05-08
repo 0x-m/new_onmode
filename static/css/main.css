@@ -4270,6 +4270,10 @@ body[dir="rtl"] .checkbox:checked,
   margin-top: -0.25rem;
 }
 
+.mb-32 {
+  margin-bottom: 8rem;
+}
+
 .ml-2 {
   margin-left: 0.5rem;
 }
@@ -4288,10 +4292,6 @@ body[dir="rtl"] .checkbox:checked,
 
 .-mt-16 {
   margin-top: -4rem;
-}
-
-.mb-32 {
-  margin-bottom: 8rem;
 }
 
 .block {

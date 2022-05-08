@@ -90,7 +90,15 @@ class ShopSet(models.Model):
     slogan = models.CharField(max_length=255, blank=True)
 
 
-class ContactUsMessages(models.Model):
+class ContactUsType(models.Model):
+    title = models.CharField(max_length=255, blank=True)
+    description = models.CharField(max_length=1000, blank=True)
+    
+    def __str__(self) -> str:
+        return self.title
+
+class ContactUsMessage(models.Model):
+    type = models.ForeignKey(to=ContactUsType, related_name='messages', on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255, blank=True)
     email = models.EmailField()
     title = models.CharField(max_length=255, blank=True)
@@ -101,3 +109,5 @@ class ContactUsMessages(models.Model):
 class CreateShopGuide(models.Model):
     content = HTMLField()
     
+class ReturnOrderGuide(models.Model):
+    content = HTMLField()

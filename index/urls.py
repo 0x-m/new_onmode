@@ -11,4 +11,6 @@ urlpatterns = [
     path('contactus/', views.contact_us, name='contactus' ),
     path('certifications/', views.certificatinos, name='certifications' ),
     path('policies/', views.policies, name='policies' ),
+    path('return/terms', views.return_terms, name='return_terms' ),
+
 ]

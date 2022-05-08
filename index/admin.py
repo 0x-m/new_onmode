@@ -1,6 +1,6 @@
 import site
 from django.contrib import admin
-from .models import About, BlogPost, CreateShopGuide, Law, ShopSet, SiteInfo, SliderPhoto
+from .models import About, BlogPost, ContactUsMessage, ContactUsType, CreateShopGuide, Law, ReturnOrderGuide, ShopSet, SiteInfo, SliderPhoto
 
 @admin.register(SliderPhoto)
 class SlidePhotoAdmin(admin.ModelAdmin):
@@ -21,3 +21,10 @@ admin.site.register(SiteInfo)
 admin.site.register(About)
 admin.site.register(Law)
 admin.site.register(CreateShopGuide)
+admin.site.register(ReturnOrderGuide)
+admin.site.register(ContactUsType)
+
+@admin.register(ContactUsMessage)
+class ContactUsAdmin(admin.ModelAdmin):
+    list_display = ['id', 'full_name','type', 'title']
+    list_filter = ['type__title']

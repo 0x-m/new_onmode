@@ -44,13 +44,26 @@ def contact_us(request: HttpRequest):
         if form.is_valid():
             form.save()
             return render(request, 'contactus.html', {
-                'status': 'success'
+                'status': 'success',
+                'types': ContactUsType.objects.all()
             })
         return render(request, 'contactus.html', {
-            'status': 'faild'
+            'status': 'faild',
+            'types': ContactUsType.objects.all()
         })
 
     
-    return render(request, 'contactus.html')
+    return render(request, 'contactus.html', {
+        'status': '',
+        'types': ContactUsType.objects.all()
+
+    })
 
 
+
+def return_terms(request: HttpRequest):
+    return render(request, 'return_order_guide.html', {
+        'guide': ReturnOrderGuide.objects.first()
+    })
+    
+    

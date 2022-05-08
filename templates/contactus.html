@@ -30,6 +30,11 @@
             <h2 class="text-center p-2 text-gray-400 text-xl">تماس به ما</h2>
             <form action="{% url 'index:contactus' %}" method="post" class="w-full p-2 flex flex-col gap-2">
                 {% csrf_token %}
+                <select class="select select-bordered" name="type" id="">
+                    {% for type in types %}
+                        <option value="{{type.id}}" {% if forloop.counter == 0 %}selected{% endif %}>{{type.title}}</option>
+                    {% endfor %}
+                </select>
                 <input name="full_name" placeholder="نام و نام خانوادگی" class="input input-bordered w-full"
                     type="text">
                 <input name="email" placeholder="ایمیل" class="input input-bordered w-full" type="email">

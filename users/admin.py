@@ -27,7 +27,6 @@ class AddressInline(admin.StackedInline):
 
 class WalletInline(admin.StackedInline):
     model = Wallet
-    readonly_fields = ['date_last_withdraw']
     
 class UserModelAdmin(UserAdmin):
     

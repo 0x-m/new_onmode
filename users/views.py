@@ -13,6 +13,7 @@ from django.urls import reverse
 from httpx import RequestError
 from ippanel import Client
 from decouple import config
+
 from promotions.models import GiftCard
 
 # from catalog.models import Product
@@ -295,3 +296,4 @@ def check_email(request: HttpRequest):
             })
 
     return HttpResponseNotAllowed(['POST'])
+
