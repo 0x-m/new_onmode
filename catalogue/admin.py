@@ -1,10 +1,13 @@
+import imp
+from multiprocessing.spawn import import_main_path
 from pickletools import read_uint1
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportMixin
-
 from .models import Category, Collection, CreateShopRequest, Option, Photo, Product, ProductOptionValue, ProductStats, ProductType, Shop, Comment
-
+from import_export.admin import ExportMixin
+from import_export.resources import ModelResource
+from import_export.fields import Field
 
 @admin.register(CreateShopRequest)
 class CreateShopRequestAdmin(admin.ModelAdmin):
@@ -259,8 +262,37 @@ class ProductFailsFilter(admin.SimpleListFilter):
             return queryset.order_by('stats__fails')
 
 
+class ProductResource(ModelResource):
+    class Meta:
+        model = Product
+        fields = ['id','name', 
+                  'en_name','price', 
+                  'has_sales', 
+                  'sales_price','quantity', 
+                  'shipping_cost','attributes',
+                  'meta_title', 'meta_description',
+                  'meta_keywords', 'quantity', 
+                  'stock_low_threshold', 
+                  'free_shipping', 'published', 
+                  'prod_code', 'shop__name', 'category__name', 
+                  'date_created', 'last_updated', 'discount__code']
+        export_order = ['id','name', 
+                  'en_name','price', 
+                  'has_sales', 
+                  'sales_price','quantity', 
+                  'shipping_cost','attributes',
+                  'meta_title', 'meta_description',
+                  'meta_keywords', 'quantity', 
+                  'stock_low_threshold', 
+                  'free_shipping', 'published', 
+                  'prod_code', 'shop__name', 'category__name', 
+                  'date_created', 'last_updated', 'discount__code'
+        ]
+
+
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ExportMixin,admin.ModelAdmin):
+    resource_class = ProductResource
     @admin.action(description='rate')
     def get_rate(instance):
         return instance.stats.rates_avg
