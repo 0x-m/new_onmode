@@ -111,3 +111,17 @@ class CreateShopGuide(models.Model):
     
 class ReturnOrderGuide(models.Model):
     content = HTMLField()
+    
+class GeoLocation(models.Model):
+    provinces = models.JSONField()
+    cities = models.JSONField()
+
+    
+    def get_cities(self, province_id):
+        _cities = []
+        for city in self.cities:
+            if str(city['province_id']).strip() == str(province_id).strip():
+                _cities.append(city['name'])
+        return _cities
+    
+    

@@ -11,6 +11,12 @@ from .models import Order, OrderItem
 from .forms import AcceptOrderForm, AddOrderItemForm
 from django.core.paginator import *
 from decouple import config
+from index.models import GeoLocation
+
+
+
+
+
 def cart(request: HttpRequest):
     orders = request.user.orders.filter(paid=False)
     return render(request, 'shop/cart.html', {
@@ -131,6 +137,11 @@ def checkout(request: HttpRequest, shop_name):
     user = request.user
     cart = get_object_or_404(Order, user=user, shop=shop, paid=False)
     wallet_has_balance = request.user.wallet.has_balance(cart.final_price)
+
+    provinces = GeoLocation.objects.first()
+    if provinces:
+        provinces = provinces.provinces
+        
     if request.method == 'POST':
         address_id = request.POST.get('address')
         order_msg = request.POST.get('order_msg')
@@ -143,7 +154,8 @@ def checkout(request: HttpRequest, shop_name):
                 'cart': cart,
                 'address_status': 'invalid address' if not address else '',
                 'pay_status': 'invalid pay_via' if not pay_via else '',
-                'wallet_has_balance': wallet_has_balance
+                'wallet_has_balance': wallet_has_balance,
+                'provinces': provinces
             })
 
         cart.address = address
@@ -184,9 +196,10 @@ def checkout(request: HttpRequest, shop_name):
                     'address_status': 'invalid address' if not address else '',
                     'pay_status': 'invalid pay_via' if not pay_via else '',
                     'wallet_has_balance': wallet_has_balance,
-                    'connection': 'error' 
+                    'connection': 'error',
+                    'provinces': provinces
+
                 })
-            return HttpResponse(req_result.status_code)
 
         elif pay_via == 'wallet':
             if wallet_has_balance:
@@ -198,7 +211,7 @@ def checkout(request: HttpRequest, shop_name):
             else:
                 return Http404()
 
-        return redirect('https://www.google.com')
+       
         # if not cart.paid:
         #     cart.pay(ref_id, authority)
         #     return render(request, 'shop/checkout_result.html', {
@@ -207,7 +220,9 @@ def checkout(request: HttpRequest, shop_name):
 
     return render(request, 'shop/checkout.html', {
         'cart': cart,
-        'wallet_has_balance': wallet_has_balance
+        'wallet_has_balance': wallet_has_balance,
+        'provinces': provinces
+
 
     })
 

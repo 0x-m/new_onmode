@@ -166,3 +166,31 @@ function decrementQuantity(elem) {
         }
     });
 }
+
+
+function get_cities(sender) {
+    const selecte_province = sender.selectedOptions[0].dataset['id'];
+    if (selecte_province != -1) {
+        sender.disabled = true;
+        fetch('/geo/cities/' + selecte_province).then(resp => {
+            if (resp.status == 200) {
+                resp.json().then(data => {
+                    const fragment = document.createDocumentFragment()
+                    const cities = document.getElementById('cities');
+                    cities.innerHTML = '';
+                    for (let i=0; i < data['cities'].length; ++i) {
+                        let option = document.createElement('option');
+                        option.innerText = data['cities'][i];
+                        option.value = data['cities'][i];
+                        fragment.append(option);
+                    }
+                    cities.appendChild(fragment);
+                    sender.disabled = false;
+                });
+            }
+            else {
+                sender.disabled = false;
+            }
+        });
+    } 
+}

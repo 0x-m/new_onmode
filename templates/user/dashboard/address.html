@@ -14,19 +14,14 @@
             <h4 class="text-center text-md text-gray-600 mb-2">آدرسها</h4>
             <input name="full_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1" type="text">
             <input name="phone_number" placeholder="شماره تماس" class="input input-bordered p-1" type="text">
-            <select class="select  select-bordered w-full" name="province" id="">
+            <select onchange="get_cities(this);" class="select  select-bordered w-full" name="province" id="">
                 <option value="" disabled selected>استان</option>
-                <option value="تهران">تهران</option>
-                <option value="فارس">فارس</option>
-                <option value="کرمان">کرمان</option>
-
+                {% for province in provinces %}
+                <option data-id="{{province.id}}" value="{{province.name}}">{{province.name}}</option>
+                {% endfor %}
             </select>
-            <select class="select  select-bordered w-full" name="city" id="">
+            <select class="select  select-bordered w-full" name="city" id="cities">
                 <option value="" disabled selected>شهرستان</option>
-                <option value="شیراز">شیراز</option>
-                <option value="تبس">تبس</option>
-                <option value="آمل">آمل</option>
-
             </select>
             <input name="town" placeholder="شهر" class="input input-bordered p-1" type="text">
             <input name="postal_code" placeholder="کد پستی" class="input input-bordered p-1" type="text">
@@ -70,4 +65,6 @@
 <script>
     selectMenu('profile')
 </script>
+<script defer src="{% static 'js/functions.js' %}"></script>
+
 {% endblock %}

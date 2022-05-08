@@ -1,4 +1,4 @@
-from django.http import HttpRequest, HttpResponseNotAllowed
+from django.http import HttpRequest, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import render
 
 from .forms import ContactUsForm
@@ -67,3 +67,9 @@ def return_terms(request: HttpRequest):
     })
     
     
+def get_cities(request: HttpRequest, province_id):
+    loc = GeoLocation.objects.first()
+    cities = loc.get_cities(province_id);
+    return JsonResponse({
+        'cities': cities
+    })

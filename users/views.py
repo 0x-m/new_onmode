@@ -13,6 +13,7 @@ from django.urls import reverse
 from httpx import RequestError
 from ippanel import Client
 from decouple import config
+from index.models import GeoLocation
 
 from promotions.models import GiftCard
 
@@ -123,27 +124,31 @@ def profile(request: HttpRequest):
         form = ProfileForm(request.POST, instance=request.user)
         if not form.is_valid():
             return render(request, 'user/dashboard/profile.html', {
-                'status': 'invalid'
+                'status': 'invalid',
             })
 
         form.save()
 
         return render(request, 'user/dashboard/profile.html', {
-            'status': 'edited successfully'
+            'status': 'edited successfully',
+
         })
 
     return render(request, 'user/dashboard/profile.html', {
-        'form': ''
+        
     })
 
 
 @login_required
 def addresses(request: HttpRequest):
+    geoloc = GeoLocation.objects.first()
+
     if request.method == 'POST':
         form = AddressForm(request.POST)
         if not form.is_valid():
             return render(request, 'user/dashboard/address.html', {
-                'errors': form.errors
+                'errors': form.errors,
+                'provinces': geoloc.provinces
             })
         address = form.save(commit=False)
         address.user = request.user
@@ -154,10 +159,13 @@ def addresses(request: HttpRequest):
             return redirect('orders:checkout', shop_name=shop_name)
 
         return render(request, 'user/dashboard/address.html', {
-            'errors': form.cleaned_data
+            'errors': form.cleaned_data,
+            'provinces': geoloc.provinces
         })
 
-    return render(request, 'user/dashboard/address.html')
+    return render(request, 'user/dashboard/address.html', {
+        'provinces': geoloc.provinces
+    })
 
 
 @login_required
