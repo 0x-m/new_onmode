@@ -1,7 +1,4 @@
 
-from operator import truediv
-from anyio import fail_after
-from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
@@ -11,8 +8,7 @@ from django.db.models.signals import post_save
 import secrets
 import string
 from decouple import config
-# from catalogue.models import Product
-
+from django.urls import reverse
 
 class CustomUserManager(UserManager):
         
@@ -57,6 +53,14 @@ class User(AbstractUser):
     
 
 
+
+    @property 
+    def full_name(self):
+        if self.first_name and self.last_name:
+            return self.first_name + ' ' + self.last_name
+        return ' '
+    
+    
     @property
     def cart_count(self):
         count = 0
@@ -64,7 +68,8 @@ class User(AbstractUser):
             count += len(order)
 
         return count
-
+    
+  
     @property
     def has_completed_profile(self):
         return self.first_name and self.last_name
@@ -271,15 +276,48 @@ class DepositTransaction(models.Model):
         self.save()
     
 
-class Message(models.Model):
-    class TYPES(models.TextChoices):
-        Normal = 'Normal',
-        Warning = 'Warning',
-        Success = 'Success'
-        
+
+class TicketType(models.Model):
+    title = models.CharField(max_length=255)
     
-    user = models.ForeignKey(to=User, related_name='messages', on_delete=models.CASCADE)
-    type = models.CharField(max_length=20, choices=TYPES.choices, default=TYPES.Normal)
+    def __str__(self) -> str:
+        return self.title
+    
+class Ticket(models.Model):
+    user = models.ForeignKey(to=User, related_name='tickets', on_delete=models.CASCADE)
+    type = models.ForeignKey(to=TicketType, related_name='tickets', on_delete=models.CASCADE)
     title = models.CharField(max_length=255,blank=True)
-    body = models.CharField(max_length=255, blank=True)
-    visited = models.BooleanField(default=False)
+    body = models.TextField(max_length=5000)
+    seen_by_user = models.BooleanField(default=False)
+    seen_by_intendant = models.BooleanField(default=False)
+    can_reply = models.BooleanField(default=False)
+    closed = models.BooleanField(default=False)
+    replied = models.BooleanField(default=False)
+    date_created = models.DateTimeField(default=timezone.now)
+    
+    def get_absolute_url(self):
+        return reverse('users:ticket', kwargs={'ticket_id': self.id})
+    
+    def __str__(self) -> str:
+        return self.title + str(self.id)
+    
+    @property
+    def no_unseens(self):
+        if self.replies:
+            return self.replies.filter(seen_by_user=False).count()
+    
+class TicketReply(models.Model):
+    ticket = models.ForeignKey(to=Ticket, related_name='replies', on_delete=models.CASCADE)
+    body = models.TextField(max_length=5000)
+    user = models.ForeignKey(to=User, 
+                                 related_name='answered_tickets', 
+                                 on_delete=models.SET_NULL, null=True)
+    date_created = models.DateTimeField(default=timezone.now)
+    seen_by_user = models.BooleanField(default=False)
+    seen_by_intendant = models.BooleanField(default=False)
+    
+
+
+
+    
+    

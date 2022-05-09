@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 from django import forms
 
 
-from .models import CheckoutRequest, DepositTransaction, User, Address, Wallet
+from .models import CheckoutRequest, DepositTransaction, Ticket, TicketReply, TicketType, User, Address, Wallet
 
 from jalali_date.admin import ModelAdminJalaliMixin, StackedInlineJalaliMixin, TabularInlineJalaliMixin	
 from jalali_date import datetime2jalali, date2jalali
@@ -125,3 +125,7 @@ class DepositAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = DepositResource
     fields  = ['id', 'amount', 'date_committed', 'succeed']
     readonly_fields = ['id', 'date_committed']
+    
+
+admin.site.register(Ticket)
+admin.site.register(TicketType)

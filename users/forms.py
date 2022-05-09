@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 
 #from catalog.models import Product
 #from .models import Comment
-from .models import Address, CheckoutRequest, User
+from .models import Address, CheckoutRequest, TicketReply, User, Ticket
 
 class SignUpForm(forms.Form):
     phone_num = forms.CharField(max_length=11,
@@ -57,3 +57,16 @@ class CheckoutForm(forms.ModelForm):
 
 class EmailCheckerForm(forms.Form):
     email = forms.EmailInput()
+
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        fields  = ['type', 'title', 'body']
+        
+        
+class TicketReplyForm(forms.ModelForm):
+    class Meta:
+        model = TicketReply
+        fields = ['body',]
+        

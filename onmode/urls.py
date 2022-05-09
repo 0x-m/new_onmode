@@ -13,7 +13,7 @@ from catalogue.views import shop, search, category
 
 
 def allp(request):
-    return render(request, 'limited_access.html')
+    return render(request, 'user/dashboard/create_ticket.html')
 
 urlpatterns = [
     path('', include('index.urls', namespace='index')),

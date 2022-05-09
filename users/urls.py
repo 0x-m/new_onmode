@@ -30,7 +30,13 @@ urlpatterns = [
     path('dashboard/shop/product/photo/add/<pid>', catalog.add_photo, name='add-photo'),
     path('dashboard/shop/product/photo/delete/<pid>', catalog.delete_photo, name='delete-photo'),
     path('dashboard/shop/product/photo/preview/<pid>', catalog.change_preview_photo, name='make-as-preview'),
-    path('check_email/', views.check_email, name='check_email')
+    path('check_email/', views.check_email, name='check_email'),
+    path('dashboard/messages/create/', views.create_ticket, name='create-ticket'),
+    path('dashboard/messages/all/', views.tickets, name='all-tickets'),
+    path('dashboard/messages/message/reply/<ticket_id>/', views.reply_ticket, name='reply-ticket'),
+    path('dashboard/messages/message/<ticket_id>/', views.ticket, name='ticket'),
+
+
 
 
     

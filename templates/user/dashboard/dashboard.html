@@ -168,6 +168,32 @@
 
                         </ul>
                     </li>
+                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a  id="messages" href="{% url 'users:messages' %}">
+                            <i class="bi-envelope md:text-xl"></i>
+                            <span class="hidden md:block">پیام رسانی</span>
+                        </a>
+                        <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
+                            <li>
+                                <a href="{% url 'users:create-ticket' %}">
+                                    <i class="bi-plus"></i>
+                                    <span>ارسال تیکت جدید</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:all-tickets' %}">
+                                    <i class="bi-ticket"></i>
+                                    <span>همه تیکتها</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:messages' %}">
+                                    <i class="bi-bell"></i>
+                                    <span>همه پیامها</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li >
                         <a id="favourites" href="{% url 'users:favourites' %}">
                             <i class="bi-heart md:text-xl"></i>
@@ -186,12 +212,7 @@
                             <span class="hidden md:block">سفارشها</span>
                         </a>
                     </li>
-                    <li>
-                        <a  id="messages" href="{% url 'users:messages' %}">
-                            <i class="bi-envelope md:text-xl"></i>
-                            <span class="hidden md:block">پیامها</span>
-                        </a>
-                    </li>
+                   
 
                 </ul>
             </section>

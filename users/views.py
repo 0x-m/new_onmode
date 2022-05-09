@@ -2,9 +2,10 @@
 from audioop import minmax
 from mimetypes import common_types
 from pickletools import read_uint1
+from random import lognormvariate
 from wsgiref.handlers import read_environ
 from wsgiref.util import request_uri
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
@@ -13,15 +14,16 @@ from django.urls import reverse
 from httpx import RequestError
 from ippanel import Client
 from decouple import config
+from requests import ReadTimeout
 from index.models import GeoLocation
 
 from promotions.models import GiftCard
 
 # from catalog.models import Product
 
-from .models import User, Wallet
+from .models import Ticket, TicketType, User, Wallet
 
-from .forms import AddressForm, CheckoutForm, EmailCheckerForm, SignUpForm, VerificationCodeForm, ProfileForm
+from .forms import AddressForm, CheckoutForm, EmailCheckerForm, SignUpForm, TicketForm, TicketReplyForm, VerificationCodeForm, ProfileForm
 from .OTP import OTP, InvalidCodeException, ExpiredCodeException
 
 
@@ -52,16 +54,18 @@ def signup(request: HttpRequest):
             phone_num = form.cleaned_data.get('phone_num', None)
             
             user = User.objects.filter(phone_num=phone_num).first()
-            if not user.is_active:
-                return render(request, 'limited_access.html')
+            if user:
+                if not user.is_active:
+                    return render(request, 'limited_access.html')
             
             request.session['phone_num'] = phone_num
             request.session.save()
 
             OTP(request).clear()
             code = OTP(request).code
-            res = send_verification_code(phone_num, code)
-            
+            # res = send_verification_code(phone_num, code)
+            print(code)
+            res = True
             if res:
                 return redirect('users:verify')
             else:
@@ -309,4 +313,88 @@ def check_email(request: HttpRequest):
             })
 
     return HttpResponseNotAllowed(['POST'])
+
+
+#-------------------------TICKETS-----------------------
+
+@login_required
+def create_ticket(request: HttpRequest):
+    ticket_types = TicketType.objects.all()
+    if request.method == 'POST':
+        form = TicketForm(request.POST)
+        if form.is_valid():
+            ticket =  form.save(commit=False)
+            ticket.user = request.user
+            if request.user.is_staff:
+                ticket.repilied = True
+            else:
+                ticket.repilied = False
+            ticket.save()
+            return redirect('users:ticket', ticket_id=ticket) 
+        else:
+            return render(request, 'user/dashboard/create_ticket.html', {
+                'errors': form.errors
+            })
+                
+    return render(request, 'user/dashboard/create_ticket.html', {
+        'types': ticket_types
+    })
+
+@login_required
+def reply_ticket(request: HttpRequest, ticket_id):
+    print('...............dsfsfds............')
+    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    if not (ticket.user == request.user or request.user.is_staff):
+        return HttpResponseForbidden('you dont have permission to reply ')
+    if request.method == 'POST':
+        reply_form = TicketReplyForm(request.POST)
+        if reply_form.is_valid():
+            reply = reply_form.save(commit=False)
+            reply.user = request.user
+            reply.ticket = ticket
+            reply.save()
+            print('reply saved...')
+            return redirect('users:ticket', ticket_id=ticket.id)
+        else:
+            return HttpResponse('sfsdfdsf');
+    
+    return HttpResponseNotAllowed(['POST'])
+
+                
+@login_required
+def tickets(request: HttpRequest):
+
+    paginator = Paginator(request.user.tickets.all(), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    return render(request, 'user/dashboard/tickets.html', {
+        'page': page,
+    })
+
+ 
+@login_required
+def ticket(request: HttpResponse, ticket_id):
+
+    ticket = get_object_or_404(Ticket, pk=ticket_id)
+    
+    user = request.user
+    if user == ticket.user:
+        ticket.seen_by_user = True
+    elif user.is_staff:
+        ticket.seen_by_intendant = True
+
+    ticket.save()
+        
+    return render(request, 'user/dashboard/ticket.html', {
+        'ticket': ticket
+    })
+
+    
 
