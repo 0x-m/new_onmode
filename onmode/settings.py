@@ -1,7 +1,9 @@
 
 
 from pathlib import Path
+from decouple import config
 
+from . import storage_backends
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'storages',
     'tinymce',
     'gtm',
     'import_export',
@@ -68,8 +71,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'onmode.wsgi.application'
 ALLOW_UNICODE_SLUGS = True
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -79,8 +80,6 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -100,9 +99,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'users.user'
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('en-us', 'english'),
@@ -114,24 +110,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
-
-import os
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
-
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -174,3 +152,41 @@ TINYMCE_DEFAULT_CONFIG = {
     "alignright alignjustify | bullist numlist outdent indent | " 
     "removeformat | help |  "
 }
+
+#Cloud Storage Configurations----------------------
+USE_S3 = config('USE_S3',default=False, cast=bool)
+
+
+
+
+import os
+
+
+
+if USE_S3:
+    AWS_ACCESS_KEY_ID = 'afa9396c-f015-4a2f-9917-40d62c09646a'
+    AWS_SECRET_ACCESS_KEY = 'e1e762f233a0877eb37f32e1ca721fb248b01535f3fa65c047e325653e5d94bd'
+    # AWS_STORAGE_BUCKET_NAME = 'mediabucket'
+    # AWS_S3_CUSTOM_DOMAIN = '%s.s3.ir-thr-at1.arvanstorage.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_S3_ENDPOINT_URL = 'https://s3.ir-thr-at1.arvanstorage.com'
+    #static file storage
+    STATIC_URL = f'https://{storage_backends.StaticStorage.custom_domain}/{storage_backends.StaticStorage.bucket_name}/'
+    STATICFILES_STORAGE = 'onmode.storage_backends.StaticStorage'
+    
+    #media file settings
+    # PUBLIC_MEDIA_LOCATION = 'mediabucket'
+    MEDIA_URL = f'https://{storage_backends.PublicMediaStorage.custom_domain}/{storage_backends.PublicMediaStorage.bucket_name}/'
+    DEFAULT_FILE_STORAGE = 'onmode.storage_backends.PublicMediaStorage'
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+

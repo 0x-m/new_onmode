@@ -58,6 +58,14 @@ class User(AbstractUser):
 
 
     @property
+    def cart_count(self):
+        count = 0
+        for order in self.orders.filter(paid=False).all():
+            count += len(order)
+
+        return count
+
+    @property
     def has_completed_profile(self):
         return self.first_name and self.last_name
     

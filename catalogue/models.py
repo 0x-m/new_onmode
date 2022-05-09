@@ -2,11 +2,6 @@
 from audioop import ratecv
 from email.policy import default
 import os
-from re import T
-from turtle import RawTurtle, back
-from unittest import defaultTestLoader
-from attr import field
-from click import edit
 from django.db import models
 from django.dispatch import receiver
 from django.http import HttpRequest
@@ -21,7 +16,7 @@ from django.urls.base import reverse
 import django_filters
 from django.utils.text import slugify
 from decouple import config
-
+from onmode.storage_backends import SiteStorage
 #TODO: move it to utils
 def persian_slugify(txt: str):
     slug = ''
@@ -30,12 +25,13 @@ def persian_slugify(txt: str):
             slug += c
         else:
             slug += '-'
+    return slug
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     en_name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True, allow_unicode=True)
-    en_slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, allow_unicode=True, null=True)
+    en_slug = models.SlugField(blank=True, null=True)
     meta_title = models.CharField(max_length=90, blank=True)
     meta_keywords = models.CharField(max_length=100, blank=True)
     meta_description = models.CharField(max_length=100, blank=True)
@@ -192,7 +188,7 @@ class Product(models.Model):
         to=Category, related_name='products', on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50, blank=False, null=False, db_index=True)
     en_name = models.CharField(max_length=50, blank=True, null=False, db_index=True)
-    slug = models.SlugField(blank=True, null=True)
+    slug = models.SlugField(blank=True, null=True, allow_unicode=True)
     en_slug = models.SlugField(null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True, db_index=True)
     meta_description = models.CharField(max_length=255, blank=True, db_index=True)
@@ -314,7 +310,7 @@ class Product(models.Model):
         return price
 
     def __str__(self) -> str:
-        return self.name
+        return self.name + f'({self.id})'
 
 def get_brand(request: HttpRequest):
     if request is None:
@@ -488,8 +484,8 @@ class Collection(models.Model):
     featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40, unique=True)
     en_name = models.CharField(max_length=40, unique=True)
-    slug = models.SlugField(editable=False, blank=True)
-    en_slug = models.SlugField(editable=False, blank=True)
+    slug = models.SlugField(editable=False, blank=True, null=True, allow_unicode=True)
+    en_slug = models.SlugField(editable=False, blank=True, null=True)
     slogan = models.CharField(max_length=1000, blank=True)
     meta_title = models.CharField(max_length=40, blank=True)
     meta_description = models.CharField(max_length=90, blank=True)
@@ -499,9 +495,9 @@ class Collection(models.Model):
     prefer_collection_discount = models.BooleanField(default=False)
     page_poster_alt = models.CharField(max_length=255, blank=True)
     page_poster_url = models.URLField(blank=True, null=True)
-    page_poster = models.ImageField(null=True, blank=True)
+    page_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
     index_view = models.BooleanField(default=False)
-    index_poster = models.ImageField(null=True, blank=True)
+    index_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
     index_poster_url = models.URLField(null=True, blank=True)
     index_poster_link = models.URLField(blank=True, null=True)
     index_poster_alt = models.CharField(max_length=255, blank=True)

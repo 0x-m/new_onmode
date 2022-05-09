@@ -93,7 +93,7 @@
                     <a href="{% url 'orders:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                         <div class="indicator">
                             <i class="bi-bag text-xl md:text-2xl "></i>
-                            <span class="badge badge-primary badge-sm indicator-item">10</span>
+                            <span class="badge badge-primary badge-sm indicator-item">{{user.cart_count}}</span>
                         </div>
                     </a>
                 </div>
