@@ -3,8 +3,10 @@
 {% load options  %}
 {% block content %}
 
-<img src="https://source.unsplash.com/p-I9wV811qk/1920x1047
-" class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
+{% if shop.banner %}
+<img src="{{shop.banner.url}}" 
+class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
+{% endif %}
 <div class="w-full mt-2 p-1 md:hidden">
     <button onclick="openFilter();" class="btn btn-primary">فیلتر</button>
 </div>

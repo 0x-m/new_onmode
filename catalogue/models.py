@@ -1,5 +1,6 @@
 
 from audioop import ratecv
+from contextlib import nullcontext
 from email.policy import default
 import os
 from django.db import models
@@ -69,8 +70,8 @@ class Shop(models.Model):
     name = models.CharField(max_length=40)  # TODO: make it unique
     meta_title = models.CharField(max_length=100, blank=True)
     meta_description = models.CharField(max_length=400, blank=True)
-    # baner = models.ForeignKey(to='Photos', on_delete=models.SET_NULL)
-    # logo = models.ForeignKey(to='Photo', on_delete=models.SET_NULL)
+    banner = models.ImageField(null=True, blank=True)
+    logo = models.ImageField(null=True, blank=True)
     address_description = models.TextField(max_length=1000, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     user_custom_product_capacity = models.BooleanField(default=False)

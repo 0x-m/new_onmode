@@ -24,6 +24,15 @@
     </head>
 
     <body class="bg-stone-50 min-h-full ">
+        {% if siteinfo.show_pinned_message %}
+        <div style="background-color: {{siteinfo.pinned_color}}; color: {{siteinfo.pinned_text_color}};" class="w-full p-2">
+            <a href="{{siteinfo.pinned_url}}">
+                <p class="w-full text-xs">
+                    {{siteinfo.pinned_message}}
+                </p>
+            </a>
+        </div>
+        {% endif %}
         <header class="w-full bg-white shadow">
             <nav class="navbar bg-base-100 gap-1 ">
                 <div class="flex-1 gap-2 p-1 basis-12">

@@ -268,7 +268,19 @@ def edit_shop(requeset: HttpRequest):
                 'shop': shop
             })
 
-        shop_form.save()
+        shop = shop_form.save(commit=False)
+        logo = requeset.FILES.get('logo', None)
+        banner = requeset.FILES.get('banner', None)
+        print(logo)
+        if logo:
+            if shop.logo:
+                shop.logo.delete()
+            shop.logo = logo
+        if banner:
+            if shop.banner:
+                shop.banner.delete()
+            shop.banner = banner
+        shop.save()
         return render(requeset, 'shop/about.html', {
             'status': 'success',
             'shop': shop

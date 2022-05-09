@@ -94,9 +94,9 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             </div>
             <div class="grid grid-cols-4 md:grid-cols-5 md:w-3/4 mx-auto gap-2 items-center justify-center">
                 {% for shop in shopset.shops.all %}
-                <a href="">
+                <a href="/{{shop.name}}">
                     <article class="p-1 gap-2 flex flex-col  justify-center items-center ">
-                        <img src="{{shop.logo.url}}" class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
+                        <img src="{% if shop.logo %}{{shop.logo.url}}{% endif %}" class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
                         <h2 class="text-[0.6rem] text-gray-500 max-w-[80px] truncate text-ellipsis">{{shop.name}}
                         </h2>
                     </article>
