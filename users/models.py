@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
 from django.dispatch import receiver
+from django.forms import modelformset_factory
 from django.utils import timezone
 from django.db.models.signals import post_save
 import secrets
@@ -318,6 +319,15 @@ class TicketReply(models.Model):
     
 
 
-
+class Message(models.Model):
+    class TYPES(models.TextChoices):
+        NORMAL = 'Normal',
+        WARNING = 'Warning',
+        INFO = 'Info'
+    user = models.ForeignKey(to=User, related_name='messages', on_delete=models.CASCADE)
+    type = models.CharField(max_length=10, choices=TYPES.choices, default=TYPES.INFO)
+    title = models.CharField(max_length=255, blank=True)
+    body = models.TextField(max_length=5000, blank=True)
+    read = models.BooleanField(default=False)
     
     

@@ -48,6 +48,7 @@ class SiteInfo(models.Model):
     pinned_color = models.CharField(max_length=10, blank=True)
     pinned_text_color = models.CharField(max_length=10, blank=True)
     pinned_url = models.URLField(null=True, blank=True)
+    show_pinned_message = models.BooleanField(default=False)
     jumbo_message = models.TextField(max_length=1000, blank=True)
     jumbo_button_text = models.CharField(max_length=50, blank=True)
     jumbo_button_url = models.URLField(null=True, blank=True)
