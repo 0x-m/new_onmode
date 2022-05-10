@@ -345,7 +345,7 @@ def create_ticket(request: HttpRequest):
             else:
                 ticket.repilied = False
             ticket.save()
-            return redirect('users:ticket', ticket_id=ticket) 
+            return redirect('users:ticket', ticket_id=ticket.id) 
         else:
             return render(request, 'user/dashboard/create_ticket.html', {
                 'errors': form.errors
