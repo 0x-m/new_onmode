@@ -1,5 +1,3 @@
-from gettext import Catalog
-from unicodedata import name
 from django.urls import path
 from . import views
 from catalogue import views as catalog

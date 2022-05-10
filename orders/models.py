@@ -1,9 +1,7 @@
 
-from asyncio import FastChildWatcher
 import string
 import secrets
 from django.db import models
-from django.dispatch import receiver
 from django.utils import timezone
 from promotions.models import Coupon
 from users.models import Address

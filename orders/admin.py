@@ -1,4 +1,3 @@
-from xmlrpc.server import resolve_dotted_attribute
 from django.contrib import admin
 from .models import Order, OrderItem, WalletAlternation
 from import_export import resources

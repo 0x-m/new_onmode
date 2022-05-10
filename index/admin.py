@@ -1,4 +1,3 @@
-import site
 from django.contrib import admin
 from .models import About, BlogPost, ContactUsMessage, ContactUsType, CreateShopGuide, GeoLocation, Law, ReturnOrderGuide, ShopSet, SiteInfo, SliderPhoto
 

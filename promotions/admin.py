@@ -1,10 +1,6 @@
 
-from inspect import classify_class_attrs
 from django.contrib import admin
-from django.urls import clear_script_prefix
-
 from .models import Coupon, Discount, GiftCard
-
 from import_export.resources import ModelResource
 from import_export.admin import ImportExportMixin, ExportMixin
 

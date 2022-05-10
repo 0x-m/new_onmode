@@ -1,8 +1,6 @@
 
 
 import secrets
-from sys import excepthook
-
 from django.contrib.auth.backends import BaseBackend
 from django.utils import timezone
 from django.http import HttpRequest
