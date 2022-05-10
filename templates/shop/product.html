@@ -1,6 +1,13 @@
 {% extends '../base.html' %}
 {% load static %}
 {% load options  %}
+{% load jalali_tags %}
+
+{% block head %}
+<meta name="description" content="{{product.meta_description}}">
+<meta name="keywords" content="{{product.meta_keywords}}">
+{% endblock %}
+
 
 {% block title %}
 {{ product.name }}
@@ -195,7 +202,7 @@
                         {{ comment.body }}
                     </p>
                     <div class="flex justify-end p-1">
-                        <span class="text-[0.6rem] mt-1 text-gray-400">نوشته شده در تاریخ:{{comment.date_created}}</span>
+                        <span class="text-[0.6rem] mt-1 text-gray-400">نوشته شده در تاریخ:{{comment.date_created|to_jalali:'%y/%m/%d'}}</span>
                     </div>
                 </article>
                 {% endif  %}

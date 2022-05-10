@@ -1,8 +1,8 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
-
+{% load jalali_tags%}
 {% block title %}
-
+سفارش با کد {{order.code}}
 {% endblock %}
 
 {% block content  %}
@@ -74,15 +74,15 @@
             </div>
             <div class="flex justify-between">
                 <span>تاریخ ثبت:</span>
-                <span>{{order.date_created}}</span>
+                <span>{{order.date_created|to_jalali:'%y/%m/%d'}}</span>
             </div>
             <div class="flex justify-between">
                 <span>تاریخ ارسال:</span>
-                <span>{{order.date_sent}}</span>
+                <span>{{order.date_sent|to_jalali:'%y/%m/%d'}}</span>
             </div>
             <div class="flex justify-between">
                 <span>تاریخ دریافت:</span>
-                <span>{{order.date_fulfilled}}</span>
+                <span>{{order.date_fulfilled|to_jalali:'%y/%m/%d'}}</span>
             </div>
 
         </div>

@@ -1,6 +1,6 @@
 {% extends '../base.html' %}
 {% load static %}
-
+{% load jalali_tags %}
 {% block content %}
 {% if not user.has_completed_profile %}
 <div class="w-full  flex justify-between bg-red-500 text-white p-3">
@@ -83,7 +83,7 @@
             </div>
             <div class="flex justify-between">
                 <span>تاریخ ثبت</span>
-                <span>{{cart.date_created}}</span>
+                <span>{{cart.date_created|to_jalali:'%y/%m/%d'}}</span>
             </div>
         </div>
     </section>

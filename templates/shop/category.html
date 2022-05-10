@@ -2,6 +2,12 @@
 {% load static %}
 {% load options  %}
 
+{% block head %}
+<meta name="description" content="{{category.meta_description}}">
+<meta name="keywords" content="{{category.meta_keywords}}">
+{% endblock %}
+
+
 {% block title %}
 {{collection.name}}
 {% endblock %}

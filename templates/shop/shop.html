@@ -1,6 +1,13 @@
 {% extends '../base.html' %}
 {% load static %}
 {% load options  %}
+
+
+{% block head %}
+<meta name="description" content="{{shop.meta_description}}">
+<meta name="keywords" content="{{shop.meta_keywords}}">
+{% endblock %}
+
 {% block content %}
 
 {% if shop.banner %}

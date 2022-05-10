@@ -64,8 +64,8 @@ def signup(request: HttpRequest):
 
             OTP(request).clear()
             code = OTP(request).code
-            # res = send_verification_code(phone_num, code)
-            print(code)
+            res = send_verification_code(phone_num, code)
+            # print(code)
             res = True
             if res:
                 return redirect('users:verify')

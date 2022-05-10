@@ -1,8 +1,8 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
-
+{% load jalali_tags %}
 {% block title %}
-
+تیکت شماره {{ticket.id}}
 {% endblock %}
 
 {% block content  %}
@@ -17,7 +17,7 @@
                 <p class="w-full p-1 pb-3 text-xs text-white">
                     {{ticket.body}}
                 </p>
-                <span class="text-white absolute left-3 bottom-1 text-[0.6rem]">{{ticket.date_created}}</span>
+                <span class="text-white absolute left-3 bottom-1 text-[0.6rem]">{{ticket.date_created|to_jalali:'%y/%m/%d'}}</span>
             </article>
             {% for reply in ticket.replies.all %}
             {% if user == reply.user %}
@@ -28,7 +28,7 @@
                         <p class="w-full p-1 pb-3 text-gray-500 text-xs">
                             {{reply.body}}
                         </p>
-                        <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created}}</span>
+                        <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created|to_jalali:'%y/%m/%d'}}</span>
                     </article>
                 {% else %}
                     <article class="w-3/4  bg-stone-50 rounded-box p-2 relative">
@@ -37,7 +37,7 @@
                         <p class="w-full p-1 pb-3 text-gray-500 text-xs">
                             {{reply.body}}
                         </p>
-                        <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created}}</span>
+                        <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created|to_jalali:'%y/%m/%d'}}</span>
                     </article>
                 {% endif %}
             {% else %}
@@ -48,7 +48,7 @@
                     <p class="w-full p-1 pb-3 text-gray-500 text-xs">
                         {{reply.body}}
                     </p>
-                    <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created}}</span>
+                    <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created|to_jalali:'%y/%m/%d'}}</span>
                 </article>
 
                 {% else %}
@@ -57,7 +57,7 @@
                     <p class="w-full p-1 pb-3 text-gray-500 text-xs">
                         {{reply.body}}
                     </p>
-                    <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created}}</span>
+                    <span class="text-gray-400 absolute left-3 bottom-1 text-[0.6rem]">{{reply.date_created|to_jalali:'%y/%m/%d'}}</span>
                 </article>
                 {% endif %}
             {% endif %}

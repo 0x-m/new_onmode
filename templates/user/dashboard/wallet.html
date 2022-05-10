@@ -1,8 +1,8 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
-
+{% load jalali_tags %}
 {% block title %}
-wallet
+کیف پول
 {% endblock %}
 
 {% block content  %}
@@ -69,7 +69,7 @@ wallet
                     {% for checkout in user.wallet.checkouts.all|slice:':3' %}
                         <div class="flex justify-between text-sm p-1 gap-2 mt-2">
                             <span>برداشت</span>
-                            <span>{{checkout.date_created}}</span>
+                            <span>{{checkout.date_created|to_jalali:'%y/%m/%d'}}</span>
                             <span>
                                 {% with checkout.state as state %}
                                     {% if state == 'inp' %}
@@ -88,7 +88,7 @@ wallet
                     {% for deposit in user.wallet.deposits.all|slice:':3' %}
                         <div class="flex justify-between p-1 gap-2 mt-2">
                             <span>واریز</span>
-                            <span>{{deposit.date_created}}</span>
+                            <span>{{deposit.date_created|to_jalali:'%y/%m/%d'}}</span>
                             <span>
                                 {% if deposit.succeeded %}
                                 موفق
