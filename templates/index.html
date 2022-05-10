@@ -13,12 +13,13 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         <div class="swiper-slide w-full h-60 md:h-96">
             <a href="{{slide.link}}">
                 {% if slide.photo_url %}
-                <img src="{{slide.photo_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+                <img  data-src="{{slide.photo_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow swiper-lazy "
                     alt="{{slide.alt}}">
                 {% elif slide.photo %}
-                <img src="{{slide.photo.url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+                <img  data-src="{{slide.photo.url}}" class=" w-full   h-60 md:h-96  object-cover swiper-lazy  shadow "
                     alt="{{slide.alt}}">
                 {% endif %}
+                <div class="swiper-lazy-preloader"></div>
             </a>
         </div>
         {% endfor %}
@@ -96,7 +97,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 {% for shop in shopset.shops.all %}
                 <a href="/{{shop.name}}">
                     <article class="p-1 gap-2 flex flex-col  justify-center items-center ">
-                        <img src="{% if shop.logo %}{{shop.logo.url}}{% endif %}" class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
+                        <img loading="lazy" src="{% if shop.logo %}{{shop.logo.url}}{% endif %}" class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
                         <h2 class="text-[0.6rem] text-gray-500 max-w-[80px] truncate text-ellipsis">{{shop.name}}
                         </h2>
                     </article>
@@ -128,7 +129,7 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
                 method="post">
                 <a href="{% url 'catalogue:product_detail' product.prod_code %}">
-                    <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                    <img loading="lazy" src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
                         alt="{{product.preview.img.alt}}">
                 </a>
                 <div class="flex justify-between w-full items-center">
@@ -191,11 +192,11 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
     <div class="w-full md:w-3/4 mx-auto p-2 flex items-center justify-center mt-2 gap-2">
         {% if collection.index_poster_url %}
         <a href="{{collection.index_poster_link}}">
-            <img src="{{collection.index_poster_url}}}" class="w-full h-80 object-cover rounded-box shadow-sm" alt="">
+            <img loading="lazy" src="{{collection.index_poster_url}}}" class="w-full h-80 object-cover rounded-box shadow-sm" alt="">
         </a>
         {% elif collection.index_poster %}
         <a class="block w-full" href="{{collection.index_poster_link}}">
-            <img src="{{collection.index_poster.url}}" class="w-full h-80 object-cover rounded-box shadow-sm"
+            <img loading="lazy" src="{{collection.index_poster.url}}" class="w-full h-80 object-cover rounded-box shadow-sm"
                 alt="{{collection.index_poster_alt}}">
         </a>
         {% endif %}
@@ -223,9 +224,9 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             <a href="{{post.url}}">
                 <article class="rounded-box relative shadow-md">
                     {% if post.photo_url %}
-                    <img src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
+                    <img loading="lazy" src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
                     {% elif post.photo %}
-                    <img src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
+                    <img loading="lazy" src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
                     {% endif %}
                     <div class="w-full h-1/2 absolute flex  items-center justify-center  left-0 bottom-0 rounded-b-box "
                         style="background-color: #33333355;">
@@ -248,6 +249,9 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             // Optional parameters
             autoplay: {
                 delay: 3000,
+            },
+            lazy: {
+                loadPrevNext: true,
             },
             // If we need pagination
             pagination: {

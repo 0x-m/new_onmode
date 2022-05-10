@@ -305,6 +305,7 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
     list_display = ['name', 'price', 'shop',
                     get_rate,get_sells_count, 'quantity', 'published', 'deleted']
     list_editable = ['published', ]
+    
     readonyl_fields = ['id', 'prod_code', 'date_created',
                        'slug', 'en_slug', 'last_updated']
     search_fields = ['shop__name', 'name', 'en_name', 'meta_title']
@@ -317,7 +318,7 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
                    
     ordering = ['date_created']
     inlines = [ProductStatsInline, ]
-
+    filter_horizontal = ['relateds']
 
 @admin.register(ProductOptionValue)
 class ProductoptionValueAdmin(admin.ModelAdmin):

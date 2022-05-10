@@ -36,7 +36,7 @@
         <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
             method="post">
             <a href="{% url 'catalogue:product_detail' product.prod_code %}">
-                <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                <img loading="lazy" src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
                     alt="{{product.preview.img.alt}}">
             </a>
             <div class="flex justify-between w-full items-center">

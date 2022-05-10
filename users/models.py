@@ -135,6 +135,17 @@ class User(AbstractUser):
         size_mb = size / (1024*1024)
         self.consumed_storage -= size_mb
         self.save()
+        
+    @property
+    def left_storage(self):
+        #TODO: duplicate code.......
+        max_capacity = self.MAX_STORAGE_SIZE
+        if self.use_custom_storage_capcity:
+            max_capacity = self.custom_storage_capacity
+
+        return round(max_capacity - self.consumed_storage)
+
+        
 
 
 @receiver(post_save, sender=User)

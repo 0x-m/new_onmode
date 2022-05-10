@@ -1,5 +1,6 @@
 
 from math import prod
+import secrets
 from tkinter.tix import Tree
 from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
@@ -91,6 +92,30 @@ def delete_product(request: HttpRequest, pid):
         'product': product
     })
 
+
+
+@login_required
+def add_related_product(request: HttpRequest, product_id):
+    print('-------------------------')
+    product = get_object_or_404(Product, pk=product_id, shop__owner=request.user, deleted=False)
+    prod_code = request.GET.get('prod_code', None)
+    related = get_object_or_404(Product, prod_code=prod_code, deleted=False)
+
+    if product.relateds.count() > 5:
+        return HttpResponseForbidden('not allowed')
+    product.relateds.add(related)
+    return redirect('users:add-option', pid=product.id)
+        
+@login_required
+def delete_related_product(request: HttpRequest, product_id):
+    product = get_object_or_404(Product, pk=product_id, shop__owner=request.user, deleted=False)
+    prod_code = request.GET.get('prod_code', None)
+    related_product = get_object_or_404(Product, prod_code=prod_code)
+    if product == related_product:
+        return HttpResponseForbidden()
+    
+    product.relateds.remove(related_product)
+    return redirect('users:add-option', pid=product.id)
 
 
 def filter(request: HttpRequest, shop_name):
@@ -271,7 +296,6 @@ def edit_shop(requeset: HttpRequest):
         shop = shop_form.save(commit=False)
         logo = requeset.FILES.get('logo', None)
         banner = requeset.FILES.get('banner', None)
-        print(logo)
         if logo:
             if shop.logo:
                 shop.logo.delete()
@@ -421,6 +445,8 @@ def like(request: HttpRequest, product_id):
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code =product_code)
     liked = product.likes.filter(user=request.user).exists()
+
+    relateds = Product.objects.filter(category=product.category).first()
     comment = None
     try:
         comment = request.user.comments.get(product=product)

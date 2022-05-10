@@ -4,7 +4,7 @@
 {% block content %}
 
 {% if shop.banner %}
-<img src="{{shop.banner.url}}" 
+<img loading="lazy" src="{{shop.banner.url}}" 
 class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
 {% endif %}
 <div class="w-full mt-2 p-1 md:hidden">
@@ -179,7 +179,7 @@ class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
             <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
                 method="post">
                 <a href="{% url 'catalogue:product_detail' product.prod_code %}">
-                    <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                    <img loading="lazy" src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
                         alt="{{product.preview.img.alt}}">
                 </a>
                 <div class="flex justify-between w-full items-center">

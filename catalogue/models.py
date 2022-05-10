@@ -216,6 +216,7 @@ class Product(models.Model):
     discount = models.ForeignKey(to=Discount,
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True)
+    relateds = models.ManyToManyField(to='self')
 
 
 
@@ -385,10 +386,6 @@ class ProductFilter(django_filters.FilterSet):
 
 
 
-
-# TODO: stores similarity between products....
-# class RelatedProduct(models.Model):
-#     pass
 
 
 class ProductStats(models.Model):
