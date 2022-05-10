@@ -115,6 +115,8 @@
 {% block scripts %}
 
 <script defer>
+    selectMenu('shop')
+
     function check_shop(sender) {
         const name = sender.value;
         const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
@@ -139,6 +141,5 @@
         })
     }
 </script>
-selectMenu('shop')
 
 {% endblock %}
