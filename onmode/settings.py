@@ -153,8 +153,20 @@ TINYMCE_DEFAULT_CONFIG = {
     "removeformat | help |  "
 }
 
+
+
+TIME_ZONE = 'Asia/Tehran'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+USE_I18N = True
+
+USE_TZ = True
+
+
 #Cloud Storage Configurations----------------------
-USE_S3 = config('USE_S3',default=False, cast=bool)
+USE_S3 = False #config('USE_S3',default=False, cast=bool)
 
 
 
