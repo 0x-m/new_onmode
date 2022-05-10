@@ -25,7 +25,8 @@
 
     <body class="bg-stone-50 min-h-full ">
         {% if siteinfo.show_pinned_message %}
-        <div style="background-color: {{siteinfo.pinned_color}}; color: {{siteinfo.pinned_text_color}};" class="w-full p-2">
+        <div style="background-color: {{siteinfo.pinned_color}}; color: {{siteinfo.pinned_text_color}};"
+            class="w-full p-2">
             <a href="{{siteinfo.pinned_url}}">
                 <p class="w-full text-xs">
                     {{siteinfo.pinned_message}}
@@ -59,14 +60,21 @@
                     {% if user.is_authenticated %}
                     <div tabindex="0" dir="ltr" class="dropdown  dropdown-hover">
                         <a tabindex="0" class="btn btn-ghost btn-circle ">
-                            <i class="bi-person text-xl md:text-3xl "></i>
+                            <div class="indicator">
+                                {% if not user.new_messages == 0 %}
+                                <span class="badge badge-error badge-sm text-white indicator-item">{{user.new_messages}}</span>
+                                {% endif %}
+                                <i class="bi-person text-xl md:text-3xl "></i>
+                            </div>
                         </a>
+
                         <ul tabindex="0" dir="rtl"
                             class="dropdown-content menu menu-vertical menu-compact w-48 p-2 rounded-box shadow bg-base-100">
                             <li>
                                 <a href="{% url 'users:dashboard' %}" class="text-xs">
                                     <i class="bi-person text-lg"></i>
                                     {{user.phone_num}}
+
                                 </a>
                             </li>
                             <li>
@@ -86,6 +94,7 @@
                                 <a href="{% url 'users:messages' %}" class="text-xs">
                                     <i class="bi-bell text-lg"></i>
                                     پیامها
+                                    <div class="badge badge-error text-white badge-xs p-1">{{user.new_messages}}</div>
                                 </a>
                             </li>
                             <li>
@@ -97,12 +106,13 @@
 
                         </ul>
                     </div>
+
                     {% endif  %}
 
                     <a href="{% url 'orders:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                         <div class="indicator">
                             <i class="bi-bag text-xl md:text-2xl "></i>
-                            <span class="badge badge-primary badge-sm indicator-item">{{user.cart_count}}</span>
+                            <span id="cart-badge" class="badge badge-primary badge-sm indicator-item">{{user.cart_count}}</span>
                         </div>
                     </a>
                 </div>
@@ -113,10 +123,10 @@
                 class="md:basis-1/6  md:mt-8 p-2 flex justify-center z-50 items-center w-full md:h-screen fixed bottom-2 md:static">
                 <ul
                     class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md text-sm  rounded-box">
-                    <li   class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <a id="profile"  tabindex="0">
+                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a id="profile" tabindex="0">
                             <i class="bi-person md:text-xl"></i>
-                            <span  class="hidden md:block">مشخصات</span>
+                            <span class="hidden md:block">مشخصات</span>
                         </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             <li>
@@ -141,15 +151,15 @@
 
                         </ul>
                     </li>
-                    <li  class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <a id="shop"  tabindex="0">
+                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a id="shop" tabindex="0">
                             <i class="bi-shop md:text-xl"></i>
-                            <span  class="hidden md:block">فروشگاه</span>
+                            <span class="hidden md:block">فروشگاه</span>
                         </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             {% if user.has_shop %}
-                            <li >
-                                <a  href="{% url 'users:edit-shop' %}">
+                            <li>
+                                <a href="{% url 'users:edit-shop' %}">
                                     <i class="bi-info-circle"></i>
                                     <span>مشخصات بوتیک</span>
                                 </a>
@@ -178,7 +188,7 @@
                         </ul>
                     </li>
                     <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <a  id="messages" href="{% url 'users:messages' %}">
+                        <a id="messages" href="{% url 'users:messages' %}">
                             <i class="bi-envelope md:text-xl"></i>
                             <span class="hidden md:block">پیام رسانی</span>
                         </a>
@@ -203,25 +213,25 @@
                             </li>
                         </ul>
                     </li>
-                    <li >
+                    <li>
                         <a id="favourites" href="{% url 'users:favourites' %}">
                             <i class="bi-heart md:text-xl"></i>
                             <span class="hidden md:block">علایق</span>
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a id="comments" href="{% url 'users:comments' %}">
                             <i class="bi-chat md:text-xl"></i>
                             <span class="hidden md:block">دیدگاهها</span>
                         </a>
                     </li>
-                    <li >
+                    <li>
                         <a id="orders" href="{% url 'orders:user_orders' %}">
                             <i class="bi-bag-check md:text-xl"></i>
                             <span class="hidden md:block">سفارشها</span>
                         </a>
                     </li>
-                   
+
 
                 </ul>
             </section>
@@ -269,7 +279,7 @@
                 list.add('active');
                 console.log(id, 'aaa');
             }
-    
+
         </script>
         {% block scripts %}
 

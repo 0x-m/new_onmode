@@ -7,39 +7,23 @@
 
 {% block content  %}
 <div class="flex flex-col items-center justify-items-center content-start md:mt-8  w-full h-full gap-2 p-2">
-    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2 w-full md:w-1/2  rounded-box" action=""
-        method="post">
-        <h2 class="text-gray-600 text-center mt-2">عنوان</h2>
+    <div class="w-full justify-center flex gap-1 tabs">
+        <a class="tab tab-bordered {% if state == 'unread' %} tab-active {% endif %}" href="{% url 'users:messages' %}">جدید</a>
+        <a class="tab tab-bordered {% if state == 'read' %}tab-active{% endif %}" href="{% url 'users:messages' %}?state=read">خوانده شده</a>
+    </div>
+    {% for message in messages %}
+    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2 w-full md:w-1/2  rounded-box"
+        action="" method="post">
+        <h2 class="text-gray-600 text-center mt-2">{{message.title}}</h2>
         <p class="text-sm text-gray-400 p-2">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ratione, tenetur. Labore, tempore architecto. Nobis adipisci blanditiis, tempore necessitatibus aut distinctio accusamus iure sunt rerum nihil fugiat harum maxime esse quaerat.
+            {{message.body}}
         </p>
-        <form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-            <button class="btn btn-success  text-white text-xs">خواندم</button>
+        <form  class="p-2 flex justify-center items-center gap-1" action="{% url 'users:delete-message' message.id %}" method="get">
+            <button formaction="{% url 'users:read-message' message.id %}" class="btn btn-success  text-white text-xs">خواندم</button>
+            <button class="btn btn-error  text-white text-xs">حذف</button>
         </form>
     </article>
-    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2 w-full md:w-1/2  rounded-box" action=""
-    method="post">
-    <h2 class="text-gray-600 text-center mt-2">عنوان</h2>
-    <p class="text-sm text-gray-400 p-2">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ratione, tenetur. Labore, tempore architecto. Nobis adipisci blanditiis, tempore necessitatibus aut distinctio accusamus iure sunt rerum nihil fugiat harum maxime esse quaerat.
-    </p>
-    <form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-        <button class="btn btn-success  text-white text-xs">خواندم</button>
-    </form>
-</article>
-
-<article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2 w-full md:w-1/2  rounded-box" action=""
-method="post">
-<h2 class="text-gray-600 text-center mt-2">عنوان</h2>
-<p class="text-sm text-gray-400 p-2">
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ratione, tenetur. Labore, tempore architecto. Nobis adipisci blanditiis, tempore necessitatibus aut distinctio accusamus iure sunt rerum nihil fugiat harum maxime esse quaerat.
-</p>
-<form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-    <button class="btn btn-success  text-white text-xs">خواندم</button>
-</form>
-</article>
-
-
+    {% endfor %}
 </div>
 {% endblock %}
 {% block scripts %}

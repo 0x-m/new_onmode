@@ -6,7 +6,7 @@ from django.contrib.auth.admin import UserAdmin
 from django import forms
 
 
-from .models import CheckoutRequest, DepositTransaction, Ticket, TicketReply, TicketType, User, Address, Wallet
+from .models import CheckoutRequest, DepositTransaction, Message, Ticket, TicketReply, TicketType, User, Address, Wallet
 
 from jalali_date.admin import ModelAdminJalaliMixin, StackedInlineJalaliMixin, TabularInlineJalaliMixin	
 from jalali_date import datetime2jalali, date2jalali
@@ -129,3 +129,4 @@ class DepositAdmin(ExportMixin, admin.ModelAdmin):
 
 admin.site.register(Ticket)
 admin.site.register(TicketType)
+admin.site.register(Message)

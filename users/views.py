@@ -1,5 +1,6 @@
 
 from audioop import minmax
+from email.errors import MessageError
 from mimetypes import common_types
 from pickletools import read_uint1
 from random import lognormvariate
@@ -21,7 +22,7 @@ from promotions.models import GiftCard
 
 # from catalog.models import Product
 
-from .models import Ticket, TicketType, User, Wallet
+from .models import Message, Ticket, TicketType, User, Wallet
 
 from .forms import AddressForm, CheckoutForm, EmailCheckerForm, SignUpForm, TicketForm, TicketReplyForm, VerificationCodeForm, ProfileForm
 from .OTP import OTP, InvalidCodeException, ExpiredCodeException
@@ -265,10 +266,30 @@ def comments(request: HttpRequest):
         'state': state
     })
 
-
+@login_required
 def messages(request: HttpRequest):
-    return render(request, 'user/dashboard/messages.html')
+    state = request.GET.get('state', 'unread')
+    state_bool = False
+    if state == 'read':
+        state_bool = True
+    messages = request.user.messages.filter(read=state_bool)
+    return render(request, 'user/dashboard/messages.html', {
+        'messages': messages,
+        'state': 'read' if state_bool else 'unread'
+    })
+    
+@login_required
+def delete_message(request: HttpRequest, message_id):
+    message = get_object_or_404(Message, pk=message_id, user=request.user)
+    message.delete()
+    return redirect('users:messages')
 
+@login_required
+def read_message(request:HttpRequest, message_id):
+    message = get_object_or_404(Message, pk=message_id, user=request.user)
+    message.read = True
+    message.save()
+    return redirect('users:messages')
 
 def orders(request: HttpRequest):
     return render(request, 'user/dashboard/orders.html')

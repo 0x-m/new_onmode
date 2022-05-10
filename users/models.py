@@ -63,6 +63,10 @@ class User(AbstractUser):
     
     
     @property
+    def new_messages(self):
+        return self.messages.filter(read=False).count()
+    
+    @property
     def cart_count(self):
         count = 0
         for order in self.orders.filter(paid=False).all():

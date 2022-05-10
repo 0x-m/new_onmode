@@ -60,7 +60,7 @@
                 {% endif %}
             </div>
             <input type="number" min="1" value="1" class="w-16 p-2 hidden absolute bottom-2 text-xs left-1 rounded-box">
-            <button onclick="deleteFromCart(this);" data-itemid="{{item.id}}" class="absolute top-1 left-2 text-gray-600 text-md bi-x"></button>
+            <button onclick="deleteFromCart(this);" data-total="final_price_{{cart.id}}" data-itemid="{{item.id}}" class="absolute top-1 left-2 text-gray-600 text-md bi-x"></button>
         </article>
         {% endfor %}
 

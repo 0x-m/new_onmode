@@ -21,6 +21,12 @@ function like(elem) {
     });
 }
 
+function update_cart_badge(count) {
+    const cart_badge = document.getElementById('cart-badge');
+    cart_badge.innerText = count;
+    console.log('cart updated...')
+}
+
 function addToCart(elem) {
     const product_id = elem.dataset['pid'];
     const collection = elem.dataset['collection'] ?? '';
@@ -43,7 +49,11 @@ function addToCart(elem) {
         }
     }).then((res) => {
         if (res.status == 200) {
-            elem.disabled = false;
+            res.json().then(json => {
+                elem.disabled = false;
+                update_cart_badge(json['cart']);
+            })
+
         }
         console.log(res)
     });
@@ -52,11 +62,13 @@ function addToCart(elem) {
 
 function deleteFromCart(elem) {
     const order_item_id = elem.dataset['itemid'];
-    const final_price = document.getElementById('final_price');
+    const final_price = document.getElementById(elem.dataset['total']);
     fetch('/cart/delete/' + order_item_id).then((res) => {
         if (res.status == 200) {
             res.json().then(json => {
                 final_price.innerText = json['final_price'];
+                update_cart_badge(json['cart']);
+                console.log(json['cart'], 'cart value')
             });
             elem.parentNode.remove();
         }
@@ -141,7 +153,9 @@ function incrementQuantity(elem) {
         if (res.status == 200) {
             res.json().then((json) => {
                 final_price.innerText = json['final_price'];
-                num_box.value = parseInt(num_box.value) + 1
+                num_box.value = parseInt(num_box.value) + 1;
+                update_cart_badge(json['cart']);
+
             });
             elem.disabled = false;
         }
@@ -158,6 +172,8 @@ function decrementQuantity(elem) {
             res.json().then(json => {
                 final_price.innerText = json['final_price'];
                 num_box.value = parseInt(num_box.value) - 1;
+                update_cart_badge(json['cart']);
+
                 if (num_box.value == 0) {
                     elem.parentNode.parentNode.remove();
                 }

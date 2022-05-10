@@ -69,6 +69,8 @@ def add_item(request: HttpRequest):
             return JsonResponse({
                 'status': 'added',
                 'final_price': order.final_price,
+                'cart': request.user.cart_count
+
 
             })
         else:
@@ -91,6 +93,8 @@ def delete_item(request: HttpRequest, order_item_id):
     return JsonResponse({
         'status': 'deleted',
         'final_price': order.final_price if order else 0,
+        'cart': request.user.cart_count
+
 
     })
 
@@ -108,6 +112,7 @@ def increment(request: HttpRequest, order_item_id):
         'status': 'incremented',
         'final_price': order_item.order.final_price,
         'pp': order_item.product.compute_price(),
+        'cart': request.user.cart_count
     })
 
 
@@ -127,7 +132,9 @@ def decrement(request: HttpRequest, order_item_id):
 
     return JsonResponse({
         'status': 'decremented',
-        'final_price': order.final_price if order else None
+        'final_price': order.final_price if order else None,
+        'cart': request.user.cart_count
+
     })
 
 
