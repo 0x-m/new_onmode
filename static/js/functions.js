@@ -29,7 +29,7 @@ function update_cart_badge(count) {
 
 function addToCart(elem) {
     const product_id = elem.dataset['pid'];
-    const collection = elem.dataset['collection'] ?? '';
+    const collection = elem.dataset['collection'] == null ? '': elem.dataset['collection'];
     const obj = document.getElementById('product_options');
     const options = obj == null ? '': obj.value;
     const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
