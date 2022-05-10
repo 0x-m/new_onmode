@@ -13,7 +13,7 @@ class PublicMediaStorage(S3Boto3Storage):
 
 class StaticStorage(S3Boto3Storage):
     location = 'static'
-    default_acl = 'punlic-read'
+    default_acl = 'public-read'
     bucket_name = config('STATIC_FILES_BUCKET_NAME')
     custom_domain = '%s.s3.ir-thr-at1.arvanstorage.com' % bucket_name
 
