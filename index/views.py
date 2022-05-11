@@ -18,8 +18,9 @@ def policies(request: HttpRequest):
     })
 
 def certificatinos(request: HttpRequest):
+    certs = Certificate.objects.all()
     return render(request, 'certs.html', {
-        
+        'certs': certs
     })
 
 def index(request: HttpRequest):
