@@ -127,6 +127,21 @@ class DepositAdmin(ExportMixin, admin.ModelAdmin):
     readonly_fields = ['id', 'date_committed']
     
 
-admin.site.register(Ticket)
-admin.site.register(TicketType)
-admin.site.register(Message)
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['user', 'type', 'title', 'read']
+    list_filter = ['type', 'read']
+    readonly_fields = ['read']
+    
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ['user', 'type', 'title', 'closed']
+    list_filte = ['type', 'closed', 'date_created']
+    readonly_fields = ['can_reply', 'replied', 'seen_by_user', 'seen_by_intendant']
+    
+
+@admin.register(TicketType)
+class TicketTypeAdmin(admin.ModelAdmin):
+    list_display = ['title']
