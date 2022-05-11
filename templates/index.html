@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load options  %}
+
+{% block title %}{{siteinfo.title}}{% endblock %}
+
+{% block head %}
+<meta name="description" content="{{siteinfo.description}}">
+<meta name="keywords" content="{{siteinfo.keywords}}">
+{% endblock  %}
+
 {% block content %}
 <!--
 https://source.unsplash.com/p-I9wV811qk/1920x1047
