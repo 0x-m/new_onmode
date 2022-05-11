@@ -1,5 +1,4 @@
 
-from tkinter.messagebox import NO
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
