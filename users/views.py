@@ -69,7 +69,7 @@ def signup(request: HttpRequest):
         else:
             return render(request, 'user/signup.html', {
                 'form': SignUpForm(),
-                'error': form.errors
+                'errors': form.errors
             })
     return render(request, 'user/signup.html', {
         'form': SignUpForm()
@@ -147,7 +147,7 @@ def addresses(request: HttpRequest):
         if not form.is_valid():
             return render(request, 'user/dashboard/address.html', {
                 'errors': form.errors,
-                'provinces': geoloc.provinces
+                'provinces': geoloc.provinces if geoloc else None
             })
         address = form.save(commit=False)
         address.user = request.user
@@ -159,11 +159,11 @@ def addresses(request: HttpRequest):
 
         return render(request, 'user/dashboard/address.html', {
             'errors': form.cleaned_data,
-            'provinces': geoloc.provinces
+            'provinces': geoloc.provinces if geoloc else None
         })
 
     return render(request, 'user/dashboard/address.html', {
-        'provinces': geoloc.provinces
+        'provinces': geoloc.provinces if geoloc else None
     })
 
 

@@ -94,6 +94,9 @@
 <div class="flex flex-col gap-3  justify-center items-center w-full min-h-screen">
     <i class="bi-bag-x text-8xl text-gray-400"></i>
     <h2>سبد خرید شما خالیست</h2>
+    {% if not user.is_authenticated %}
+    <h2 class="text-[0.6rem] text-gray-400">جهت خرید لطفا در سایت عضو شوید</h2>
+    {% endif %}
 </div>
 {% endif %}
 {% endblock %}

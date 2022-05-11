@@ -22,11 +22,15 @@
                 {% csrf_token %}
                 <input dir="ltr" name="phone_num" placeholder="شماره همراه" type="text"
                     class="input input-bordered w-full max-w-xs">
+                    {% for error in errors %}
+                    {% if error == 'phone_num' %}
+                    <h2 class="text-error text-xs text-center">شماره وارده شده معتبر  نمیباشد</h2>
+                    {% endif %}
+                    {% endfor %}
                 <button type="submit" class="btn btn-primary text-white">دریافت کد تایید</button>
             </form>
             <span class="text-xs text-red-700 mt-3">عضویت به منزله پذیرش  تمامی قوانین آنمد میباشد</span>
         </main>
-        {{error}}
         <footer class="absolute bottom-0">
 
         </footer>

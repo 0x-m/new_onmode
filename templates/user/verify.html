@@ -14,19 +14,20 @@
         <main class="bg-white flex flex-col items-center justify-self-center  rounded-box shadow p-4 ">
             <div class="avatar mb-2">
                 <div class="w-24 rounded-full">
-                    <img src="{{siteinfo.logo.url}}"  alt="">
+                    <img src="{{siteinfo.logo.url}}" alt="">
                 </div>
             </div>
             <form class="flex flex-col gap-2 " method="post" action="{% url 'users:verify' %}">
                 {% csrf_token %}
-                <input name="code" placeholder="کد تایید" type="text"
-                    class="input input-bordered w-full max-w-xs">
+                <input name="code" placeholder="کد تایید" type="text" class="input input-bordered w-full max-w-xs">
+                {% if error == 'invalid code' %}
+                <h2 class="text-error text-xs text-center">کد وارده شده صحیح نمیباشد</h2>
+                {% endif %}
                 <button type="submit" class="btn btn-primary text-white">ورود</button>
             </form>
-            <span class="text-xs text-red-700 mt-3">عضویت به منزله پذیرش  تمامی قوانین آنمد میباشد</span>
+            <span class="text-xs text-red-700 mt-3">عضویت به منزله پذیرش تمامی قوانین آنمد میباشد</span>
 
         </main>
-        {{error}}
         <footer class="absolute bottom-0">
 
         </footer>

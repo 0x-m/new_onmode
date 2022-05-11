@@ -1,4 +1,5 @@
 
+from tkinter.messagebox import NO
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -16,9 +17,10 @@ from index.models import GeoLocation
 
 
 
-
 def cart(request: HttpRequest):
-    orders = request.user.orders.filter(paid=False)
+    orders = []
+    if request.user.is_authenticated:
+        orders = request.user.orders.filter(paid=False)
     return render(request, 'shop/cart.html', {
         'carts': orders
     })
@@ -162,7 +164,7 @@ def checkout(request: HttpRequest, shop_name):
                 'address_status': 'invalid address' if not address else '',
                 'pay_status': 'invalid pay_via' if not pay_via else '',
                 'wallet_has_balance': wallet_has_balance,
-                'provinces': provinces
+                'provinces': provinces if provinces else None
             })
 
         cart.address = address
@@ -204,7 +206,7 @@ def checkout(request: HttpRequest, shop_name):
                     'pay_status': 'invalid pay_via' if not pay_via else '',
                     'wallet_has_balance': wallet_has_balance,
                     'connection': 'error',
-                    'provinces': provinces
+                    'provinces': provinces if provinces else None
 
                 })
 
@@ -228,7 +230,7 @@ def checkout(request: HttpRequest, shop_name):
     return render(request, 'shop/checkout.html', {
         'cart': cart,
         'wallet_has_balance': wallet_has_balance,
-        'provinces': provinces
+        'provinces': provinces if provinces else None
 
 
     })
