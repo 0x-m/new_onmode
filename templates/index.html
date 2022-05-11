@@ -2,11 +2,10 @@
 {% load static %}
 {% load options  %}
 
-{% block title %}{{siteinfo.title}}{% endblock %}
+{% block title %}{{siteinfo.site_title}}{% endblock %}
 
 {% block head %}
-<meta name="description" content="{{siteinfo.description}}">
-<meta name="keywords" content="{{siteinfo.keywords}}">
+<meta name="description" content="{{siteinfo.site_description}}">
 {% endblock  %}
 
 {% block content %}

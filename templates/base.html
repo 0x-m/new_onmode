@@ -14,7 +14,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Harmattan&family=Lemonada&display=swap"
             rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
-        <link rel="icon"  href="{{siteinfo.favicon}}">
+        <link rel="icon"  href="{% if siteinfo.favicon %}{{siteinfo.favicon}}{% endif %}">
         {% if siteinfo.enable_GTM  %}
         {% gtm_head GOOGLE_TAG_ID %}
         {% endif %}
@@ -61,7 +61,7 @@
                 <nav class="navbar bg-base-100 gap-1 ">
                     <div class="flex-1 gap-2 p-1 basis-12">
                         <a href="{% url 'index:index'  %}">
-                            <img src="{{siteinfo.logo.url}}"
+                            <img src="{% if siteinfo.logo %}{{siteinfo.logo.url}}{% endif %}"
                                 class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full" alt="logo">
                         </a>
                         <div class="form-control w-full mr-2">
