@@ -15,6 +15,8 @@ import django_filters
 from django.utils.text import slugify
 from decouple import config
 from onmode.storage_backends import SiteStorage
+
+
 #TODO: move it to utils
 def persian_slugify(txt: str):
     slug = ''

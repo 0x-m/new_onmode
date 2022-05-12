@@ -1,3 +1,10 @@
+'''
+
+author: hamze ghaedi (github: 0x-m)
+
+'''
+
+
 from django.http import HttpRequest, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import render
 

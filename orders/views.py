@@ -1,4 +1,12 @@
 
+'''
+
+author: hamze ghaedi (github: 0x-m)
+
+'''
+
+
+
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -42,7 +50,6 @@ def refresh_order(request: HttpRequest, order_id):
 @login_required
 def add_item(request: HttpRequest):
     if request.method == 'POST':
-        print(request.POST, 'post....')
         form = AddOrderItemForm(request.POST)
         if form.is_valid():
             user = request.user
@@ -51,7 +58,6 @@ def add_item(request: HttpRequest):
 
             # users can not buy form theirselves
             if user.shop == shop:
-                print('invalid')
                 return JsonResponse({
                     'status': 'invalid action'
                 })
@@ -66,7 +72,6 @@ def add_item(request: HttpRequest):
             order_item.options = form.cleaned_data['options']
             order_item.refresh()  # ambiguous this method updates prices fields and save the model
             print(order_item.final_price)
-            print('added....')
             return JsonResponse({
                 'status': 'added',
                 'final_price': order.final_price,
@@ -82,7 +87,6 @@ def add_item(request: HttpRequest):
 
 @login_required
 def delete_item(request: HttpRequest, order_item_id):
-    print('delete issued')
     order_item = get_object_or_404(
         OrderItem, pk=order_item_id, order__user=request.user)
 

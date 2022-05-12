@@ -130,8 +130,9 @@ class Order(models.Model):
         
         total = self.total
         coupon = self.coupon
-        if coupon and coupon.is_valid():
-            total = coupon.apply(total)
+        if coupon:
+            if coupon.is_valid():
+                total = coupon.apply(total)
         return total
 
     @property

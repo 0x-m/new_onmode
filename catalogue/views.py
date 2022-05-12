@@ -1,4 +1,10 @@
 
+'''
+
+author: hamze ghaedi (github: 0x-m)
+
+'''
+
 
 from django.db.models import Q
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotFound, JsonResponse
