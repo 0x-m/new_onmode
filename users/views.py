@@ -7,16 +7,14 @@ author: hamze ghaedi (github: 0x-m)
 '''
 
 
+from ast import expr_context
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
-from httpx import RequestError
 from ippanel import Client
 from decouple import config
-from requests import ReadTimeout
 from index.models import GeoLocation
 
 from promotions.models import GiftCard
@@ -201,10 +199,14 @@ def wallet_checkout(request: HttpRequest):
         status = None
         wallet = request.user.wallet
         amount = form.cleaned_data['amount']
-
+        try:
+            amount = int(amount)
+        except:
+            amount = 0
+            
         if not (MIN_AMOUNT <= amount <= MAX_AMOUNT):
             status = 'invalid_amount_range'
-
+            
         if not wallet.has_balance(amount):
             status = 'wallet_has_no_enough_money'
 

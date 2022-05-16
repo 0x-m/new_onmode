@@ -14,6 +14,10 @@ from django.utils.translation import gettext_lazy as _
 from import_export.resources import ModelResource
 from import_export.admin import ExportMixin
 from import_export.fields import Field
+
+
+
+
 class UserCreationForm(forms.ModelForm):
     password1 = None
     password2 = None
@@ -102,11 +106,16 @@ class CheckoutAdmin(ExportMixin,ModelAdmin):
     @admin.display(description='available')
     def available(instance):
         return instance.wallet.available
+    
+    @admin.display(description='fulfill')
+    def fulfill_checkout(model, request, qs):
+        for c in qs:
+            c.fulfill() #TODO: use update bach for ....
         
-    list_display = [customer,'amount',freezed, available, 'state' ,'date_created']
+    list_display = [customer,'amount','fee',freezed, available, 'state' ,'date_created']
     fields = [customer, 'merch_card', 'amount', 'call_me', 'state', 'date_created', 'date_proceeded']
     readonly_fields = [customer,'date_created', 'date_proceeded']
-
+    actions = [fulfill_checkout]
 
 class DepositResource(ModelResource):
     user = Field()

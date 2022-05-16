@@ -38,6 +38,28 @@
                 <p class="text-xs text-blue-400 p-2 text-center">
                     از آخرین برداشت شما کمتر از هفت روز گذشته است !
                 </p>
+                {% with user.wallet.last_checkout as checkout %}
+                <h4 class="text-xs mt-2 w-full text-right p-2 ">آخرین برداشت:</h4>
+                <div class="flex flex-col mr-4 w-full  gap-2 text-gray-500 text-[0.6rem]">
+                    <h4 class="w-full text-right">مبلغ:{{checkout.amount}} تومان</h4>
+                    <h4>پورسانت:{{checkout.fee}} تومان</h4>
+                    <h4>مبلغ نهایی:{{checkout.final_amount}} تومان</h4>
+                    <span>تاریخ:{{checkout.date_created|to_jalali:'%y/%m/%d %H:%M'}}</span>
+                    <span>وضعیت: 
+                        <span>
+                            {% with checkout.state as state %}
+                            {% if state == 'inp' %}
+                            درحال بررسی
+                            {% elif state == 'ful' %}
+                            موفق
+                            {% elif state == 'rej' %}
+                            رد شده
+                            {% endif %}
+                            {% endwith %}
+                        </span>
+                    </span>
+                </div>
+                {% endwith %}
             </div>
             {% endif %}
         </form>
@@ -66,72 +88,76 @@
             <div class="bg-base-100 rounded-box p-2 w-full flex flex-col ">
                 <h2 class="text-center text-gray-500 ">تاریخچه</h2>
                 {% if user.wallet.checkouts %}
-                    {% for checkout in user.wallet.checkouts.all|slice:':3' %}
-                        <div class="flex justify-between text-sm p-1 gap-2 mt-2">
-                            <span>برداشت</span>
-                            <span>{{checkout.date_created|to_jalali:'%y/%m/%d'}}</span>
-                            <span>
-                                {% with checkout.state as state %}
-                                    {% if state == 'inp' %}
-                                    درحال بررسی
-                                    {% elif state == 'ful' %}
-                                    موفق
-                                    {% elif state == 'rej' %}
-                                    رد شده
-                                    {% endif %}
-                                {% endwith %}
-                            </span>
-                        </div>
-                    {% endfor %}
+                {% for checkout in user.wallet.checkouts.all|slice:':3' %}
+                <div class="flex justify-between text-sm p-1 gap-2 mt-2">
+                    <span>برداشت</span>
+                    <span>{{checkout.date_created|to_jalali:'%y/%m/%d'}}</span>
+                    <span>
+                        {% with checkout.state as state %}
+                        {% if state == 'inp' %}
+                        درحال بررسی
+                        {% elif state == 'ful' %}
+                        موفق
+                        {% elif state == 'rej' %}
+                        رد شده
+                        {% endif %}
+                        {% endwith %}
+                    </span>
+                </div>
+                {% endfor %}
                 {% endif %}
                 {% if user.wallet.deposits %}
-                    {% for deposit in user.wallet.deposits.all|slice:':3' %}
-                        <div class="flex justify-between p-1 gap-2 mt-2">
-                            <span>واریز</span>
-                            <span>{{deposit.date_created|to_jalali:'%y/%m/%d'}}</span>
-                            <span>
-                                {% if deposit.succeeded %}
-                                موفق
-                                {% else %}
-                                ناموفق
-                                {% endif %}
-                            </span>
-                        </div>
-                    {% endfor %}
+                {% for deposit in user.wallet.deposits.all|slice:':3' %}
+                <div class="flex justify-between p-1 gap-2 mt-2">
+                    <span>واریز</span>
+                    <span>{{deposit.date_created|to_jalali:'%y/%m/%d'}}</span>
+                    <span>
+                        {% if deposit.succeeded %}
+                        موفق
+                        {% else %}
+                        ناموفق
+                        {% endif %}
+                    </span>
+                </div>
+                {% endfor %}
                 {% endif %}
             </div>
         </section>
         {% with checkout_status as status %}
-    {% if status == 'invalid_form' %}
-        <div class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20 -mt-16 ">
+        {% if status == 'invalid_form' %}
+        <div
+            class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20 -mt-16 ">
             <i class="bi-x text-4xl"></i>
             <p class="w-full">
                 مبلغ یا شماره حساب اشتباه وارد شده است
             </p>
         </div>
-    {% elif status == 'invalid_amount_range' %}
-        <div class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20  -mt-16">
+        {% elif status == 'invalid_amount_range' %}
+        <div
+            class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20  -mt-16">
             <i class="bi-x text-4xl"></i>
             <p class="w-full">
                 حداقل و حداکثر مبلغ قابل برداشت به ترتیب (صدهزار تومان) و (ده میلیون تومان) میباشد.
             </p>
         </div>
-    {% elif status == 'wallet_has_no_enough_money' %}
-        <div class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20 -mt-16">
+        {% elif status == 'wallet_has_no_enough_money' %}
+        <div
+            class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-error text-sm md:text-lg text-white mb-20 -mt-16">
             <i class="bi-x text-4xl"></i>
             <p class="w-full">
                 موجودی حساب شما کافی نیست!
             </p>
         </div>
-    {% elif status == 'success' %}
-        <div class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-success text-sm md:text-lg text-white mb-20 -mt-16 ">
+        {% elif status == 'success' %}
+        <div
+            class="w-full  items-center flex gap-2 p-2 rounded-box mx-auto bg-success text-sm md:text-lg text-white mb-20 -mt-16 ">
             <i class="bi-check text-4xl"></i>
             <p class="w-full">
                 درخواست شما با موفقیت ثبت شد.
             </p>
         </div>
-    {% endif %}
-{% endwith %}
+        {% endif %}
+        {% endwith %}
 
     </section>
 

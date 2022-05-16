@@ -172,12 +172,12 @@ class Address(models.Model):
 class Wallet(models.Model):
     user = models.OneToOneField(
         to=User, related_name='wallet', on_delete=models.CASCADE)
-    available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    available = models.PositiveBigIntegerField(default=0)
+    freezed = models.PositiveBigIntegerField(default=0)
     date_last_withdraw = models.DateTimeField(null=True, blank=True)
 
     def has_balance(self, amount):
-        return amount >= self.available
+        return amount <= self.available
 
     def deposit(self, amount):
         self.available += amount
@@ -201,6 +201,11 @@ class Wallet(models.Model):
     def total(self):
         return self.available + self.freezed
     
+    
+    @property
+    def last_checkout(self):
+        return self.checkouts.order_by('date_created').last()
+    
     @property
     def allow_withdraw(self):
         
@@ -214,6 +219,7 @@ class Wallet(models.Model):
 
         return t >= self.date_last_withdraw + timezone.timedelta(days=period)
 
+    
     
     def inc_freeze(self, amount):
         self.freezed += amount
@@ -246,7 +252,7 @@ class CheckoutRequest(models.Model):
     wallet = models.ForeignKey(
         to=Wallet, on_delete=models.CASCADE, related_name='checkouts')
     merch_card = models.CharField(max_length=20, blank=True, null=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount = models.PositiveBigIntegerField(default=0)
     call_me = models.BooleanField(default=False)
     status = models.CharField(max_length=100, blank=True)
     state = models.CharField(
@@ -255,6 +261,18 @@ class CheckoutRequest(models.Model):
     date_created = models.DateTimeField(default=timezone.now)
     date_proceeded = models.DateTimeField(default=timezone.now)
 
+    @property
+    def fee(self):
+        fee_percent = 0
+        shop = self.wallet.user.shop
+        if shop:
+            fee_percent = shop.fee 
+        return (fee_percent / 100) * self.amount
+    
+    @property
+    def final_amount(self):
+        return self.amount - self.fee
+    
     def fulfill(self):
         self.wallet.withdraw(self.amount)
         self.date_proceeded = timezone.now()
@@ -277,7 +295,7 @@ class CheckoutRequest(models.Model):
     
 class DepositTransaction(models.Model):
     wallet = models.ForeignKey(to=Wallet, related_name='deposits', on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.PositiveBigIntegerField(default=0)
     date_committed = models.DateTimeField(default=timezone.now)
     succeed = models.BooleanField(default=False)
     
