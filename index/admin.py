@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import About, BlogPost, ContactUsMessage, ContactUsType, CreateShopGuide, GeoLocation, Law, ReturnOrderGuide, ShopSet, SiteInfo, SliderPhoto
+from .models import About, BlogPost, Certificate, ContactUsMessage, ContactUsType, CreateShopGuide, GeoLocation, Law, ReturnOrderGuide, ShopSet, SiteInfo, SliderPhoto
 
 @admin.register(SliderPhoto)
 class SlidePhotoAdmin(admin.ModelAdmin):
@@ -27,3 +27,5 @@ admin.site.register(GeoLocation)
 class ContactUsAdmin(admin.ModelAdmin):
     list_display = ['id', 'full_name','type', 'title']
     list_filter = ['type__title']
+    
+admin.site.register(Certificate)
