@@ -46,6 +46,7 @@ class CategoryResource(resources.ModelResource):
         model = Category
         fields = ['id','parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
         export_order = ['id', 'parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
+        from_encoding = 'utf-8-sig'
         
 
 @admin.register(Category)
