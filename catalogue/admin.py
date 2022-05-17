@@ -44,8 +44,8 @@ class OptionAdmin(admin.ModelAdmin):
 class CategoryResource(resources.ModelResource):
     class Meta:
         model = Category
-        execlude = ['id',]
         fields = ['id','parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
+        import_id_fields = ['id']
         export_order = ['id', 'parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
         
         
