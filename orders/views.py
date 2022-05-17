@@ -1,10 +1,8 @@
 
 '''
-
 author: hamze ghaedi (github: 0x-m)
 
 '''
-
 
 
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
