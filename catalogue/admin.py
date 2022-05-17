@@ -46,12 +46,13 @@ class CategoryResource(resources.ModelResource):
         model = Category
         fields = ['id','parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
         export_order = ['id', 'parent', 'name', 'en_name', 'meta_title', 'meta_description', 'meta_keywords']
-        from_encoding = 'utf-8-sig'
+        
         
 
 @admin.register(Category)
 class CategoryAdmin(ImportExportMixin, admin.ModelAdmin):
     resource_class = CategoryResource
+    from_encoding = 'utf-8-sig'
     list_display = ['id', 'name', 'parent']
     readonly_fields = ['id', 'slug', 'en_slug']
 
