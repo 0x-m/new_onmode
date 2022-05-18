@@ -237,4 +237,4 @@ LOGGING = {
 }
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
-TINYMCE_JS_URL =  STATIC_URL + '/tiny_mce/tinymce.min.js'
+# TINYMCE_JS_URL =  STATIC_URL + '/tiny_mce/tinymce.min.js'
