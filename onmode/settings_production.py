@@ -223,11 +223,15 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
+        },
+        'logfile': {
+            'class': 'logging.FileHandler',
+            'filename': 'server.log'
         }
     },
     'loggers': {
         'testlogger': {
-            'handlers': ['console'],
+            'handlers': ['logfile'],
             'level': 'INFO',
         }
     }
