@@ -6,7 +6,7 @@ from import_export.admin import ExportMixin
 from import_export.resources import ModelResource
 from import_export.fields import Field
 from django.db.models import Count
-
+from import_export.tmp_storages import MediaStorage
 @admin.register(CreateShopRequest)
 class CreateShopRequestAdmin(admin.ModelAdmin):
 
@@ -54,6 +54,7 @@ class CategoryResource(resources.ModelResource):
 class CategoryAdmin(ImportExportMixin, admin.ModelAdmin):
     resource_class = CategoryResource
     from_encoding = 'utf-8'
+    tmp_storage_class = MediaStorage
     list_display = ['id', 'name', 'parent']
     readonly_fields = ['id', 'slug', 'en_slug']
 
