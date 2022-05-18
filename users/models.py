@@ -156,11 +156,11 @@ def create_wallet(sender, instance, created, **kwargs):
 class Address(models.Model):
     user = models.ForeignKey(
         to=User, related_name='addresses', on_delete=models.CASCADE)
-    full_name = models.CharField(max_length=100, null=True, blank=True)
-    phone_number = models.CharField(max_length=100, null=True, blank=True)
-    province = models.CharField(max_length=255, blank=True, null=True)
-    city = models.CharField(max_length=255, null=True, blank=True)
-    town = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=100, default='')
+    phone_number = models.CharField(max_length=100, default='')
+    province = models.CharField(max_length=255,default='')
+    city = models.CharField(max_length=255, default='')
+    town = models.CharField(max_length=255,default='')
     description = models.TextField()
     postal_code = models.CharField(max_length=20)
     removed = models.BooleanField(default=False)
