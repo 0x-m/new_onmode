@@ -53,7 +53,7 @@ class CategoryResource(resources.ModelResource):
 @admin.register(Category)
 class CategoryAdmin(ImportExportMixin, admin.ModelAdmin):
     resource_class = CategoryResource
-    from_encoding = 'utf-8-sig'
+    from_encoding = 'utf-8'
     list_display = ['id', 'name', 'parent']
     readonly_fields = ['id', 'slug', 'en_slug']
 
