@@ -237,4 +237,4 @@ LOGGING = {
 }
 DEBUG_PROPAGATE_EXCEPTIONS = True
 
-TINYMCE_JS_ROOT =  os.path.join(STATIC_URL, 'tiny_mce')
+TINYMCE_JS_ROOT =  os.path.join(STATIC_ROOT, 'tiny_mce')
