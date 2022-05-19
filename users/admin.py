@@ -56,6 +56,10 @@ class UserModelAdmin(UserAdmin):
             'fields': ('groups',),
             
         }),
+        (_('Custom storage'),{
+            'fields': ('use_custom_storage_capcity', 'custom_storage_capacity'),
+            
+        })
 
     )
    ordering = ['phone_num', 'first_name', 'last_name']
