@@ -298,6 +298,8 @@ class DepositTransaction(models.Model):
     amount = models.PositiveBigIntegerField(default=0)
     date_committed = models.DateTimeField(default=timezone.now)
     succeed = models.BooleanField(default=False)
+    authority = models.CharField(max_length=255, blank=True)
+    ref_id = models.CharField(max_length=255, blank=True)
     
     def apply(self):
         self.wallet.deposit(self.amount)

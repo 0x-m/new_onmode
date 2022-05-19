@@ -35,7 +35,6 @@ def index(request: HttpRequest):
     slides = SliderPhoto.objects.all().order_by('precedence')
     product = Product.objects.first()
     collections = Collection.objects.filter(index_view=True)
-    print(collections)
     shopset = ShopSet.objects.first()
     
     return render(request, 'index.html', {

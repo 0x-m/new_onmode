@@ -13,6 +13,7 @@ from catalogue.models import Shop, Product
 from users.models import Address
 from promotions.models import Coupon
 import requests
+from django.urls import reverse
 from .models import Order, OrderItem
 from .forms import AcceptOrderForm, AddOrderItemForm
 from django.core.paginator import *
@@ -183,7 +184,7 @@ def checkout(request: HttpRequest, shop_name):
             params = {
                 'merchant_id': merchant_id,
                 'amount': cart.final_price,
-                'callback_url': 'https://localhost:800/orders/verify',
+                'callback_url': reverse('orders:verify_payment'),
                 'currency': 'IRT',
                 'description': cart.description,
                 'metadata': {
@@ -254,7 +255,7 @@ def verify_payment(request: HttpRequest, order_id):
             'accept': 'application/json'
         }
 
-        req = requests.post('', headers=headers, params=params)
+        req = requests.post('https://api.zarinpal.com/pg/v4/payment/verify.json', headers=headers, params=params)
 
         res = None
         try:
@@ -265,7 +266,7 @@ def verify_payment(request: HttpRequest, order_id):
         if res['data']['code'] == 100:
             ref_id = res['data']['ref_id']
             order.pay(ref_id, authority)
-            return render(request, 'shop/checkout_resut', {
+            return render(request, 'shop/checkout_result', {
                 'ref_id': ref_id,
                 'status': 'success',
                 'pay_via': 'direct'

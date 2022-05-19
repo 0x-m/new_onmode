@@ -17,6 +17,7 @@ urlpatterns = [
     path('dashboard/messages/read/<message_id>', views.read_message, name='read-message'),
     path('dashboard/orders', views.orders, name='orders'),
     path('dashboard/wallet', views.wallet, name='wallet'),
+    path('dashboard/wallet/deposit/verify/<amount>', views.wallet_deposit_verify, name='deposit-verify'),
     path('dashboard/wallet/deposit', views.wallet_deposit, name='deposit'),
     path('dashboard/wallet/checkout', views.wallet_checkout, name='wallet_checkout'),
     path('dashboard/shop/create-shop', catalog.create_shop_request,name='create-shop' ),

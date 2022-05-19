@@ -13,15 +13,18 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from httpx import RequestError
 from ippanel import Client
 from decouple import config
+import requests
 from index.models import GeoLocation
 
 from promotions.models import GiftCard
 
 # from catalog.models import Product
 
-from .models import Message, Ticket, TicketType, User, Wallet
+from .models import DepositTransaction, Message, Ticket, TicketType, User, Wallet
 
 from .forms import AddressForm, CheckoutForm, EmailCheckerForm, SignUpForm, TicketForm, TicketReplyForm, VerificationCodeForm, ProfileForm
 from .OTP import OTP, InvalidCodeException, ExpiredCodeException
@@ -239,9 +242,88 @@ def wallet_deposit(request: HttpRequest):
                 return redirect('users:wallet')
             except:
                 return HttpResponse('not found....')
+        else:
+            merchant_id = config('MERCHANT_ID', '')
+            params = {
+                'merchant_id': merchant_id,
+                'amount': amount,
+                'callback_url': reverse('users:deposit-verify', kwargs= {'amount': amount}) ,
+                'currency': 'IRT',
+                'description': 'wallet deposit',
+                'metadata': {
+                    'mobile': request.user.phone_num
+                }
+            }
+            headers = {
+                'content-type': 'application/json',
+                'accept': 'application/json'
+            }
+
+            req_result = requests.post('https://api.zarinpal.com/pg/v4/payment/request.json',
+                                       headers=headers, json=params)
+            res = req_result.json()
+            if res['data']['code'] == 100:
+                return redirect('https://www.zarinpal.com/pg/StartPay/' + res['data']['authority'])
+            else:
+                return render(request, 'shop/checkout.html', {
+                    'connection': 'error'
+                })
 
     return HttpResponseNotAllowed(['POST'])
 
+
+def wallet_deposit_verify(request: HttpRequest, amount):
+    if request.GET.get('Status') == 'OK':
+        authority = request.GET.get('Authority')
+        merchant_id = config('MERCHANT_ID', '')
+        params = {
+            'merchant_id': merchant_id,
+            'authority': authority,
+            'amount': amount
+        }
+
+        headers = {
+            'content-type': 'application/json',
+            'accept': 'application/json'
+        }
+
+        req = requests.post('https://api.zarinpal.com/pg/v4/payment/verify.json', headers=headers, params=params)
+
+        res = None
+        try:
+            res = req.json()
+        except:
+            return Http404()
+
+        if res['data']['code'] == 100:
+            ref_id = res['data']['ref_id']
+            d = DepositTransaction(wallet=request.user.wallet, 
+                                   amount=amount,
+                                   authority=authority,
+                                   ref_id=ref_id,
+                                   succeed=True)
+            d.save()
+            d.apply()
+            return render(request, 'shop/checkout_result', {
+                'ref_id': ref_id,
+                'status': 'success',
+                'pay_via': 'direct'
+            })
+        elif res['code'] == 101:
+            return render(request, 'shop/checkout_result.html', {
+                'status': 'success',
+                'ref_id': ref_id,
+                'pay_via': 'direct'
+            })
+        else:
+            return render(request, 'shop/checkout_result.html', {
+                'status': 'faild',
+                'status_code': str(res['data']['code'])
+            })
+    else:
+        return render(request, 'shop/checkout_result.html', {
+            'status': 'faild'
+        })
 
 @login_required
 def comments(request: HttpRequest):
@@ -366,7 +448,6 @@ def create_ticket(request: HttpRequest):
 
 @login_required
 def reply_ticket(request: HttpRequest, ticket_id):
-    print('...............dsfsfds............')
     ticket = get_object_or_404(Ticket, pk=ticket_id)
     if not (ticket.user == request.user or request.user.is_staff):
         return HttpResponseForbidden('you dont have permission to reply ')
@@ -377,7 +458,6 @@ def reply_ticket(request: HttpRequest, ticket_id):
             reply.user = request.user
             reply.ticket = ticket
             reply.save()
-            print('reply saved...')
             return redirect('users:ticket', ticket_id=ticket.id)
         else:
             return HttpResponse('sfsdfdsf');
