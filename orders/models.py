@@ -133,6 +133,7 @@ class Order(models.Model):
         if coupon:
             if coupon.is_valid():
                 total = coupon.apply(total)
+        total += self.get_shipping_cost()
         return total
 
     @property
@@ -175,6 +176,17 @@ class Order(models.Model):
         for item in self.items.all():
             if item.is_expired():
                 return True
+            
+    def get_shipping_cost(self):
+        shipping_cost = 0
+        c = 0
+        for item in self.items.all():
+            cost = item.get_shipping_cost()
+            shipping_cost += cost
+            if cost != 0:
+                c += 1
+        return shipping_cost // c
+            
             
     def refresh(self):
         for item in self.items.all():
@@ -293,6 +305,7 @@ class Order(models.Model):
         self.state = self.STATES.PENDING
         self.save()
 
+    
 
 class OrderItem(models.Model):
     order = models.ForeignKey(to=Order,
@@ -312,6 +325,8 @@ class OrderItem(models.Model):
     discount_pecent = models.PositiveIntegerField(default=0)
     quantity = models.PositiveIntegerField(default=0)
     options = models.JSONField(null=True, blank=True)
+    free_shipping = models.BooleanField(default=False)
+    shipping_cost = models.PositiveBigIntegerField(default=0)
     collection = models.ForeignKey(
         to=Collection, related_name='orders', on_delete=models.SET_NULL, null=True, blank=True)
     raced = models.BooleanField(default=False)
@@ -323,6 +338,8 @@ class OrderItem(models.Model):
         self.sales_price = self.product.sales_price
         self.has_sales = self.product.has_sales
         self.final_price = self.product.compute_price(self.collection)
+        self.free_shipping = self.product.free_shipping
+        self.shipping_cost = self.product.get_shipping_cost
         discount = self.product.get_discount(self.collection)
         if discount:
             self.discount_code = discount.code
@@ -330,7 +347,8 @@ class OrderItem(models.Model):
         self.save()
 
     def is_expired(self):
-        return (self.final_price != self.product.compute_price(self.collection))
+        return (self.final_price != self.product.compute_price(self.collection) 
+                or self.shipping_cost != self.product.get_shipping_cost)
 
     @property
     def available(self):
@@ -358,6 +376,11 @@ class OrderItem(models.Model):
     def __len__(self):
         return self.quantity
     
+    def get_shipping_cost(self):
+        if self.free_shipping:
+            return 0
+        else:
+            return self.shipping_cost
 
 
 class WalletAlternation(models.Model):

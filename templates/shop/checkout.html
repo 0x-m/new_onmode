@@ -66,6 +66,10 @@
         </div>
         <div class="bg-white p-4 rounded-box flex flex-col gap-3 ">
             <div class="flex justify-between">
+                <span>هزینه ارسال:</span>
+                <span id="shipping_cost">{{cart.get_shipping_cost}}تومان</span>
+            </div>
+            <div class="flex justify-between">
                 <span>جمع کل:</span>
                 <span id="total_price">{{cart.total}}تومان</span>
             </div>
@@ -74,7 +78,7 @@
                 <span id="has_coupon">{% if cart.coupon.is_valid  %}دارد{% else %}ندارد{% endif %}</span>
             </div>
             <div class="flex justify-between">
-                <span>جمع کل با تخفیف:</span>
+                <span>مبلغ پرداختی:</span>
                 <span id="final_price">{{cart.final_price}}تومان</span>
             </div>
             <div class="flex justify-between">

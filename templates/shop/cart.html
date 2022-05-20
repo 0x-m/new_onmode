@@ -72,7 +72,10 @@
                     {{cart.shop.address_description}}
                 </p>
             </div>
-
+            <div class="flex justify-between rounded-box mt-2">
+                <span> هزینه ارسال:</span>
+                <div><span id="final_price_{{cart.id}}">{{ cart.get_shipping_cost }}</span> تومان</div>
+            </div>
             <div class="flex justify-between rounded-box mt-2">
                 <span>جمع کل:</span>
                 <div><span id="final_price_{{cart.id}}">{{ cart.final_price }}</span> تومان</div>

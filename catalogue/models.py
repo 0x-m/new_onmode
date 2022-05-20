@@ -227,6 +227,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
 
+
     @property
     def colors(self):
         try:
@@ -257,6 +258,12 @@ class Product(models.Model):
             pass       
     
     
+    @property
+    def get_shipping_cost(self):
+        if self.free_shipping:
+            return 0
+        else:
+            self.shipping_cost
 
     @property
     def is_available(self) -> bool:
