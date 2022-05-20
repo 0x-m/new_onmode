@@ -547,6 +547,11 @@ class Photo(models.Model):
     img = models.ImageField(upload_to=generate_path)
     url = models.URLField(null=True)
     alt = models.CharField(max_length=255, blank=True)
+    
+    def get_photo(self):
+        if self.img:
+            return self.img.url
+        return None
 
 
 class Comment(models.Model):

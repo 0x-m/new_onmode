@@ -15,7 +15,7 @@
         <main class="bg-white flex flex-col items-center justify-self-center  rounded-box shadow p-4 ">
             <div class="avatar mb-2">
                 <div class="w-24 rounded-full">
-                    <img src="{{siteinfo.logo.url}}"  alt="">
+                    <img src="{% if siteinfo.logo %}{{siteinfo.logo.url}}{% endif %}"  alt="">
                 </div>
             </div>
             <form class="flex flex-col gap-2 " method="post" action="{% url 'users:signup' %}">

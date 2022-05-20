@@ -322,9 +322,6 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
     inlines = [ProductStatsInline, ]
     filter_horizontal = ['relateds']
 
-@admin.register(ProductOptionValue)
-class ProductoptionValueAdmin(admin.ModelAdmin):
-    pass
 
 
 @admin.register(Photo)
