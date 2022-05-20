@@ -77,6 +77,7 @@ class Order(models.Model):
     authority = models.CharField(max_length=50, blank=True)
     paid = models.BooleanField(default=False)
     pay_source  = models.CharField(max_length=20, choices=PAYSOURCE.choices, null=True)
+
     @property
     def quantity(self):
         q = 0
@@ -182,10 +183,12 @@ class Order(models.Model):
         c = 0
         for item in self.items.all():
             cost = item.get_shipping_cost()
-            shipping_cost += cost
             if cost != 0:
                 c += 1
-        return shipping_cost // c
+                shipping_cost += cost
+            if c != 0:
+                shipping_cost //= c
+        return shipping_cost 
             
             
     def refresh(self):
