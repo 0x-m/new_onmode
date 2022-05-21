@@ -305,7 +305,7 @@ class ProductAdmin(ExportMixin,admin.ModelAdmin):
 
 
     list_display = ['name', 'price', 'shop',
-                    get_rate,get_sells_count, 'quantity', 'published', 'deleted']
+                    get_rate,get_sells_count, 'quantity', 'published', 'deleted', 'compute_price']
     list_editable = ['published', ]
     
     readonyl_fields = ['id', 'prod_code', 'date_created',
