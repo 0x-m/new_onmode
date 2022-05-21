@@ -7,7 +7,9 @@
 <meta name="description" content="{{shop.meta_description}}">
 <meta name="keywords" content="{{shop.meta_keywords}}">
 {% endblock %}
-
+{% block title %}
+shop.meta_title
+{% endblock %}
 {% block content %}
 
 {% if shop.banner %}

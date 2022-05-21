@@ -1,6 +1,11 @@
 {% extends '../base.html' %}
 {% load static %}
 {% load jalali_tags %}
+
+{% block title %}
+تسویه حساب
+{% endblock %}
+
 {% block content %}
 {% if not user.has_completed_profile %}
 <div class="w-full  flex justify-between bg-red-500 text-white p-3">

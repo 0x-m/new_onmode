@@ -498,7 +498,7 @@ def search(request: HttpRequest):
     
 def shop(request: HttpRequest, shop_name):
     shop = get_object_or_404(Shop, name=shop_name, active=True)
-    paginator = Paginator(shop.products.filter(deleted=False).all(), 20)
+    paginator = Paginator(shop.products.filter(deleted=False, published=True).all(), 20)
     pg = request.GET.get('page')
 
     page = None
