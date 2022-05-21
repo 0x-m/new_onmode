@@ -484,7 +484,7 @@ def create_stats(sender, instance, created, **kwargs):
 
 
 class Collection(models.Model):
-    products = models.ManyToManyField(to=Product, related_name='collections')
+    products = models.ManyToManyField(to=Product, related_name='collections', blank=True, null=True)
     featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40, unique=True)
     en_name = models.CharField(max_length=40, unique=True)

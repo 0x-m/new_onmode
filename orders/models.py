@@ -350,8 +350,7 @@ class OrderItem(models.Model):
         self.save()
 
     def is_expired(self):
-        return (self.final_price != self.product.compute_price(self.collection) 
-                or self.shipping_cost != self.product.get_shipping_cost)
+        return (self.final_price != self.product.compute_price(self.collection))
 
     @property
     def available(self):
