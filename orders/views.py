@@ -184,7 +184,9 @@ def checkout(request: HttpRequest, shop_name):
             params = {
                 'merchant_id': merchant_id,
                 'amount': cart.final_price,
-                'callback_url': reverse('orders:verify_payment'),
+                'callback_url': reverse('orders:verify_payment', kwargs= {
+                    'order_id': cart.id
+                    }),
                 'currency': 'IRT',
                 'description': cart.description,
                 'metadata': {
