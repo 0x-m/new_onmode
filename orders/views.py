@@ -5,6 +5,7 @@ author: hamze ghaedi (github: 0x-m)
 '''
 
 
+from re import T
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -372,7 +373,7 @@ def fulfill(request: HttpRequest):
 
 @login_required
 def user_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, user=request.user)
+    order = get_object_or_404(Order, code=order_code, user=request.user, paid=True)
     return render(request, 'user/dashboard/order.html', {
         'order': order
     })
@@ -381,7 +382,7 @@ def user_order(request: HttpRequest, order_code):
 @login_required
 def user_orders(request: HttpRequest):
     state = request.GET.get('state', 'pending')
-    paginator = Paginator(request.user.orders.filter(state=state).all(), 20)
+    paginator = Paginator(request.user.orders.filter(state=state, paid=False).all(), 20)
     pg = request.GET.get('page')
     page = None
     try:
@@ -398,7 +399,7 @@ def user_orders(request: HttpRequest):
 
 @login_required
 def shop_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, shop=request.user.shop)
+    order = get_object_or_404(Order, code=order_code, shop=request.user.shop, paid=True)
     return render(request, 'shop/order.html', {
         'order':order
     })
