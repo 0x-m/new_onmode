@@ -406,7 +406,9 @@ def shop_order(request: HttpRequest, order_code):
 @login_required
 def shop_orders(request: HttpRequest):
     state = request.GET.get('state', 'pending')
-
+    if state == 'accepted':
+        state = ['accepted', 'notverified']
+        
     paginator = Paginator(request.user.shop.orders.filter(state=state).all(), 20)
     pg = request.GET.get('page')
     page = None
