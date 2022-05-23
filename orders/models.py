@@ -248,7 +248,7 @@ class Order(models.Model):
             raise Exception()
 
     def set_tracking_code(self, code):
-        if self.state == self.STATES.ACCEPTED:
+        if self.state in  [self.STATES.ACCEPTED, self.STATES.NOTVERIFIED]:
             self.tracking_code = code
             self.state = self.STATES.VERIFYING
             self.save()
