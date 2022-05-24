@@ -223,7 +223,7 @@ def checkout(request: HttpRequest, shop_name):
                     'status': 'success'
                 })
             else:
-                return Http404()
+                return Http404() #TODO:...
 
        
         # if not cart.paid:
@@ -268,6 +268,9 @@ def verify_payment(request: HttpRequest, order_id):
 
         if res['data']['code'] == 100:
             ref_id = res['data']['ref_id']
+            #increase available money in customer wallet:
+            request.user.wallet.deposit(order.final_price)
+            
             order.pay(ref_id, authority)
             return render(request, 'shop/checkout_result', {
                 'ref_id': ref_id,
