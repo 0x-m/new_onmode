@@ -5,12 +5,13 @@ author: hamze ghaedi (github: 0x-m)
 '''
 
 
-from re import T
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from catalogue.models import Shop, Product
+
 from users.models import Address
 from promotions.models import Coupon
 import requests
@@ -409,8 +410,15 @@ def shop_order(request: HttpRequest, order_code):
     
 @login_required
 def shop_orders(request: HttpRequest):
+   
+    shop = get_object_or_404(Shop, user=request.user, active=True)
+
     state = request.GET.get('state', 'pending')
-        
+    orders = shop.orders.filter(state=state, paid=False).all()
+
+    if state == 'accepted':
+        orders |= shop.orders.filter(state='notverified', paid=False).all()
+    
     paginator = Paginator(request.user.shop.orders.filter(state=state, paid=False).all(), 20)
     pg = request.GET.get('page')
     page = None
@@ -426,7 +434,6 @@ def shop_orders(request: HttpRequest):
         'page': page,
         'state': state
     })
-
 
 
 
