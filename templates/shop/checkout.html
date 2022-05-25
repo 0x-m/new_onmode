@@ -71,12 +71,12 @@
         </div>
         <div class="bg-white p-4 rounded-box flex flex-col gap-3 ">
             <div class="flex justify-between">
-                <span>هزینه ارسال:</span>
-                <span id="shipping_cost">{{cart.get_shipping_cost}}تومان</span>
-            </div>
-            <div class="flex justify-between">
                 <span>جمع کل:</span>
                 <span id="total_price">{{cart.total}}تومان</span>
+            </div>
+            <div class="flex justify-between">
+                <span>هزینه ارسال:</span>
+                <span id="shipping_cost">{{cart.get_shipping_cost}}تومان</span>
             </div>
             <div class="flex justify-between">
                 <span>کوپن تخفیف:</span>
@@ -166,7 +166,7 @@
                 rows="2"></textarea>
 
             <div class="flex gap-4">
-                {% if wallet_has_balance == 'True' %}
+                {% if wallet_has_balance  %}
                     <div class="form-control">
                         <label class="label cursor-pointer w-fit">
                             <input type="radio" class="radio radio-primary radio-xs" name="pay_via" value="wallet" id=""

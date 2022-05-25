@@ -13,7 +13,7 @@
             <option value="accepted" {% if state == 'accepted'  %}selected{% endif %}>در حال انجام</option>
             <option value="sent" {% if state == 'sent'  %}selected{% endif %}>ارسال شده</option>
             <option value="fulfilled" {% if state == 'fulfilled'  %}selected{% endif %}>دریافت شده</option>
-            <option value="canceled" {% if state == 'canceled'  %}selected{% endif %}>لغو شده</option>
+            <option value="Rejected" {% if state == 'Rejected'  %}selected{% endif %}>لغو شده</option>
             <option value="returned" {% if state == 'returned'  %}selected{% endif %}>بازگشتی</option>
         </select>
         <button class="btn btn-primary">فیلتر</button>

@@ -221,10 +221,15 @@ def checkout(request: HttpRequest, shop_name):
                 cart.pay('site wallet', cart.code)
                 return render(request,'shop/checkout_result.html', {
                     'ref_id': cart.code,
-                    'status': 'success'
+                    'status': 'success',
+                    'order': cart
                 })
             else:
-                return Http404() #TODO:...
+                return render(request,'shop/checkout_result.html', {
+                    'ref_id': cart.code,
+                    'status': 'faild',
+                    'order': cart
+                })
 
        
         # if not cart.paid:
@@ -305,7 +310,7 @@ def accept(request: HttpRequest):
     if request.method == 'POST':
         shop = request.user.shop
         order_id = request.POST.get('order_id')
-        order = get_object_or_404(Order, shop=shop, pk=order_id, paid=False)
+        order = get_object_or_404(Order, shop=shop, pk=order_id, paid=True)
         order.accept()
         return redirect('orders:shop_order', order_code=order.code)
     
@@ -322,7 +327,7 @@ def tracking_code(request: HttpRequest):
         tracking_code = request.POST.get('tracking_code')
         order_id = request.POST.get('order_id')
         order = get_object_or_404(
-            Order, paid=False, shop=request.user.shop, pk=order_id)
+            Order, paid=True, shop=request.user.shop, pk=order_id)
 
         order.set_tracking_code(tracking_code)
         return redirect('orders:shop_order', order_code = order.code)
@@ -335,10 +340,10 @@ def reject(request: HttpRequest):
         return HttpResponseNotAllowed(['POST'])
 
     if request.method == 'POST':
-        order_id = request.POST.get('irder_id')
+        order_id = request.POST.get('order_id')
         msg = request.POST.get('reject_msg', '')
-        order = get_list_or_404(
-            Order, pk=order_id, shop=request.user.shop, paid=False)
+        order = get_object_or_404(
+            Order, pk=order_id, shop=request.user.shop, paid=True)
 
         order.reject(msg)
         return redirect('orders:shop_order', order_code=order.code)
@@ -353,8 +358,8 @@ def cancel(request: HttpRequest):
         order_id = request.POST.get('order_id')
         shop_id = request.POST.get('shop_Id')
         cancel_msg = request.POST.get('cancel_msg', '')
-        order = get_list_or_404(
-            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=False)
+        order = get_object_or_404(
+            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=True)
         order.cancel()
 
         return redirect('orders:shop_order', order_code=order.code)
@@ -370,7 +375,7 @@ def fulfill(request: HttpRequest):
         shop_id = request.POST.get('shop_id')
 
         order = get_object_or_404(
-            Order, pk=order_id, user=request.user, shop__pk=shop_id)
+            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=True)
         order.fulfill()
         return redirect('orders:shop_order', order_code=order.code)
 
@@ -386,7 +391,12 @@ def user_order(request: HttpRequest, order_code):
 @login_required
 def user_orders(request: HttpRequest):
     state = request.GET.get('state', 'pending')
-    paginator = Paginator(request.user.orders.filter(state=state, paid=False).all(), 20)
+    orders = request.user.orders.filter(state=state, paid=True)
+    if state == 'accepted':
+        orders |= request.user.orders.filter(state='notverified', paid=True).all()
+    if state == 'canceled':
+        orders |= request.user.orders.filter(state='Rejected', paid=True).all()        
+    paginator = Paginator(orders.order_by('-date_created').all(), 20)
     pg = request.GET.get('page')
     page = None
     try:
@@ -411,15 +421,19 @@ def shop_order(request: HttpRequest, order_code):
 @login_required
 def shop_orders(request: HttpRequest):
    
-    shop = get_object_or_404(Shop, user=request.user, active=True)
+    shop = get_object_or_404(Shop, owner=request.user, active=True)
 
     state = request.GET.get('state', 'pending')
-    orders = shop.orders.filter(state=state, paid=False).all()
+    orders = shop.orders.filter(state=state, paid=True).all()
 
     if state == 'accepted':
-        orders |= shop.orders.filter(state='notverified', paid=False).all()
+        orders |= shop.orders.filter(state='notverified', paid=True).all()
     
-    paginator = Paginator(request.user.shop.orders.filter(state=state, paid=False).all(), 20)
+    if state == 'rejected':
+        orders |= shop.orders.filter(state='canceled', paid=True).all()
+            
+    paginator = Paginator(orders.order_by('-date_created').all(), 20)
+    
     pg = request.GET.get('page')
     page = None
     try:

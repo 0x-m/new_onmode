@@ -8,7 +8,7 @@
 <meta name="keywords" content="{{shop.meta_keywords}}">
 {% endblock %}
 {% block title %}
-shop.meta_title
+{{shop.meta_title}}
 {% endblock %}
 {% block content %}
 
@@ -19,6 +19,7 @@ class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
 <div class="w-full mt-2 p-1 md:hidden">
     <button onclick="openFilter();" class="btn btn-primary">فیلتر</button>
 </div>
+{% csrf_token %}
 <div class="flex gap-2">
     <form id="filter" action="{% url 'catalogue:filter' shop.name %}"
         class="md:basis-1/4 fixed hidden md:w-1/4 md:static  top-0 w-3/4 md:bg-stone-50  md:rounded-box md:mr-4  bg-white md:flex flex-col md:mt-6 z-50 overflow-auto h-screen md:h-full md:ml-2 md:shadow-none shadow-md">

@@ -33,6 +33,7 @@ def product(request: HttpRequest, pid=None):
     # Does user have any active shop ?
     user = request.user
     shop = get_object_or_404(Shop, owner=user, active=True)
+
     product = None
     if pid: #product exists if not return 404 
         product = get_object_or_404(Product, pk=pid, deleted=False)
@@ -49,6 +50,7 @@ def product(request: HttpRequest, pid=None):
                 'product': product
             })
 
+        print(form.cleaned_data['sales_price'])
         # NOTE: any better way?
         created = False
         if not product:
@@ -59,8 +61,8 @@ def product(request: HttpRequest, pid=None):
                 product.shop = shop
                 product.save()
                 created = True
-            except:
-                return HttpResponseBadRequest('max allowed product restriction...!') #TODO: needs a conceptual exception...
+            except Exception as e:
+                return HttpResponseBadRequest(f'max allowed product restriction...!\n{e}') #TODO: needs a conceptual exception...
         else:
             form.save() #update the product
 

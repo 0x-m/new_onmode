@@ -30,7 +30,7 @@ reserved_words = [
 class ProductForm(forms.ModelForm):
     colors = forms.CharField(required=False)
     sizes = forms.CharField(required=False) 
-    sales_price = forms.IntegerField(required=False)
+    sales_price = forms.IntegerField(required=False, initial=0)
     class Meta:
         model = Product
         fields = [

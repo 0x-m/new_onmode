@@ -24,6 +24,7 @@
     alt="{{collectin.page_poster_alt}}">
 {% endif %}
 {% endcomment %}
+{% csrf_token %}
 <section class=" w-full  md:w-3/4 md:basis-3/4 mx-auto">
     {% comment %}
     <h2 class="p-2 mt-8 text-2xl text-center">{{collection.name}}</h2>

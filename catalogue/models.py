@@ -263,7 +263,7 @@ class Product(models.Model):
         if self.free_shipping:
             return 0
         else:
-            self.shipping_cost
+            return self.shipping_cost
 
     @property
     def is_available(self) -> bool:

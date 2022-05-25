@@ -7,13 +7,13 @@
 
 {% block content  %}
 <div class="flex justify-center gap-2 mt-4  text-xs p-2 w-full ">
-    <form action="{% url 'orders:shop_orders' %}">
+    <form action="{% url 'orders:user_orders' %}">
         <select dir="rtl" class="select" name="state" id="">
             <option value="pending" {% if state == 'pending'  %}selected{% endif %}>جدید</option>
             <option value="accepted" {% if state == 'accepted'  %}selected{% endif %}>در حال انجام</option>
             <option value="sent" {% if state == 'sent'  %}selected{% endif %}>ارسال شده</option>
             <option value="fulfilled" {% if state == 'fulfilled'  %}selected{% endif %}>دریافت شده</option>
-            <option value="canceled" {% if state == 'rejected'  %}selected{% endif %}>لغو شده</option>
+            <option value="canceled" {% if state == 'canceled'  %}selected{% endif %}>لغو شده</option>
             <option value="returned" {% if state == 'returned'  %}selected{% endif %}>بازگشتی</option>
         </select>
         <button class="btn btn-primary">فیلتر</button>
@@ -38,7 +38,7 @@
                 </div>
 
             </div>
-            <a href="{% url 'orders:shop_order' order.code %}" class="btn btn-primary">مشاهده جزییات</a>
+            <a href="{% url 'orders:user_order' order.code %}" class="btn btn-primary">مشاهده جزییات</a>
         </article>
         {% endfor %}
     </div>

@@ -169,8 +169,12 @@ class Order(models.Model):
                 item.product.dec_quantity(item.quantity)
             # item.product.stats.inc_sales()
         # -----------------------
-        
         self.save()
+        
+        #sms to shopkeeper----------------
+        
+        #---------------------------------
+
 
     @property
     def is_expired(self):
@@ -222,17 +226,18 @@ class Order(models.Model):
             self.state = self.STATES.REJECTED
             self.reject_msg = msg
             # decrease seller freezed and increase buyer available
-            self.user.deposit(self.final_price)
+            self.user.wallet.deposit(self.final_price)
             self.shop.owner.wallet.dec_freeze(self.final_price)
             # ----------------------------------------------------
             #inform customer------------------------
             try:
-                send_notification(cus_sms_client, 'ORDER_REJECTED_SMS_CODE', {
+                resp = send_notification(cus_sms_client, 'ORDER_REJECTED_SMS_CODE', {
                     'name': self.user.first_name,
                     'id': self.code
                 }, self.user.phone_num)
-            except:
-                pass #TODO
+                print('reject sms state:', resp,'------------------------')
+            except Exception as e:
+                print(f'reject sms faild {e}')
             
             self.save()
         else:
