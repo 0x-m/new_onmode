@@ -266,7 +266,7 @@ def wallet_deposit(request: HttpRequest):
                 return redirect('https://www.zarinpal.com/pg/StartPay/' + res['data']['authority'])
             else:
                 return render(request, 'shop/checkout.html', {
-                    'connection': 'error'
+                    'deposit_status': 'error'
                 })
 
     return HttpResponseNotAllowed(['POST'])

@@ -186,7 +186,7 @@ def checkout(request: HttpRequest, shop_name):
             params = {
                 'merchant_id': merchant_id,
                 'amount': cart.final_price,
-                'callback_url': reverse('orders:verify_payment', kwargs= {
+                'callback_url': 'https://onmode.ir/' + reverse('orders:verify_payment', kwargs= {
                     'order_id': cart.id
                     }),
                 'currency': 'IRT',
