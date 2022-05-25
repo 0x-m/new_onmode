@@ -247,7 +247,7 @@ def wallet_deposit(request: HttpRequest):
             params = {
                 'merchant_id': merchant_id,
                 'amount': amount,
-                'callback_url': reverse('users:deposit-verify', kwargs= {'amount': amount}) ,
+                'callback_url': 'https://onmode.ir' + reverse('users:deposit-verify', kwargs= {'amount': amount}) ,
                 'currency': 'IRT',
                 'description': 'wallet deposit',
                 'metadata': {
