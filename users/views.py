@@ -7,7 +7,6 @@ author: hamze ghaedi (github: 0x-m)
 '''
 
 
-from ast import expr_context
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseServerError, JsonResponse
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -104,6 +103,7 @@ def verify_code(request: HttpRequest):
             otp.check(code)
             user, _ = User.objects.get_or_create(phone_num=phone_num)
             user.backend = 'users.OTP.OTPAuthenticationBackend'
+            user.set_unusable_password()
             login(request=request, user=user)
             del request.session['phone_num']
             request.session.save()
