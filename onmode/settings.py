@@ -111,6 +111,13 @@ USE_I18N = True
 USE_TZ = True
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.OTP.OTPAuthenticationBackend',
+] 
+
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 

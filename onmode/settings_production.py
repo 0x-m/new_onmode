@@ -66,6 +66,14 @@ TEMPLATES = [
     },
 ]
 
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.OTP.OTPAuthenticationBackend',
+] 
+
+
+
 WSGI_APPLICATION = 'onmode.wsgi.application'
 ALLOW_UNICODE_SLUGS = True
 

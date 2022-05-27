@@ -103,7 +103,7 @@ def verify_code(request: HttpRequest):
             otp = OTP(request)
             otp.check(code)
             user, _ = User.objects.get_or_create(phone_num=phone_num)
-
+            user.backend = 'users.OTP.OTPAuthenticationBackend'
             login(request=request, user=user)
             del request.session['phone_num']
             request.session.save()
