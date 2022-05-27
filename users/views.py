@@ -13,7 +13,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from httpx import RequestError
 from ippanel import Client
 from decouple import config
 import requests

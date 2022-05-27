@@ -28,7 +28,6 @@ INSTALLED_APPS = [
     'tinymce',
     'gtm',
     'import_export',
-    'sslserver',
     'django_filters',
     'jalali_date',
     'users',
