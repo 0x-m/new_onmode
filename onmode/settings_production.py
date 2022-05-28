@@ -84,7 +84,7 @@ DATABASES = {
         'USER': config('DB_USER_NAME'),
         'PASSWORD': config('DB_PASSWORD'),
         'OPTIONS': {
-            'sql_mode': ''
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         }
 
     }
