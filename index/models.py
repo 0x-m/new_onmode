@@ -132,6 +132,6 @@ class SitePage(models.Model):
     def save(self, *args, **kwargs):
         if self.en_name:
             self.slug = slugify(self.en_name)
-        super().save(*arg, **kwargs)
+        super().save(*args, **kwargs)
     
 
