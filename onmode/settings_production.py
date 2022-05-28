@@ -8,7 +8,7 @@ from . import storage_backends
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY')
-
+print(SECRET_KEY)
 DEBUG = False
 
 ALLOWED_HOSTS = ['onmode.ir','www.onmode.ir']
@@ -48,7 +48,6 @@ MIDDLEWARE = [
 ]
 
 
-SESSION_SAVE_EVERY_REQUEST = True
 
 
 ROOT_URLCONF = 'onmode.urls'
@@ -207,42 +206,42 @@ IMPORT_EXPORT_USE_TRANSACTIONS = False
 
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': ('%(asctime)s [%(process)d] [%(levelname)s] ' +
-                       'pathname=%(pathname)s lineno=%(lineno)s ' +
-                       'funcname=%(funcName)s %(message)s'),
-            'datefmt': '%Y-%m-%d %H:%M:%S'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        }
-    },
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-        'logfile': {
-            'class': 'logging.FileHandler',
-            'filename': 'server.log'
-        }
-    },
-    'loggers': {
-        'testlogger': {
-            'handlers': ['logfile'],
-            'level': 'INFO',
-        }
-    }
-}
-DEBUG_PROPAGATE_EXCEPTIONS = True
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'verbose': {
+#             'format': ('%(asctime)s [%(process)d] [%(levelname)s] ' +
+#                        'pathname=%(pathname)s lineno=%(lineno)s ' +
+#                        'funcname=%(funcName)s %(message)s'),
+#             'datefmt': '%Y-%m-%d %H:%M:%S'
+#         },
+#         'simple': {
+#             'format': '%(levelname)s %(message)s'
+#         }
+#     },
+#     'handlers': {
+#         'null': {
+#             'level': 'DEBUG',
+#             'class': 'logging.NullHandler',
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'verbose'
+#         },
+#         'logfile': {
+#             'class': 'logging.FileHandler',
+#             'filename': 'server.log'
+#         }
+#     },
+#     'loggers': {
+#         'testlogger': {
+#             'handlers': ['logfile'],
+#             'level': 'INFO',
+#         }
+#     }
+# }
+# DEBUG_PROPAGATE_EXCEPTIONS = True
 
 TINYMCE_JS_URL =  'https://onmodestaticfiles.s3.ir-thr-at1.arvanstorage.com/static/tinymce/tinymce.min.js'
