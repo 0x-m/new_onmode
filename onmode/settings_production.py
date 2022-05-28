@@ -1,6 +1,5 @@
 
 
-from ast import Str
 from pathlib import Path
 from decouple import config
 
@@ -8,7 +7,7 @@ from . import storage_backends
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', cast=Str)
+SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = False
 
