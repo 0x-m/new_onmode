@@ -1,0 +1,7 @@
+User-Agent: Googlebot
+User-Agent: Bingbot
+User-Agent: Slurp
+
+Disallow: /users
+
+sitemap: https://onmode.ir/sitemap.xml
