@@ -90,7 +90,7 @@ class OTP():
 
 class OTPAuthenticationBackend(BaseBackend):
     def authenticate(self, request: HttpRequest, phone_num):
-        u = User.objects.get_or_create(phone_num=phone_num)
+        u, _ = User.objects.get_or_create(phone_num=phone_num)
         return u
 
     def get_user(self, user_id):

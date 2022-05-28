@@ -72,11 +72,6 @@ TEMPLATES = [
 ]
 
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'users.OTP.OTPAuthenticationBackend',
-] 
-
 
 
 WSGI_APPLICATION = 'onmode.wsgi.application'
@@ -113,6 +108,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'users.user'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.OTP.OTPAuthenticationBackend',
+] 
+
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('en', 'English'),
@@ -122,9 +122,6 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = False
-
-USE_I18N = False
-
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

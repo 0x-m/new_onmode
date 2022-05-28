@@ -64,9 +64,9 @@ def signup(request: HttpRequest):
 
             OTP(request).clear()
             code = OTP(request).code
-            res = send_verification_code(phone_num, code)
-            # print(code)
-            # res = True
+            # res = send_verification_code(phone_num, code)
+            print(code)
+            res = True
             if res:
                 return redirect('users:verify')
             else:
@@ -100,9 +100,10 @@ def verify_code(request: HttpRequest):
         try:
             otp = OTP(request)
             otp.check(code)
-            user, _ = User.objects.get_or_create(phone_num=phone_num)
+            # user, _ = User.objects.get_or_create(phone_num=phone_num)
+            user = authenticate(phone_num=phone_num)
             user.backend = 'users.OTP.OTPAuthenticationBackend'
-            user.set_unusable_password()
+            # user.set_unusable_password()
             login(request=request, user=user)
             del request.session['phone_num']
             request.session.save()

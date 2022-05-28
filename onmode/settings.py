@@ -98,6 +98,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'users.user'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.OTP.OTPAuthenticationBackend',
+] 
+
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('en-us', 'english'),
@@ -109,11 +114,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'users.OTP.OTPAuthenticationBackend',
-] 
 
 
 
