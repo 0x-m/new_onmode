@@ -64,9 +64,9 @@ def signup(request: HttpRequest):
 
             OTP(request).clear()
             code = OTP(request).code
-            # res = send_verification_code(phone_num, code)
-            print(code)
-            res = True
+            res = send_verification_code(phone_num, code)
+            # print(code)
+            # res = True
             if res:
                 return redirect('users:verify')
             else:
@@ -307,13 +307,15 @@ def wallet_deposit_verify(request: HttpRequest, amount):
             return render(request, 'shop/checkout_result', {
                 'ref_id': ref_id,
                 'status': 'success',
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'depost': True
             })
         elif res['code'] == 101:
             return render(request, 'shop/checkout_result.html', {
                 'status': 'success',
                 'ref_id': ref_id,
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'deposit': True
             })
         else:
             return render(request, 'shop/checkout_result.html', {

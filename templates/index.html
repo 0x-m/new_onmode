@@ -5,7 +5,10 @@
 {% block title %}{{siteinfo.site_title}}{% endblock %}
 
 {% block head %}
-<meta name="description" content="{{siteinfo.site_description}}">
+<meta name="description" property="og:description" content="{{siteinfo.site_description}}">
+<meta property="og:title" content="{{siteinfo.site_title}}" >
+<meta property="og:url" content="https://wwww.onmode.ir">
+
 {% endblock  %}
 
 {% block content %}
@@ -20,10 +23,10 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
         <div class="swiper-slide w-full h-60 md:h-96">
             <a href="{{slide.link}}">
                 {% if slide.photo_url %}
-                <img  data-src="{{slide.photo_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow swiper-lazy "
+                <img data-src="{{slide.photo_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow swiper-lazy "
                     alt="{{slide.alt}}">
                 {% elif slide.photo %}
-                <img  data-src="{{slide.photo.url}}" class=" w-full   h-60 md:h-96  object-cover swiper-lazy  shadow "
+                <img data-src="{{slide.photo.url}}" class=" w-full   h-60 md:h-96  object-cover swiper-lazy  shadow "
                     alt="{{slide.alt}}">
                 {% endif %}
                 <div class="swiper-lazy-preloader"></div>
@@ -44,7 +47,8 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             {{siteinfo.jumbo_message}}
         </p>
         <div class="flex justify-end p-1">
-            <a href="{{siteinfo.jumbo_button_url}}" class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
+            <a href="{{siteinfo.jumbo_button_url}}"
+                class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
         </div>
     </div>
 </div>
@@ -56,7 +60,8 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             {{siteinfo.jumbo_message}}
         </p>
         <div class="flex justify-end p-1">
-            <a href="{{siteinfo.jumbo_button_url}}" class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
+            <a href="{{siteinfo.jumbo_button_url}}"
+                class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
         </div>
     </div>
 </div>
@@ -69,7 +74,8 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             {{siteinfo.jumbo_message}}
         </p>
         <div class="flex justify-end p-1">
-            <a href="{{siteinfo.jumbo_button_url}}" class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
+            <a href="{{siteinfo.jumbo_button_url}}"
+                class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
         </div>
     </div>
 </div>
@@ -84,39 +90,14 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                 {{siteinfo.jumbo_message}}
             </p>
             <div class="flex justify-end p-1">
-                <a href="{{siteinfo.jumbo_button_url}}" class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
+                <a href="{{siteinfo.jumbo_button_url}}"
+                    class="btn btn-primary rounded-box">{{siteinfo.jumbo_button_text }}</a>
             </div>
         </div>
     </div>
-{% endif %}
-{% endif %}
-{% endwith %}
-
-    <div class="flex flex-col items-center justify-center  p-2 mt-8">
-        <div class="flex flex-col w-11/12 mt-2 mx-auto gap-4  p-3">
-            <div class="w-full flex items-center justify-between">
-                <div class="flex flex-col gap-2">
-                    <h2 class="text-sm md:text-xl text-gray-500">{{shopset.title}}</h2>
-                    <h4 class="text-xs md:text-md text-gray-400">{{shopset.slogan}}</h4>
-                </div>
-            </div>
-            <div class="grid grid-cols-4 md:grid-cols-5 md:w-3/4 mx-auto gap-2 items-center justify-center">
-                {% for shop in shopset.shops.all %}
-                <a href="/{{shop.name}}">
-                    <article class="p-1 gap-2 flex flex-col  justify-center items-center ">
-                        <img loading="lazy" src="{% if shop.logo %}{{shop.logo.url}}{% endif %}" class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
-                        <h2 class="text-[0.6rem] text-gray-500 max-w-[80px] truncate text-ellipsis">{{shop.name}}
-                        </h2>
-                    </article>
-                </a>
-                {% endfor  %}
-
-            </div>
-        </div>
-        <section class=""></section>
-    </div>
-
-    <div class="divider w-1/3 mx-auto"></div>
+    {% endif %}
+    {% endif %}
+    {% endwith %}
 
     {% if collections %}
     {% for collection in collections %}
@@ -168,15 +149,16 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
                         class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-bag text-gray  text-xl"></i>
                     </button>
-                    <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
+                    <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                        class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-heart text-gray  text-xl"></i>
                     </button>
                     {% else  %}
-                    <a href="{% url 'users:edit-product' product.id %}"
-                        class="btn btn-ghost btn-sm btn-circle text-md">
+                    <a href="{% url 'users:edit-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-pencil text-gray  text-xl"></i>
                     </a>
-                    <a href="{% url 'users:delete-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
+                    <a href="{% url 'users:delete-product' product.id %}"
+                        class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-trash text-gray  text-xl"></i>
                     </a>
                     {% endif  %}
@@ -199,21 +181,48 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
     <div class="w-full md:w-3/4 mx-auto p-2 flex items-center justify-center mt-2 gap-2">
         {% if collection.index_poster_url %}
         <a href="{{collection.index_poster_link}}">
-            <img loading="lazy" src="{{collection.index_poster_url}}}" class="w-full h-80 object-cover rounded-box shadow-sm" alt="">
+            <img loading="lazy" src="{{collection.index_poster_url}}}"
+                class="w-full h-80 object-cover rounded-box shadow-sm" alt="">
         </a>
         {% elif collection.index_poster %}
         <a class="block w-full" href="{{collection.index_poster_link}}">
-            <img loading="lazy" src="{{collection.index_poster.url}}" class="w-full h-80 object-cover rounded-box shadow-sm"
-                alt="{{collection.index_poster_alt}}">
+            <img loading="lazy" src="{{collection.index_poster.url}}"
+                class="w-full h-80 object-cover rounded-box shadow-sm" alt="{{collection.index_poster_alt}}">
         </a>
         {% endif %}
     </div>
+    <div class="divider w-1/3 mx-auto"></div>
     {% endfor %}
 
 
     {% endif %}
 
+    <div class="flex flex-col items-center justify-center  p-2 mt-8">
+        <div class="flex flex-col w-11/12 mt-2 mx-auto gap-4  p-3">
+            <div class="w-full flex items-center justify-between">
+                <div class="flex flex-col gap-2">
+                    <h2 class="text-sm md:text-xl text-gray-500">{{shopset.title}}</h2>
+                    <h4 class="text-xs md:text-md text-gray-400">{{shopset.slogan}}</h4>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 md:grid-cols-5 md:w-3/4 mx-auto gap-2 items-center justify-center">
+                {% for shop in shopset.shops.all %}
+                <a href="/{{shop.name}}">
+                    <article class="p-1 gap-2 flex flex-col  justify-center items-center ">
+                        <img loading="lazy" src="{% if shop.logo %}{{shop.logo.url}}{% endif %}"
+                            class="rounded-3xl w-16  h-16 object-cover" alt="{{shop.name}}">
+                        <h2 class="text-[0.6rem] text-gray-500 max-w-[80px] truncate text-ellipsis">{{shop.name}}
+                        </h2>
+                    </article>
+                </a>
+                {% endfor  %}
 
+            </div>
+        </div>
+        <section class=""></section>
+    </div>
+
+    <div class="divider w-1/3 mx-auto"></div>
 
     {% if posts %}
     <div class="flex flex-col items-center justify-center  mx-auto  p-2 mt-8">
@@ -231,9 +240,11 @@ https://source.unsplash.com/p-I9wV811qk/1920x1047
             <a href="{{post.url}}">
                 <article class="rounded-box relative shadow-md">
                     {% if post.photo_url %}
-                    <img loading="lazy" src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
+                    <img loading="lazy" src="{{post.photo_url}}" class="h-52 md:h-80 rounded-box object-cover"
+                        alt="{{post.alt}}">
                     {% elif post.photo %}
-                    <img loading="lazy" src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover" alt="{{post.alt}}">
+                    <img loading="lazy" src="{{post.photo.url}}" class="h-52 md:h-80 rounded-box object-cover"
+                        alt="{{post.alt}}">
                     {% endif %}
                     <div class="w-full h-1/2 absolute flex  items-center justify-center  left-0 bottom-0 rounded-b-box "
                         style="background-color: #33333355;">

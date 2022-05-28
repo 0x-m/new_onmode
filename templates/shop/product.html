@@ -4,8 +4,12 @@
 {% load jalali_tags %}
 
 {% block head %}
-<meta name="description" content="{{product.meta_description}}">
+<meta name="description" property="og:description" content="{{product.meta_description}}">
 <meta name="keywords" content="{{product.meta_keywords}}">
+<meta property="og:url" content="{{product.get_absolute_url}}">
+<meta property="og:title" content="{{product.name}}" >
+<meta property="og:image" content="{% if product.preview.img %}{{product.preview.img.url}}{% endif %}" >
+<meta property="og:image:alt" content="{{product.preview.img.alt}}" >
 {% endblock %}
 
 

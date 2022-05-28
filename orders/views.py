@@ -222,13 +222,16 @@ def checkout(request: HttpRequest, shop_name):
                 return render(request,'shop/checkout_result.html', {
                     'ref_id': cart.code,
                     'status': 'success',
-                    'order': cart
+                    'order': cart,
+                    'pay_via': 'wallet'
                 })
             else:
                 return render(request,'shop/checkout_result.html', {
                     'ref_id': cart.code,
                     'status': 'faild',
-                    'order': cart
+                    'order': cart,
+                    'pay_via': 'wallet'
+
                 })
 
        
@@ -281,13 +284,15 @@ def verify_payment(request: HttpRequest, order_id):
             return render(request, 'shop/checkout_result', {
                 'ref_id': ref_id,
                 'status': 'success',
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'order': order
             })
         elif res['code'] == 101:
             return render(request, 'shop/checkout_result.html', {
                 'status': 'success',
                 'ref_id': ref_id,
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'order': order
             })
         else:
             return render(request, 'shop/checkout_result.html', {

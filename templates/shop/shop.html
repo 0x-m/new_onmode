@@ -4,7 +4,8 @@
 
 
 {% block head %}
-<meta name="description" content="{{shop.meta_description}}">
+<meta name="description" property="og:description" content="{{shop.meta_description}}">
+<meta name="author" content="{{shop.owner.full_name}}">
 <meta name="keywords" content="{{shop.meta_keywords}}">
 {% endblock %}
 {% block title %}

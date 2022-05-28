@@ -382,9 +382,9 @@ def create_shop_request(request: HttpRequest):
     })
 
 
-def collection(request: HttpRequest, collection_name):
+def collection(request: HttpRequest, slug):
 
-    collection = get_object_or_404(Collection, en_name=collection_name)
+    collection = get_object_or_404(Collection, en_slug=slug)
 
     paginator = Paginator(collection.products.all(), 20)
     pg = request.GET.get('page')

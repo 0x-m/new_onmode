@@ -50,7 +50,11 @@
             </div>
         {% endif  %}
         {% endif %}
-        <a href="{% url 'index:index' %}" class="btn btn-outline mt-4 ">بازگشت به سایت</a>
+        {% if not deposit %}
+             <a href="{% url 'orders:user_order' order.code %}" class="btn btn-outline mt-4 ">مشاهده سفارش</a>
+        {% else %}
+            <a href="{% url 'users:wallet'  %}" class="btn btn-outline mt-4 ">مشاهده کیف پول</a>
+        {% endif %}
     </body>
 
 </html>

@@ -484,7 +484,7 @@ def create_stats(sender, instance, created, **kwargs):
 
 
 class Collection(models.Model):
-    products = models.ManyToManyField(to=Product, related_name='collections', blank=True, null=True)
+    products = models.ManyToManyField(to=Product, related_name='collections', blank=True)
     featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40, unique=True)
     en_name = models.CharField(max_length=40, unique=True)
@@ -515,7 +515,7 @@ class Collection(models.Model):
         return featureds
     
     def get_absolute_url(self):
-        return reverse('catalogue:collection', kwargs={'collection_name':self.en_name})
+        return reverse('catalogue:collection', kwargs={'slug':self.en_slug})
     
     def save(self, *args, **kwargs):
         if self.en_name:

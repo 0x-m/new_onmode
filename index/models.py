@@ -1,8 +1,10 @@
 
+from ast import arg
 from django.db import models
 from django.dispatch import receiver
 from catalogue.models import  Shop
 from django.db.models.signals import pre_delete
+from django.utils.text import slugify
 from tinymce.models import HTMLField
 from onmode.storage_backends import SiteStorage
 
@@ -123,4 +125,13 @@ class GeoLocation(models.Model):
         return _cities
     
 
+class SitePage(models.Model):
+    en_name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(editable=False)
+    content = HTMLField()
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.slug = slugify(self.en_name)
+        super().save(*arg, **kwargs)
+    
 

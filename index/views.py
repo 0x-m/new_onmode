@@ -5,8 +5,9 @@ author: hamze ghaedi (github: 0x-m)
 '''
 
 
+from urllib.request import HTTPDefaultErrorHandler
 from django.http import HttpRequest, HttpResponseNotAllowed, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from .forms import ContactUsForm
 from .models import *
@@ -29,6 +30,13 @@ def certificatinos(request: HttpRequest):
     return render(request, 'certs.html', {
         'certs': certs
     })
+    
+def get_page(request: HttpRequest, slug):
+    page = get_object_or_404(SitePage, slug=slug)
+    return render(request, 'page.html', {
+        'page': page
+    })
+    
 
 def index(request: HttpRequest):
     posts = BlogPost.objects.all()[0:5]
