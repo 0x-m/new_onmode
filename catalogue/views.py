@@ -451,8 +451,7 @@ def like(request: HttpRequest, product_id):
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code =product_code)
     liked = product.likes.filter(user=request.user).exists()
-
-    relateds = Product.objects.filter(category=product.category).first()
+    can_comment = request.use.orders.filter(items__product=product,paid=True).exists()
     comment = None
     try:
         comment = request.user.comments.get(product=product)
@@ -462,7 +461,8 @@ def product_detail(request: HttpRequest, product_code):
     return render(request, 'shop/product.html', {
         'product': product,
         'comment': comment,
-        'liked': liked
+        'liked': liked,
+        'can_comment': can_comment
     })
     
 

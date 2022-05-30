@@ -133,6 +133,7 @@
         </div>
         <section id="comments" class="hidden">
             <div class="flex flex-col gap-2 mt-4">
+                {% if can_comment %}
                 {% if not  comment %}
                 <form method="post" action="{% url 'catalogue:comment' %}"
                     class="flex flex-col gap-2 w-full md:w-1/2 bg-stone-50 mb-4 rounded-box p-3 mx-auto">
@@ -186,7 +187,7 @@
                 </form>
                 {% endif %}
                 {% endif %}
-    
+                {% endif %}
                 {% for comment in product.comments.all %}
                 {% if comment.published %}
                 <article class="w-full md:w-2/3 mx-auto  flex flex-col p-2 border-b border-gray-300">
