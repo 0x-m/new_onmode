@@ -2,66 +2,98 @@
 {% load static %}
 
 {% block title %}
-
+مدیریت آدرسها
 {% endblock %}
 
 {% block content  %}
-{{errors}}
-<div class="flex flex-col md:flex-row md:mt-8 items-center justify-center w-full h-full gap-2">
-    <div class="bg-base-100 p-3  w-11/12 md:w-3/4  rounded-box shadow-md flex  flex-col md:flex-row gap-2 mb-20 ">
-        <form class="flex flex-col basis-1/2 gap-2" action="{% url 'users:addresses' %}" method="post">
-            {% csrf_token %}
-            <h4 class="text-center text-md text-gray-600 mb-2">آدرسها</h4>
-            <input name="full_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1" type="text">
-            <input name="phone_number" placeholder="شماره تماس" class="input input-bordered p-1" type="text">
-            <select class="select  select-bordered w-full" name="province" id="">
-                <option value="" disabled selected>استان</option>
-                <option value="تهران">تهران</option>
-                <option value="فارس">فارس</option>
-                <option value="کرمان">کرمان</option>
+{% if errors %}
+<div class="w-full bg-red-500 text-xs text-white p-4 flex flex-col gap-2 rounded-box">
+    {% for error in errors %}
+    {% if error == 'full_name' %}
+    <p>
+        نام  و نام خانوادگی را وارد نمایید
+    </p>
+    {% elif error == 'phone_number' %}
+    <p>
+        شماره تماس را وارد کنید
+    </p>
+    {% elif error == 'province' %}
+    <p>
+        استان را انتخاب نمایید
+    </p>
 
-            </select>
-            <select class="select  select-bordered w-full" name="city" id="">
-                <option value="" disabled selected>شهرستان</option>
-                <option value="شیراز">شیراز</option>
-                <option value="تبس">تبس</option>
-                <option value="آمل">آمل</option>
+    {% elif error == 'city' %}
+    <p>
+        شهرستان و شهر خود را وارد نمایید
+    </p>
+    {% elif error == 'description' %}
+    <p>
+        نشانی دقیق را وارد کنید
+    </p>
+    {% elif error  == 'postal_code' %}
+    <p>
+        کد پستی را وارد کنید
+    </p>
+    {% endif %}
+    {% endfor  %}
+</div>
+{% endif %}
+    <div class="flex flex-col md:flex-row md:mt-8 items-center justify-center w-full h-full gap-2">
+        <div class="bg-base-100 p-3  w-11/12 md:w-3/4  rounded-box shadow-md flex  flex-col md:flex-row gap-2 mb-20 ">
+            <form class="flex flex-col basis-1/2 gap-2" action="{% url 'users:addresses' %}" method="post">
+                {% csrf_token %}
+                <h4 class="text-center text-md text-gray-600 mb-2">آدرسها</h4>
+                <input required name="full_name" placeholder="نام و نام خانوادگی" class="input input-bordered p-1" type="text">
+                <input required name="phone_number" placeholder="شماره تماس" class="input input-bordered p-1" type="text">
+                <select onchange="get_cities(this);" class="select  select-bordered w-full" name="province" id="">
+                    <option value="" disabled selected>استان</option>
+                    {% for province in provinces %}
+                    <option data-id="{{province.id}}" value="{{province.name}}">{{province.name}}</option>
+                    {% endfor %}
+                </select>
+                <select class="select  select-bordered w-full" name="city" id="cities">
+                    <option value="" disabled selected>شهرستان</option>
+                </select>
+                <input required name="town" placeholder="شهر" class="input input-bordered p-1" type="text">
+                <input required name="postal_code" placeholder="کد پستی" class="input input-bordered p-1" type="text">
 
-            </select>
-            <input name="town" placeholder="شهر" class="input input-bordered p-1" type="text">
-            <input name="postal_code" placeholder="کد پستی" class="input input-bordered p-1" type="text">
-
-            <textarea name="description" id="" placeholder="نشانی دقیق" cols="5" class="textarea textarea-bordered"
-                rows="4"></textarea>
-            <div class="flex gap-8">
-                <div class="form-control">
-                    <label class="label cursor-pointer">
-                        <input type="radio" name="gender" class="radio checked:bg-red-500" value="man">
-                        <span class="label-text p-1 ">مرد</span>
-                    </label>
+                <textarea required name="description" id="" placeholder="نشانی دقیق" cols="5" class="textarea textarea-bordered"
+                    rows="4"></textarea>
+                <div class="flex gap-8">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <input type="radio" name="gender" class="radio checked:bg-red-500" value="man">
+                            <span class="label-text p-1 ">مرد</span>
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <input type="radio" name="gender" class="radio checked:bg-red-500" value="woman">
+                            <span class="label-text p-1 ">زن</span>
+                        </label>
+                    </div>
                 </div>
-                <div class="form-control">
-                    <label class="label cursor-pointer">
-                        <input type="radio" name="gender" class="radio checked:bg-red-500" value="woman">
-                        <span class="label-text p-1 ">زن</span>
-                    </label>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">افزودن</button>
-        </form>
-        <div class="flex flex-col gap-2 p-2 basis-1/2">
-            <h4 class="text-center text-gray-700 text-sm">آدرسهای افزوده شده</h4>
-            {% for  address in user.addresses.all %}
+                <button type="submit" class="btn btn-primary">افزودن</button>
+            </form>
+            <div class="flex flex-col gap-2 p-2 basis-1/2">
+                <h4 class="text-center text-gray-700 text-sm">آدرسهای افزوده شده</h4>
+                {% for  address in user.addresses.all %}
                 <div class="flex justify-between items-center bg-stone-50 rounded p-2">
                     <p class="text-xs text-gray-700">{{ address }}</p>
                     <button>
                         <i class="bi-trash text-red-400"></i>
                     </button>
                 </div>
-            {% endfor %}
+                {% endfor %}
 
+            </div>
         </div>
-    </div>
 
-</div>
-{% endblock %}
+    </div>
+    {% endblock %}
+
+    {% block scripts %}
+    <script>
+        selectMenu('profile')
+    </script>
+    {% endblock %}

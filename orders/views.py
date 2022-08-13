@@ -1,64 +1,68 @@
-from email import header
-import json
-from typing import get_origin
+
+'''
+author: hamze ghaedi (github: 0x-m)
+
+'''
+
+
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseNotModified, JsonResponse
 from django.shortcuts import get_list_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from catalogue.models import Shop, Product
+
 from users.models import Address
 from promotions.models import Coupon
 import requests
-from .models import Order, OrderItem, ReturnRequest
+from django.urls import reverse
+from .models import Order, OrderItem
 from .forms import AcceptOrderForm, AddOrderItemForm
+from django.core.paginator import *
+from decouple import config
+from index.models import GeoLocation
+
+
 
 
 def cart(request: HttpRequest):
-    orders = request.user.orders.filter(paid=False)
+    orders = []
+    if request.user.is_authenticated:
+        orders = request.user.orders.filter(paid=False)
     return render(request, 'shop/cart.html', {
         'carts': orders
     })
 
 
+
 @login_required
-def refresh_order(request: HttpRequest):
-    order_id = request.GET.get('id')
+def refresh_order(request: HttpRequest, order_id):
     order = get_object_or_404(
         Order, id=order_id, paid=False, user=request.user)
     order.refresh()
-    # return redirect('orders:cart')
-    return JsonResponse({
-        'status': 'refereshed'
-    })
+    return redirect('orders:cart')
+    # return JsonResponse({
+    #     'status': 'refereshed'
+    # })
 
 
-def test(request: HttpRequest):
-
-    if request.method == 'POST':
-        form = AddOrderItemForm(request.POST)
-        if form.is_valid():
-            item = form.save(commit=False)
-
-            return HttpResponse('correct')
-        else:
-            return HttpResponse(form.errors)
-
-    return render(request, 'shop/test.html', {
-        'form': AddOrderItemForm()
-    })
 
 
 @login_required
 def add_item(request: HttpRequest):
     if request.method == 'POST':
-        print(request.POST, 'post....')
         form = AddOrderItemForm(request.POST)
         if form.is_valid():
             user = request.user
             product = form.cleaned_data['product']
             shop = product.shop
 
-            # TODO: users can not buy form theirselves
+            # users can not buy form theirselves
+            if user.shop == shop:
+                return JsonResponse({
+                    'status': 'invalid action'
+                })
+                
             order, _ = Order.objects.get_or_create(
                 shop=shop, user=user, paid=False)
 
@@ -68,14 +72,15 @@ def add_item(request: HttpRequest):
             order_item.quantity = form.cleaned_data['quantity']
             order_item.options = form.cleaned_data['options']
             order_item.refresh()  # ambiguous this method updates prices fields and save the model
-
+            print(order_item.final_price)
             return JsonResponse({
                 'status': 'added',
                 'final_price': order.final_price,
+                'cart': request.user.cart_count
+
 
             })
         else:
-            print(form.errors, '////////////////')
             return HttpResponseBadRequest()
 
     return HttpResponseNotAllowed(['POST'])
@@ -83,7 +88,6 @@ def add_item(request: HttpRequest):
 
 @login_required
 def delete_item(request: HttpRequest, order_item_id):
-
     order_item = get_object_or_404(
         OrderItem, pk=order_item_id, order__user=request.user)
 
@@ -95,6 +99,8 @@ def delete_item(request: HttpRequest, order_item_id):
     return JsonResponse({
         'status': 'deleted',
         'final_price': order.final_price if order else 0,
+        'cart': request.user.cart_count
+
 
     })
 
@@ -112,6 +118,7 @@ def increment(request: HttpRequest, order_item_id):
         'status': 'incremented',
         'final_price': order_item.order.final_price,
         'pp': order_item.product.compute_price(),
+        'cart': request.user.cart_count
     })
 
 
@@ -131,7 +138,9 @@ def decrement(request: HttpRequest, order_item_id):
 
     return JsonResponse({
         'status': 'decremented',
-        'final_price': order.final_price if order else None
+        'final_price': order.final_price if order else None,
+        'cart': request.user.cart_count
+
     })
 
 
@@ -141,6 +150,11 @@ def checkout(request: HttpRequest, shop_name):
     user = request.user
     cart = get_object_or_404(Order, user=user, shop=shop, paid=False)
     wallet_has_balance = request.user.wallet.has_balance(cart.final_price)
+
+    provinces = GeoLocation.objects.first()
+    if provinces:
+        provinces = provinces.provinces
+        
     if request.method == 'POST':
         address_id = request.POST.get('address')
         order_msg = request.POST.get('order_msg')
@@ -153,7 +167,8 @@ def checkout(request: HttpRequest, shop_name):
                 'cart': cart,
                 'address_status': 'invalid address' if not address else '',
                 'pay_status': 'invalid pay_via' if not pay_via else '',
-                'wallet_has_balance': wallet_has_balance
+                'wallet_has_balance': wallet_has_balance,
+                'provinces': provinces if provinces else None
             })
 
         cart.address = address
@@ -167,10 +182,13 @@ def checkout(request: HttpRequest, shop_name):
         cart.save()
 
         if pay_via == 'direct':
+            merchant_id = config('MERCHANT_ID', '')
             params = {
-                'merchant_id': '1344b5d4-0048-11e8-94db-005056a205be',
+                'merchant_id': merchant_id,
                 'amount': cart.final_price,
-                'callback_url': 'https://localhost:800/orders/verify',
+                'callback_url': 'https://onmode.ir' + reverse('orders:verify_payment', kwargs= {
+                    'order_id': cart.id
+                    }),
                 'currency': 'IRT',
                 'description': cart.description,
                 'metadata': {
@@ -193,14 +211,30 @@ def checkout(request: HttpRequest, shop_name):
                     'address_status': 'invalid address' if not address else '',
                     'pay_status': 'invalid pay_via' if not pay_via else '',
                     'wallet_has_balance': wallet_has_balance,
-                    'connection': 'error' 
+                    'connection': 'error',
+                    'provinces': provinces if provinces else None
+
                 })
-            return HttpResponse(req_result.status_code)
 
         elif pay_via == 'wallet':
-            pass
+            if wallet_has_balance:
+                cart.pay('site wallet', cart.code)
+                return render(request,'shop/checkout_result.html', {
+                    'ref_id': cart.code,
+                    'status': 'success',
+                    'order': cart,
+                    'pay_via': 'wallet'
+                })
+            else:
+                return render(request,'shop/checkout_result.html', {
+                    'ref_id': cart.code,
+                    'status': 'faild',
+                    'order': cart,
+                    'pay_via': 'wallet'
 
-        return redirect('https://www.google.com')
+                })
+
+       
         # if not cart.paid:
         #     cart.pay(ref_id, authority)
         #     return render(request, 'shop/checkout_result.html', {
@@ -209,7 +243,9 @@ def checkout(request: HttpRequest, shop_name):
 
     return render(request, 'shop/checkout.html', {
         'cart': cart,
-        'wallet_has_balance': wallet_has_balance
+        'wallet_has_balance': wallet_has_balance,
+        'provinces': provinces if provinces else None
+
 
     })
 
@@ -219,8 +255,9 @@ def verify_payment(request: HttpRequest, order_id):
     order = get_object_or_404(Order, pk=order_id, user=request.user)
     if request.GET.get('Status') == 'OK':
         authority = request.GET.get('Authority')
+        merchant_id = config('MERCHANT_ID', '')
         params = {
-            'merchant_id': '1344b5d4-0048-11e8-94db-005056a205be',
+            'merchant_id': merchant_id,
             'authority': authority,
             'amount': order.final_price,
         }
@@ -230,7 +267,7 @@ def verify_payment(request: HttpRequest, order_id):
             'accept': 'application/json'
         }
 
-        req = requests.post('', headers=headers, params=params)
+        req = requests.post('https://api.zarinpal.com/pg/v4/payment/verify.json', headers=headers, params=params)
 
         res = None
         try:
@@ -240,17 +277,22 @@ def verify_payment(request: HttpRequest, order_id):
 
         if res['data']['code'] == 100:
             ref_id = res['data']['ref_id']
+            #increase available money in customer wallet:
+            request.user.wallet.deposit(order.final_price)
+            
             order.pay(ref_id, authority)
-            return render(request, 'shop/checkout_resut', {
+            return render(request, 'shop/checkout_result', {
                 'ref_id': ref_id,
                 'status': 'success',
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'order': order
             })
         elif res['code'] == 101:
             return render(request, 'shop/checkout_result.html', {
                 'status': 'success',
                 'ref_id': ref_id,
-                'pay_via': 'direct'
+                'pay_via': 'direct',
+                'order': order
             })
         else:
             return render(request, 'shop/checkout_result.html', {
@@ -273,7 +315,7 @@ def accept(request: HttpRequest):
     if request.method == 'POST':
         shop = request.user.shop
         order_id = request.POST.get('order_id')
-        order = get_object_or_404(Order, shop=shop, pk=order_id, paid=False)
+        order = get_object_or_404(Order, shop=shop, pk=order_id, paid=True)
         order.accept()
         return redirect('orders:shop_order', order_code=order.code)
     
@@ -290,7 +332,7 @@ def tracking_code(request: HttpRequest):
         tracking_code = request.POST.get('tracking_code')
         order_id = request.POST.get('order_id')
         order = get_object_or_404(
-            Order, paid=False, shop=request.user.shop, pk=order_id)
+            Order, paid=True, shop=request.user.shop, pk=order_id)
 
         order.set_tracking_code(tracking_code)
         return redirect('orders:shop_order', order_code = order.code)
@@ -303,10 +345,10 @@ def reject(request: HttpRequest):
         return HttpResponseNotAllowed(['POST'])
 
     if request.method == 'POST':
-        order_id = request.POST.get('irder_id')
+        order_id = request.POST.get('order_id')
         msg = request.POST.get('reject_msg', '')
-        order = get_list_or_404(
-            Order, pk=order_id, shop=request.user.shop, paid=False)
+        order = get_object_or_404(
+            Order, pk=order_id, shop=request.user.shop, paid=True)
 
         order.reject(msg)
         return redirect('orders:shop_order', order_code=order.code)
@@ -321,8 +363,8 @@ def cancel(request: HttpRequest):
         order_id = request.POST.get('order_id')
         shop_id = request.POST.get('shop_Id')
         cancel_msg = request.POST.get('cancel_msg', '')
-        order = get_list_or_404(
-            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=False)
+        order = get_object_or_404(
+            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=True)
         order.cancel()
 
         return redirect('orders:shop_order', order_code=order.code)
@@ -338,14 +380,14 @@ def fulfill(request: HttpRequest):
         shop_id = request.POST.get('shop_id')
 
         order = get_object_or_404(
-            Order, pk=order_id, user=request.user, shop__pk=shop_id)
+            Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=True)
         order.fulfill()
         return redirect('orders:shop_order', order_code=order.code)
 
 
 @login_required
 def user_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, user=request.user)
+    order = get_object_or_404(Order, code=order_code, user=request.user, paid=True)
     return render(request, 'user/dashboard/order.html', {
         'order': order
     })
@@ -353,21 +395,63 @@ def user_order(request: HttpRequest, order_code):
 
 @login_required
 def user_orders(request: HttpRequest):
+    state = request.GET.get('state', 'pending')
+    orders = request.user.orders.filter(state=state, paid=True)
+    if state == 'accepted':
+        orders |= request.user.orders.filter(state='notverified', paid=True).all()
+    if state == 'canceled':
+        orders |= request.user.orders.filter(state='Rejected', paid=True).all()        
+    paginator = Paginator(orders.order_by('-date_created').all(), 20)
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
     return render(request, 'user/dashboard/orders.html', {
-        'orders': request.user.orders.filter(paid=True).all()
+        'page': page,
+        'state': state
     })
 
 @login_required
 def shop_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, shop=request.user.shop)
+    order = get_object_or_404(Order, code=order_code, shop=request.user.shop, paid=True)
     return render(request, 'shop/order.html', {
         'order':order
     })
     
 @login_required
 def shop_orders(request: HttpRequest):
+   
+    shop = get_object_or_404(Shop, owner=request.user, active=True)
+
+    state = request.GET.get('state', 'pending')
+    orders = shop.orders.filter(state=state, paid=True).all()
+
+    if state == 'accepted':
+        orders |= shop.orders.filter(state='notverified', paid=True).all()
+    
+    if state == 'rejected':
+        orders |= shop.orders.filter(state='canceled', paid=True).all()
+            
+    paginator = Paginator(orders.order_by('-date_created').all(), 20)
+    
+    pg = request.GET.get('page')
+    page = None
+    try:
+        page = paginator.get_page(pg)
+    except PageNotAnInteger:
+        page = paginator.get_page(1)
+    except EmptyPage:
+        page = paginator.get_page(paginator.num_pages)
+
+    
     return render(request, 'shop/orders.html', {
-        'orders': request.user.shop.orders.all()
+        'page': page,
+        'state': state
     })
 
 

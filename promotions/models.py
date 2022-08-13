@@ -1,5 +1,4 @@
 
-from asyncio import FastChildWatcher
 from django.db import models
 from django.utils import timezone
 import string
@@ -20,8 +19,8 @@ class Discount(models.Model):
     percent = models.PositiveIntegerField(default=0)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
-    max_amount = models.DecimalField(
-        max_digits=10, decimal_places=2, default=10000)
+    max_amount = models.PositiveBigIntegerField(
+        default=10000)
     max_sales_allowed = models.PositiveIntegerField(default=1)
     sales = models.PositiveIntegerField(default=0, editable=False)
 
@@ -29,6 +28,8 @@ class Discount(models.Model):
         nw = timezone.now()
         return self.sales < self.max_sales_allowed and (self.start_date < nw < self.end_date)
 
+    def __str__(self) -> str:
+        return self.code
 
 class Coupon(models.Model):
 
@@ -61,6 +62,7 @@ class Coupon(models.Model):
 
     def set_used(self):
         self.used = True
+        self.date_used = timezone.now()
         self.save()
 
     def apply(self, amount):
@@ -74,6 +76,10 @@ class Coupon(models.Model):
                 diff = self.max_amount
             amount -= diff
         return amount
+    
+    def __str__(self) -> str:
+        return self.code
+
 
 
 class GiftCard(models.Model):
@@ -106,3 +112,7 @@ class GiftCard(models.Model):
     def is_valid(self):
         nw = timezone.now()
         return (not self.used) and (self.start_date < nw < self.end_date)
+
+    def __str__(self) -> str:
+        return self.code
+

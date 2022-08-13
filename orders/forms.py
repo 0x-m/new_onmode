@@ -1,9 +1,4 @@
-from lib2to3.pgen2.pgen import DFAState
-from signal import raise_signal
-from tkinter.tix import Tree
-from aiohttp import request
 from django import forms
-from pkg_resources import require
 from .models import Order, OrderItem
 from catalogue.models import Collection, Product, Shop
 

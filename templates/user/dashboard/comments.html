@@ -2,100 +2,66 @@
 {% load static %}
 
 {% block title %}
-
+دیدگاهها
 {% endblock %}
 
 {% block content  %}
-<div class="grid grid-cols-1 md:grid-cols-3 justify-items-center content-start md:mt-8  w-full h-full gap-2">
-    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2  rounded-box" action=""
-        method="post">
-        <div class="flex gap-2">
-            <div class="avatar">
-                <div class="w-24 rounded">
-                    <img src="https://i.pravatar.cc/300" class="object-cover" />
-                </div>
-            </div>
-            <div class="flex flex-col basis-full  gap-2 p-1">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-md text-gray-700 mr-2">نام محصول</h2>
-                    <div class="text-xs flex gap-1 text-gray-500">
-                        <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                            class="bi-star"></i>
-                    </div>
-                </div>
-                <p class="text-gray-400 text-xs mr-2 overflow-hidden text-ellipsis max-h-16">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae, dicta? Deserunt obcaecati eveniet
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-                    aut,
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-
-                    odit ipsa maxime.
-                </p>
-            </div>
-        </div>
-        <form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-            <button class="text-red-500 text-xs">حذف</button>
-        </form>
-    </article>
-    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2  rounded-box" action=""
-        method="post">
-        <div class="flex gap-2">
-            <div class="avatar">
-                <div class="w-24 rounded">
-                    <img src="https://i.pravatar.cc/300" class="object-cover" />
-                </div>
-            </div>
-            <div class="flex flex-col basis-full  gap-2 p-1">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-md text-gray-700 mr-2">نام محصول</h2>
-                    <div class="text-xs flex gap-1 text-gray-500">
-                        <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                            class="bi-star"></i>
-                    </div>
-                </div>
-                <p class="text-gray-400 text-xs mr-2 overflow-hidden text-ellipsis max-h-16">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae, dicta? Deserunt obcaecati eveniet
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-                    aut,
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-
-                    odit ipsa maxime.
-                </p>
-            </div>
-        </div>
-        <form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-            <button class="text-red-500 text-xs">حذف</button>
-        </form>
-    </article>
-    <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2  rounded-box" action=""
-        method="post">
-        <div class="flex gap-2">
-            <div class="avatar">
-                <div class="w-24 rounded-box">
-                    <img src="https://i.pravatar.cc/300" class="object-cover" />
-                </div>
-            </div>
-            <div class="flex flex-col basis-full  gap-2 p-1">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-md text-gray-700 mr-2">نام محصول</h2>
-                    <div class="text-xs flex gap-1 text-gray-500">
-                        <i class="bi-star "></i><i class="bi-star"></i><i class="bi-star"></i><i class="bi-star"></i><i
-                            class="bi-star"></i>
-                    </div>
-                </div>
-                <p class="text-gray-400 text-xs mr-2 overflow-hidden text-ellipsis max-h-16">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae, dicta? Deserunt obcaecati eveniet
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-                    aut,
-                    adipisci amet eos quibusdam iusto id, at cupiditate odio aspernatur voluptate tempore doloremque,
-
-                    odit ipsa maxime.
-                </p>
-            </div>
-        </div>
-        <form class="p-2 flex justify-center items-center gap-1" action="" method="post">
-            <button class="text-red-500 text-xs">حذف</button>
-        </form>
-    </article>
+<div class="w-full flex mt-4 justify-center gap-1 tabs">
+    <a href="?state=published" class="tab tab-bordered {% if state == 'published' %}tab-active{% endif %}">تایید
+        شده</a>
+    <a href="?state=notpublished" class="tab tab-bordered  {% if state != 'published' %}tab-active{% endif %}">تایید
+        نشده</a>
 </div>
+<div class="flex flex-col gap-2 h-full w-full">
+    <div class="grid grid-cols-1 md:grid-cols-3 justify-items-center content-start md:mt-8  w-full  gap-2">
+        {% for comment in page.object_list %}
+        <article class="relative bg-base-100 flex flex-col gap-2 items-center shadow-md p-2   rounded-box" action=""
+            method="post">
+            <div class="flex gap-2">
+                <div class="avatar">
+                    <div class="w-24 rounded-box">
+                        <img src="{{comment.product.preview.img.url}}" class="object-cover" />
+                    </div>
+                </div>
+                <div class="flex flex-col basis-full  gap-2 p-1">
+                    <div class="flex justify-between gap-3">
+                        <h2 class="text-sm text-gray-700 mr-2">{{comment.product.name}}</h2>
+                        <div class="text-xs flex gap-1 text-gray-500">
+                            {% for i in comment.prod_rate_complement %}
+                            <i class="bi-star "></i>
+                            {% endfor%}
+                            {% for i in comment.prod_rate %}
+                            <i class="bi-star-fill star-gold "></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-xs mr-2 overflow-hidden text-ellipsis max-h-16">
+                        {{comment.body}}
+                    </p>
+                </div>
+            </div>
+        </article>
+        {% endfor %}        
+    </div>
+    <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
+        <div class="text-sm flex gap-2">
+            {% if  page.has_previous %}
+            <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+            {% endif %}
+            {% for p in page.paginator.page_range %}
+                <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+            {% endfor %}
+            {% if  page.has_next %}
+            <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+            {% endif %}
+        </div>
+    </section>  
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    selectMenu('comments')
+</script>
 {% endblock %}

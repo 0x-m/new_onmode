@@ -1,0 +1,31 @@
+{% extends 'user/dashboard/dashboard.html' %}
+{% load static %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content  %}
+<div class="w-full flex flex-col h-full  justify-center items-center gap-2 p-2 ">
+    {% for product in page.object_list %}
+        <article class="w-full md:w-3/4 flex justify-between items-center bg-white p-2 shadow rounded-box">
+            <div>
+                <img src="{{product.preview.img.url}}" class="h-16 w-16 object-contain rounded-box" alt="">
+            </div>
+            <h2 class="text-xs text-gray-500">{{product.name}}</h2>
+            <div class="flex gap-4 text-[0.6rem]">
+                <span>قیمت: {{ product.compute_price }}</span>
+                <span>تعداد: {{ product.quantity }}</span>
+            </div>
+            <div class="flex gap-2">
+                <button>
+                    <i class="bi-pencil"></i>
+                </button>
+                <button>
+                    <i class="bi-trash"></i>
+                </button>
+            </div>
+        </article>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,17 +1,21 @@
-from contextlib import nullcontext
-from csv import list_dialects
-from attr import fields
+
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django import forms
 
-from .models import CheckoutRequest, User, Address, Wallet
+
+from .models import CheckoutRequest, DepositTransaction, Message, Ticket, TicketReply, TicketType, User, Address, Wallet
 
 from jalali_date.admin import ModelAdminJalaliMixin, StackedInlineJalaliMixin, TabularInlineJalaliMixin	
 from jalali_date import datetime2jalali, date2jalali
 from django.utils.translation import gettext_lazy as _
+from import_export.resources import ModelResource
+from import_export.admin import ExportMixin
+from import_export.fields import Field
+
+
 
 
 class UserCreationForm(forms.ModelForm):
@@ -27,7 +31,6 @@ class AddressInline(admin.StackedInline):
 
 class WalletInline(admin.StackedInline):
     model = Wallet
-    readonly_fields = ['date_last_withdraw']
     
 class UserModelAdmin(UserAdmin):
     
@@ -53,6 +56,10 @@ class UserModelAdmin(UserAdmin):
             'fields': ('groups',),
             
         }),
+        (_('Custom storage'),{
+            'fields': ('use_custom_storage_capcity', 'custom_storage_capacity'),
+            
+        })
 
     )
    ordering = ['phone_num', 'first_name', 'last_name']
@@ -71,14 +78,83 @@ admin.site.register(User, UserModelAdmin)
 class AdminAddress(ModelAdmin):
     list_display = ['full_name', 'province', 'city', 'postal_code']
     
+    
+class CheckoutResource(ModelResource):
+    customer = Field()
+
+    def dehydrate_customer(self, checkout):
+        return checkout.wallet.user.phone_num
+    
+    class Meta:
+        mdoel = CheckoutRequest
+        fields = ['id' ,'customer','amount','merch_card', 'state', 'date_created', 'date_proceeded']    
+        export_order = ['id', 'customer', 
+                        'merch_card', 
+                        'amount',
+                        'wallet__freezed',
+                        'wallet_available', 
+                        'date_created', 
+                        'date_proceeded',]
+
 @admin.register(CheckoutRequest)
-class CheckoutAdmin(ModelAdmin):
+class CheckoutAdmin(ExportMixin,ModelAdmin):
+    resource_class = CheckoutResource
     @admin.display(description='customer')
     def customer(instance):
         return instance.wallet.user.phone_num
 
-    list_display = [customer,'amount', 'state', 'date_created']
+    @admin.display(description='freezed')
+    def freezed(instance):
+        return instance.wallet.freezed
+    
+    @admin.display(description='available')
+    def available(instance):
+        return instance.wallet.available
+    
+    @admin.display(description='fulfill')
+    def fulfill_checkout(model, request, qs):
+        for c in qs:
+            c.fulfill() #TODO: use update bach for ....
+        
+    list_display = [customer,'amount','fee',freezed, available, 'state' ,'date_created']
     fields = [customer, 'merch_card', 'amount', 'call_me', 'state', 'date_created', 'date_proceeded']
     readonly_fields = [customer,'date_created', 'date_proceeded']
+    actions = [fulfill_checkout]
 
-   
+class DepositResource(ModelResource):
+    user = Field()
+    
+    def dehydrate_user(self, deposit):
+        return deposit.wallet.user.phone_num
+    
+    class Meta:
+        model = DepositTransaction
+        fields = ['id','user', 'amount', 'date_committed', 'succeed']
+        export_order = ['id','user', 'amoutn', 'date_committed', 'succeed']
+
+
+@admin.register(DepositTransaction)
+class DepositAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = DepositResource
+    fields  = ['id', 'amount', 'date_committed', 'succeed']
+    readonly_fields = ['id', 'date_committed']
+    
+
+
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ['user', 'type', 'title', 'read']
+    list_filter = ['type', 'read']
+    readonly_fields = ['read']
+    
+
+@admin.register(Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ['user', 'type', 'title', 'closed']
+    list_filte = ['type', 'closed', 'date_created']
+    readonly_fields = ['can_reply', 'replied', 'seen_by_user', 'seen_by_intendant']
+    
+
+@admin.register(TicketType)
+class TicketTypeAdmin(admin.ModelAdmin):
+    list_display = ['title']

@@ -1,6 +1,5 @@
 
 import os
-from attr import field
 from django.db import models
 from django.dispatch import receiver
 from django.http import HttpRequest
@@ -13,20 +12,33 @@ from users.models import User
 from promotions.models import Discount
 from django.urls.base import reverse
 import django_filters
+from django.utils.text import slugify
+from decouple import config
+from onmode.storage_backends import SiteStorage
 
+
+#TODO: move it to utils
+def persian_slugify(txt: str):
+    slug = ''
+    for c in txt:
+        if c not in [' ', ' ', '?', '(', ')', '%', '٪']:
+            slug += c
+        else:
+            slug += '-'
+    return slug
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
     en_name = models.CharField(max_length=50)
-    slug = models.SlugField(blank=True)
-    en_slug = models.SlugField(blank=True)
+    slug = models.SlugField(blank=True, allow_unicode=True, null=True)
+    en_slug = models.SlugField(blank=True, null=True)
     meta_title = models.CharField(max_length=90, blank=True)
     meta_keywords = models.CharField(max_length=100, blank=True)
     meta_description = models.CharField(max_length=100, blank=True)
     parent = models.ForeignKey(to='self',
                                related_name='childs',
                                on_delete=models.CASCADE,
-                               null=True)
+                               null=True, blank=True)
 
     # photo = models.ForeignKey(to='Photo',
     #   on_delete=models.DO_NOTHING,
@@ -35,19 +47,33 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def __str__(self) -> str:
-        return self.name
+        name = self.name
+        if self.parent:
+            name = self.parent.name + '/' + self.name
+        return name
+    
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+        
+            
 
 
 class Shop(models.Model):
+    MAX_PRODUCTS = config('SHOP_MAX_PRODUCT',default=100, cast=int)
     owner = models.ForeignKey(
         to=User, related_name='shops', on_delete=models.SET_NULL, null=True,)
     name = models.CharField(max_length=40)  # TODO: make it unique
-    meta_title = models.CharField(max_length=100)
-    meta_description = models.CharField(max_length=400)
-    # baner = models.ForeignKey(to='Photos', on_delete=models.SET_NULL)
-    # logo = models.ForeignKey(to='Photo', on_delete=models.SET_NULL)
-    address_description = models.TextField(max_length=1000)
-    phone = models.CharField(max_length=20)
+    meta_title = models.CharField(max_length=100, blank=True)
+    meta_description = models.CharField(max_length=400, blank=True)
+    banner = models.ImageField(null=True, blank=True)
+    logo = models.ImageField(null=True, blank=True)
+    address_description = models.TextField(max_length=1000, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    user_custom_product_capacity = models.BooleanField(default=False)
     product_capacity = models.PositiveIntegerField(default=100)
     product_count = models.PositiveIntegerField(default=0)
     fee = models.PositiveIntegerField(default=9)
@@ -56,7 +82,10 @@ class Shop(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def has_capacity(self):
-        return self.product_capacity > self.product_count
+        capacity = self.MAX_PRODUCTS
+        if self.user_custom_product_capacity:
+            capacity = self.product_capacity
+        return capacity > self.product_count
 
     @property
     def owner_phone(self):
@@ -65,7 +94,7 @@ class Shop(models.Model):
 
     def inc_product_count(self):
         if not self.has_capacity():
-            return  # NOTE: raising Exception..??
+            return Exception('max allowd product restriction')  # NOTE: raising Exception..??
 
         self.product_count += 1
         self.save()
@@ -77,8 +106,13 @@ class Shop(models.Model):
         self.save()
 
     def __str__(self) -> str:
-        return self.meta_title
+        return self.name
 
+
+@receiver(post_save, sender=Shop)
+def set_has_shop(sender, instance, created, **kwawrgs):
+    if created:
+        instance.owner.has_shop = True
 
 @receiver(pre_delete, sender=Shop)
 def has_shop_hadler(sender, instance, **kwargs):
@@ -93,7 +127,8 @@ class Option(models.Model):
         Boolean = 'BOL', 'Boolean'
         Choices = 'CHO', 'Choices'
         MultiChoices = 'CHS', 'MultiChoices'
-
+    
+    fa_name = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=20, unique=True)
     type = models.CharField(max_length=3,
                             choices=TYPES.choices,
@@ -151,13 +186,13 @@ class Product(models.Model):
         max_length=20, default=generate_code, editable=False)
     category = models.ForeignKey(
         to=Category, related_name='products', on_delete=models.CASCADE, null=True)
-    name = models.CharField(max_length=50, blank=False, null=False)
-    en_name = models.CharField(max_length=50, blank=True, null=False)
-    slug = models.SlugField(blank=True, null=True)
+    name = models.CharField(max_length=50, blank=False, null=False, db_index=True)
+    en_name = models.CharField(max_length=50, blank=True, null=False, db_index=True)
+    slug = models.SlugField(blank=True, null=True, allow_unicode=True)
     en_slug = models.SlugField(null=True, blank=True)
-    meta_title = models.CharField(max_length=255, blank=True)
-    meta_description = models.CharField(max_length=255, blank=True)
-    meta_keywords = models.CharField(max_length=255, blank=True)
+    meta_title = models.CharField(max_length=255, blank=True, db_index=True)
+    meta_description = models.CharField(max_length=255, blank=True, db_index=True)
+    meta_keywords = models.CharField(max_length=255, blank=True, db_index=True)
     sku = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField(default=0, blank=False)
     stock_low_threshold = models.IntegerField(default=1)
@@ -180,6 +215,55 @@ class Product(models.Model):
     discount = models.ForeignKey(to=Discount,
                                  on_delete=models.SET_NULL,
                                  null=True, blank=True)
+    relateds = models.ManyToManyField(to='self')
+
+
+
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+
+    @property
+    def colors(self):
+        try:
+            colors = Option.objects.get(name='color').choices
+            product_colors = self.options.get(
+                option__name='color').value.split(',')
+            res = []
+            for color in colors:
+                if str(color['id']) in product_colors:
+                    res.append(color)
+            return res
+        except:
+            pass
+
+
+    @property
+    def sizes(self):
+        try:
+            sizes = Option.objects.get(name='size').choices
+            product_colors = self.options.get(option__name='size').value.split(',')
+            res = []
+            for size in sizes:
+                if str(size['id']) in product_colors:
+                    res.append(size)
+            
+            return res
+        except:
+            pass       
+    
+    
+    @property
+    def get_shipping_cost(self):
+        if self.free_shipping:
+            return 0
+        else:
+            return self.shipping_cost
 
     @property
     def is_available(self) -> bool:
@@ -233,6 +317,9 @@ class Product(models.Model):
 
         return price
 
+    def __str__(self) -> str:
+        return self.name + f'({self.id})'
+
 def get_brand(request: HttpRequest):
     if request is None:
         return Product.objects.none()
@@ -251,8 +338,8 @@ class ProductFilter(django_filters.FilterSet):
     brands = django_filters.CharFilter(method='brand_filter')
     colors = django_filters.CharFilter(method='color_filter')
     sizes = django_filters.CharFilter(method='filter_size')
-
-
+    has_sales = django_filters.BooleanFilter(field_name='has_sales')
+    orderby = django_filters.CharFilter(method='order_by')
     def brand_filter(self, queryset, name, value):
         ls = self.request.GET.getlist('brands')
         return queryset.filter(options__option__name='brand', options__value__in=ls)
@@ -282,6 +369,20 @@ class ProductFilter(django_filters.FilterSet):
         return queryset.filter(options__option__name='size', options__option__regex=rx)
         
     
+    def order_by(self, queryset, name, value):
+        if value == 'newest':
+            return queryset.order_by('-date_created')
+        elif value == 'popular':
+            return queryset.order_by('-stats__likes')
+        elif value == 'bestselling':
+            return queryset.order_by('-stats__sales')
+        elif value == 'hot':
+            return queryset.order_by('-stats__comments')
+            
+        return queryset
+
+        
+        
     
     class Meta:
         model = Product
@@ -291,15 +392,6 @@ class ProductFilter(django_filters.FilterSet):
 
 
 
-@receiver(post_save, sender=Product)
-def create_stats(sender, instance, created, **kwargs):
-    if created:
-        ProductStats.objects.get_or_create(product=instance)
-
-
-# TODO: stores similarity between products....
-# class RelatedProduct(models.Model):
-#     pass
 
 
 class ProductStats(models.Model):
@@ -309,9 +401,9 @@ class ProductStats(models.Model):
     views = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     comments = models.IntegerField(
         default=0, validators=[MinValueValidator(0)])
-    sales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    # sales = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     likes = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    fails = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    # fails = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     rates_avg = models.FloatField(default=0, validators=[
         MinValueValidator(0), MaxValueValidator(5)
     ])
@@ -325,6 +417,10 @@ class ProductStats(models.Model):
         return range(5 - len(self.rate))
         
 
+    @property
+    def number_of_sells(self):
+        return self.product.orders.filter(order__state='fulfilled').count()
+    
     def inc_views(self):
         self.views += 1
         self.save()
@@ -340,9 +436,11 @@ class ProductStats(models.Model):
         self.rates_avg = new_rate_avg
         self.save()
 
-    def dec_comments(self):
+    def dec_comments(self, rate):
         if (self.comments > 0):
+            new_rate_avg = (self.comments * self.rates_avg - rate) / (self.comments - 1)
             self.comments -= 1
+            self.rates_avg = new_rate_avg
             self.save()
 
     def inc_likes(self):
@@ -354,35 +452,44 @@ class ProductStats(models.Model):
             self.likes -= 1
             self.save()
 
-    def inc_sales(self):
-        self.sales += 1
-        self.save()
+    # def inc_sales(self):
+    #     self.sales += 1
+    #     self.save()
 
-    def dec_sales(self):
-        if (self.sales > 0):
-            self.sales -= 1
-            self.save()
+    # def dec_sales(self):
+    #     if (self.sales > 0):
+    #         self.sales -= 1
+    #         self.save()
 
-    def inc_fails(self):
-        self.fails += 1
-        self.save()
+    # def inc_fails(self):
+    #     self.fails += 1
+    #     self.save()
 
-    def dec_fails(self):
-        if (self.fails > 0):
-            self.fails -= 1
-            self.save()
+    # def dec_fails(self):
+    #     if (self.fails > 0):
+    #         self.fails -= 1
+    #         self.save()
+    
+    
+
+
+@receiver(post_save, sender=Product)
+def create_stats(sender, instance, created, **kwargs):
+    if created:
+        ProductStats.objects.get_or_create(product=instance)
+
 
 
 # TODO: create a stats for shop
 
 
 class Collection(models.Model):
-    products = models.ManyToManyField(to=Product, related_name='collections')
+    products = models.ManyToManyField(to=Product, related_name='collections', blank=True)
     featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40, unique=True)
     en_name = models.CharField(max_length=40, unique=True)
-    slug = models.SlugField(editable=False, blank=True)
-    en_slug = models.SlugField(editable=False, blank=True)
+    slug = models.SlugField(editable=False, blank=True, null=True, allow_unicode=True)
+    en_slug = models.SlugField(editable=False, blank=True, null=True)
     slogan = models.CharField(max_length=1000, blank=True)
     meta_title = models.CharField(max_length=40, blank=True)
     meta_description = models.CharField(max_length=90, blank=True)
@@ -392,9 +499,9 @@ class Collection(models.Model):
     prefer_collection_discount = models.BooleanField(default=False)
     page_poster_alt = models.CharField(max_length=255, blank=True)
     page_poster_url = models.URLField(blank=True, null=True)
-    page_poster = models.ImageField(null=True, blank=True)
+    page_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
     index_view = models.BooleanField(default=False)
-    index_poster = models.ImageField(null=True, blank=True)
+    index_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
     index_poster_url = models.URLField(null=True, blank=True)
     index_poster_link = models.URLField(blank=True, null=True)
     index_poster_alt = models.CharField(max_length=255, blank=True)
@@ -408,8 +515,18 @@ class Collection(models.Model):
         return featureds
     
     def get_absolute_url(self):
-        return reverse('catalogue:collection', kwargs={'collection_name':self.en_name})
+        return reverse('catalogue:collection', kwargs={'slug':self.en_slug})
+    
+    def save(self, *args, **kwargs):
+        if self.en_name:
+            self.en_slug = slugify(self.en_name)
+        if self.name:
+            self.slug = persian_slugify(self.name)
+        super().save(*args, **kwargs)
+        
 
+
+    
 
 class ProductOptionValue(models.Model):
     product = models.ForeignKey(
@@ -430,7 +547,11 @@ class Photo(models.Model):
     img = models.ImageField(upload_to=generate_path)
     url = models.URLField(null=True)
     alt = models.CharField(max_length=255, blank=True)
-
+    
+    def get_photo(self):
+        if self.img:
+            return self.img.url
+        return None
 
 
 class Comment(models.Model):
@@ -439,6 +560,16 @@ class Comment(models.Model):
     body = models.TextField()
     published = models.BooleanField(default=False)
     rate = models.PositiveBigIntegerField()
+    date_created = models.DateTimeField(default=timezone.now)
+    
+    @property
+    def prod_rate(self):
+        return range(self.rate)
+    
+    @property
+    def prod_rate_complement(self):
+        return range(5 - self.rate)
+    
     
 
 @receiver(post_save, sender=Comment)
@@ -448,7 +579,7 @@ def increase_comments(sender, instance: Comment, created, **kwargs):
 
 @receiver(pre_delete, sender=Comment)
 def decrease_comment(sender, instance, **kwargs):
-    instance.product.stats.dec_comments()
+    instance.product.stats.dec_comments(instance.rate)
     
     
    

@@ -6,12 +6,14 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        <link rel="stylesheet" href="{% static 'css/main.min.css' %}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Harmattan&family=Lemonada&display=swap"
             rel="stylesheet">
+        <link rel="icon"  href="{% if siteinfo.favicon %}{{siteinfo.favicon}}{% endif %}">
+
 
         <style>
             * {
@@ -24,12 +26,22 @@
     </head>
 
     <body class="bg-stone-50 min-h-full ">
+        {% if siteinfo.show_pinned_message %}
+        <div style="background-color: {{siteinfo.pinned_color}}; color: {{siteinfo.pinned_text_color}};"
+            class="w-full p-2">
+            <a href="{{siteinfo.pinned_url}}">
+                <p class="w-full text-xs">
+                    {{siteinfo.pinned_message}}
+                </p>
+            </a>
+        </div>
+        {% endif %}
         <header class="w-full bg-white shadow">
             <nav class="navbar bg-base-100 gap-1 ">
                 <div class="flex-1 gap-2 p-1 basis-12">
-                    <a href="{% url 'index' %}">
-                        <img src="https://i.pravatar.cc/300" class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full"
-                            alt="">
+                    <a href="{% url 'index:index' %}">
+                        <img src="{% if siteinfo.logo %}{{siteinfo.logo.url}}{% endif %}" class="w-8 h-8 md:h-12 md:w-12 object-cover rounded-full"
+                            alt="logo">
                     </a>
                     <div class="form-control w-full mr-2">
                         <div class="border items-center p-0 rounded-box bg-stone-50 flex gap-2 ">
@@ -48,39 +60,61 @@
                 </div>
                 <div class="flex-none">
                     {% if user.is_authenticated %}
-                        <div tabindex="0" dir="ltr" class="dropdown  dropdown-hover">
-                            <a tabindex="0" class="btn btn-ghost btn-circle ">
+                    <div tabindex="0" dir="ltr" class="dropdown  dropdown-hover">
+                        <a tabindex="0" class="btn btn-ghost btn-circle ">
+                            <div class="indicator">
+                                {% if not user.new_messages == 0 %}
+                                <span class="badge badge-error badge-sm text-white indicator-item">{{user.new_messages}}</span>
+                                {% endif %}
                                 <i class="bi-person text-xl md:text-3xl "></i>
-                            </a>
-                            <ul tabindex="0" dir="rtl"
-                                class="dropdown-content menu menu-vertical menu-compact w-48 p-2 rounded-box shadow bg-base-100">
-                                <li>
-                                    <a href="{% url 'users:dashboard' %}" class="text-xs">
-                                        <i class="bi-person text-lg"></i>
-                                        داشبورد
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'users:messages' %}" class="text-xs">
-                                        <i class="bi-bell text-lg"></i>
-                                        پیامها
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="" class="text-xs text-error">
-                                        <i class="bi-box-arrow-in-right text-lg"></i>
-                                        خروج
-                                    </a>
-                                </li>
+                            </div>
+                        </a>
 
-                            </ul>
-                        </div>
-                        {% endif  %}
+                        <ul tabindex="0" dir="rtl"
+                            class="dropdown-content menu menu-vertical menu-compact w-48 p-2 rounded-box shadow bg-base-100">
+                            <li>
+                                <a href="{% url 'users:dashboard' %}" class="text-xs">
+                                    <i class="bi-person text-lg"></i>
+                                    {{user.phone_num}}
+
+                                </a>
+                            </li>
+                            <li>
+                                {% if user.shop %}
+                                <a href="{% url 'shop' user.shop.name %}" class="text-xs">
+                                    <i class="bi-shop text-lg"></i>
+                                    بوتیک من
+                                </a>
+                                {% else %}
+                                <a href="{% url 'users:create-shop' %}" class="text-xs">
+                                    <i class="bi-shop text-lg"></i>
+                                    ساخت بوتیک
+                                </a>
+                                {% endif %}
+                            </li>
+                            <li>
+                                <a href="{% url 'users:messages' %}" class="text-xs">
+                                    <i class="bi-bell text-lg"></i>
+                                    پیامها
+                                    <div class="badge badge-error text-white badge-xs p-1">{{user.new_messages}}</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:signout' %}" class="text-xs text-error">
+                                    <i class="bi-box-arrow-in-right text-lg"></i>
+                                    خروج
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+
+                    {% endif  %}
 
                     <a href="{% url 'orders:cart' %}" tabindex="0" class="btn btn-ghost btn-circle ">
                         <div class="indicator">
                             <i class="bi-bag text-xl md:text-2xl "></i>
-                            <span class="badge badge-primary badge-sm indicator-item">10</span>
+                            <span id="cart-badge" class="badge badge-primary badge-sm indicator-item">{{user.cart_count}}</span>
                         </div>
                     </a>
                 </div>
@@ -92,10 +126,10 @@
                 <ul
                     class="menu menu-horizontal md:menu-vertical isolate  z-50 bg-base-100 p-0 md:p-2 shadow-md text-sm  rounded-box">
                     <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <label tabindex="0">
+                        <a id="profile" tabindex="0">
                             <i class="bi-person md:text-xl"></i>
                             <span class="hidden md:block">مشخصات</span>
-                        </label>
+                        </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             <li>
                                 <a href="{% url 'users:profile' %}">
@@ -103,6 +137,7 @@
                                     <span>ویرایش مشخصات</span>
                                 </a>
                             </li>
+
                             <li>
                                 <a href="{% url 'users:wallet' %}">
                                     <i class="bi-wallet"></i>
@@ -119,10 +154,10 @@
                         </ul>
                     </li>
                     <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
-                        <label tabindex="0">
+                        <a id="shop" tabindex="0">
                             <i class="bi-shop md:text-xl"></i>
                             <span class="hidden md:block">فروشگاه</span>
-                        </label>
+                        </a>
                         <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
                             {% if user.has_shop %}
                             <li>
@@ -154,40 +189,103 @@
 
                         </ul>
                     </li>
+                    <li class="dropdown dropdown-top dropdown-end dropdown-hover md:dropdown-left">
+                        <a id="messages" href="{% url 'users:messages' %}">
+                            <i class="bi-envelope md:text-xl"></i>
+                            <span class="hidden md:block">پیام رسانی</span>
+                        </a>
+                        <ul class="dropdown-content menu p-2 bg-base-100 rounded-box shadow-md w-52">
+                            <li>
+                                <a href="{% url 'users:create-ticket' %}">
+                                    <i class="bi-plus"></i>
+                                    <span>ارسال تیکت جدید</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:all-tickets' %}">
+                                    <i class="bi-ticket"></i>
+                                    <span>همه تیکتها</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:messages' %}">
+                                    <i class="bi-bell"></i>
+                                    <span>همه پیامها</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <li>
-                        <a href="{% url 'users:favourites' %}" class="active">
+                        <a id="favourites" href="{% url 'users:favourites' %}">
                             <i class="bi-heart md:text-xl"></i>
                             <span class="hidden md:block">علایق</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'users:comments' %}">
+                        <a id="comments" href="{% url 'users:comments' %}">
                             <i class="bi-chat md:text-xl"></i>
                             <span class="hidden md:block">دیدگاهها</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'orders:user_orders' %}">
+                        <a id="orders" href="{% url 'orders:user_orders' %}">
                             <i class="bi-bag-check md:text-xl"></i>
                             <span class="hidden md:block">سفارشها</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{% url 'users:messages' %}">
-                            <i class="bi-envelope md:text-xl"></i>
-                            <span class="hidden md:block">پیامها</span>
-                        </a>
-                    </li>
+
 
                 </ul>
             </section>
-            <section class="md:basis-5/6 p-2">
+            <section class="md:basis-5/6 p-2 h-full">
                 {% block content %}
+                <section class="flex flex-col gap-2 w-full h-full justify-center  p-1">
+                    <div class="md:w-3/4 flex flex-col md:flex-row gap-2">
+                        <div class="bg-base-100 rounded-box p-2 w-full md:w-1/3 flex flex-col ">
+                            <h2 class="text-center text-gray-500 ">کیف پول</h2>
+                            <div class="flex justify-between p-1 gap-2 mt-2">
+                                <span>کل موجودی:</span>
+                                <span>{{user.wallet.total}} تومان</span>
+                            </div>
+                            <div class="flex text-green-500 justify-between p-1 gap-2 mt-2">
+                                <span>قابل برداشت:</span>
+                                <span>{{user.wallet.available}} تومان</span>
+                            </div>
+                            <div class="flex text-red-500 justify-between p-1 gap-2 mt-2">
+                                <span>غیر قابل برداشت:</span>
+                                <span>{{user.wallet.freezed}} تومان</span>
+                            </div>
+
+                        </div>
+                        <section class="w-full md:w-2/3 bg-white rounded-box p-1">
+                            <h1 class="text-center text-xs ">آخرین پیامها</h1>
+                        </section>
+
+                    </div>
+                    <div class="md:w-3/4 flex flex-col md:flex-row gap-2">
+                        <div class="md:w-1/2 bg-white rounded-box p-1 ">
+                            <h1 class="text-center text-sm text-gray-600">اخرین سفارشها</h1>
+                        </div>
+                        <div class="md:w-1/2 bg-white rounded-box p-1 ">
+                            <h1 class="text-center text-sm text-gray-600">اخرین سفارشهای بوتیک</h1>
+                        </div>
+
+                    </div>
+                </section>
                 {% endblock %}
             </section>
         </main>
-        <footer></footer>
+        <script>
+            function selectMenu(id) {
+                let list = document.getElementById(id).classList;
+                list.add('active');
+                console.log(id, 'aaa');
+            }
+
+        </script>
+        <script defer src="{% static 'js/function.min.js' %}"></script>
         {% block scripts %}
+
         {% endblock %}
     </body>
 

@@ -1,8 +1,8 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
-
+{% load jalali_tags%}
 {% block title %}
-
+سفارش با کد {{order.code}}
 {% endblock %}
 
 {% block content  %}
@@ -15,6 +15,10 @@
             <div class="flex flex-col gap-2 ">
                 <h2>{{item.product.name}}</h2>
                 <div class="flex gap-3">
+                    <div class="flex gap-1 text-xs text-gray-400">
+                        <span>تعداد:</span>
+                        <span>{{item.quantity}}</span>
+                    </div>
                     {% for key, val in item.options.items %}
                     <div class="flex gap-1 text-xs text-gray-400">
                         <span>{{key}}:</span>
@@ -74,15 +78,15 @@
             </div>
             <div class="flex justify-between">
                 <span>تاریخ ثبت:</span>
-                <span>{{order.date_created}}</span>
+                <span>{{order.date_created|to_jalali:'%y/%m/%d'}}</span>
             </div>
             <div class="flex justify-between">
                 <span>تاریخ ارسال:</span>
-                <span>{{order.date_sent}}</span>
+                <span>{{order.date_sent|to_jalali:'%y/%m/%d'}}</span>
             </div>
             <div class="flex justify-between">
                 <span>تاریخ دریافت:</span>
-                <span>{{order.date_fulfilled}}</span>
+                <span>{{order.date_fulfilled|to_jalali:'%y/%m/%d'}}</span>
             </div>
 
         </div>
@@ -94,7 +98,7 @@
             </div>
             <div class="flex justify-between">
                 <span>شماره تماس:</span>
-                <span>{{order.address.phone}}</span>
+                <span>{{order.address.phone_number}}</span>
             </div>
             <div class="flex justify-between">
                 <span>استان:</span>
@@ -120,12 +124,12 @@
         <div class="flex flex-col gap-2 bg-stone-50 p-2 rounded-box">
             {% with order.state as state %}
                 {% if state == 'pending' %}
-                <form action="{% url 'orders:cancel' %}">
+                <form action="{% url 'orders:cancel' %}" class="flex flex-col">
                     {% csrf_token %}
                     <input type="hidden" name="order_id" value="{{order.id}}">
-                    <textarea name="cancel_msg" class="textarea textarea-bordered" placeholder="علت لغو" id="" cols="30"
+                    <textarea name="cancel_msg" class="textarea textarea-bordered" placeholder="علت لغو" id="" 
                         rows="2"></textarea>
-                    <button type="submit" class="btn btn-outline basis-1/2 btn-error mt-4">لغو</button>
+                    <button type="submit" class="btn btn-outline  btn-error mt-4">لغو</button>
                 </form>
                 {% elif state == 'Rejected'  %}
                     <h2 class="text-md text-error text-center">سفارش توسط فروشنده لغو شده است</j2>

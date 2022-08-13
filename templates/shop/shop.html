@@ -1,19 +1,32 @@
 {% extends '../base.html' %}
 {% load static %}
 {% load options  %}
+
+
+{% block head %}
+<meta name="description" property="og:description" content="{{shop.meta_description}}">
+<meta name="author" content="{{shop.owner.full_name}}">
+<meta name="keywords" content="{{shop.meta_keywords}}">
+{% endblock %}
+{% block title %}
+{{shop.meta_title}}
+{% endblock %}
 {% block content %}
 
-<img src="https://source.unsplash.com/p-I9wV811qk/1920x1047
-" class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
+{% if shop.banner %}
+<img loading="lazy" src="{{shop.banner.url}}" 
+class=" w-full   h-60 md:h-96  object-cover  shadow " alt="">
+{% endif %}
 <div class="w-full mt-2 p-1 md:hidden">
     <button onclick="openFilter();" class="btn btn-primary">فیلتر</button>
 </div>
+{% csrf_token %}
 <div class="flex gap-2">
-    <section id="filter"
+    <form id="filter" action="{% url 'catalogue:filter' shop.name %}"
         class="md:basis-1/4 fixed hidden md:w-1/4 md:static  top-0 w-3/4 md:bg-stone-50  md:rounded-box md:mr-4  bg-white md:flex flex-col md:mt-6 z-50 overflow-auto h-screen md:h-full md:ml-2 md:shadow-none shadow-md">
         <section class=" p-3   flex flex-col gap-2">
             <div class="md:hidden flex justify-end">
-                <button onclick="openFilter();">
+                <button type="button" onclick="openFilter();">
                     <i class="bi-x text-2xl"></i>
                 </button>
             </div>
@@ -105,15 +118,16 @@
 
         <section class="flex flex-col">
             <h2 class="text-blue-500 text-sm text-center p-2">قیمت</h2>
+            <span class="text-[0.6rem] text-center text-gray-400">به تومان</span>
             <div class="flex gap-2 p-2 justify-center">
-                <input placeholder="از" class="w-1/2 input-md input input-bordered" type="text" name="" id="">
-                <input placeholder="تا" class="w-1/2 input-md input input-bordered" type="text" name="" id="">
+                <input placeholder="از" class="w-1/2 input-md input input-bordered" type="text" name="price__gt" id="">
+                <input placeholder="تا" class="w-1/2 input-md input input-bordered" type="text" name="price__lt" id="">
             </div>
             <div class="form-control p-1 pr-2">
                 <label class="label cursor-pointer w-fit">
-                    <input type="checkbox" class="checkbox checkbox-primary " name="discount" value="{{sub_4.id}}"
+                    <input type="checkbox" class="checkbox checkbox-primary " name="has_sales" value="true"
                         id="">
-                    <span class="label-text text-xs mr-2">تخفیف دار</span>
+                    <span class="label-text text-xs mr-2">حراج شده</span>
                 </label>
             </div>
         </section>
@@ -126,7 +140,7 @@
             {% for color in colors.choices %}
             <div class="form-control">
                 <label class="rounded-full   group cursor-pointer">
-                    <input name="value" type="checkbox" value="{{color.id}}" class="appearance-none peer">
+                    <input name="colors" type="checkbox" value="{{color.id}}" class="appearance-none peer">
                     <div style="background-color:{{color.code}};"
                         class="rounded-full w-4 h-4 outline outline-transparent outline-2 peer-checked:outline-primary outline-offset-2">
                     </div>
@@ -144,7 +158,7 @@
             {% for size in sizes.choices %}
             <div class="form-control">
                 <label class="rounded-full p-1 group cursor-pointer">
-                    <input name="value" type="checkbox" value="{{size.id}}" class="appearance-none peer">
+                    <input name="sizes" type="checkbox" value="{{size.id}}" class="appearance-none peer">
                     <div class="text-center    peer-checked:bg-primary peer-checked:text-white p-1">
                         {{size.code}}
                     </div>
@@ -154,29 +168,36 @@
         </div>
         {% else %}
         {% endif %}
-        <div class="flex flex-col gap-2">
-
+        <div class="flex  gap-2 mt-8 items-center">
+            <h2 class="text-sm text-blue-600 basis-1/3">مرتب سازی:</h2>
+            <select name="orderby" class="select text-sm select-bordered basis-1/2 w-1/2 mx-auto select-sm" id="">
+                <option value="newest" selected>جدیدترین</option>
+                <option value="popular">مجبوبترین</option>
+                <option value="bestselling">پرفروش ترین</option>
+                <option value="hot">داغترین</option>
+            </select>
         </div>
         <div class="p-3 justify-center w-full">
             <button class="btn btn-primary w-full">فیلتر</button>
         </div>
-    </section>
+    </form>
 
 
     <section class="w-full md:basis-3/4">
         <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
-            {% for product in shop.products.all %}
+            {% for product in page.object_list %}
+            {% if not product.deleted %}
             <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
                 method="post">
-                <a href="">
-                    <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                <a href="{% url 'catalogue:product_detail' product.prod_code %}">
+                    <img loading="lazy" src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
                         alt="{{product.preview.img.alt}}">
                 </a>
                 <div class="flex justify-between w-full items-center">
                     <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
                     <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
                         {% for i in product.stats.rate %}
-                        <i class="bi-star-fill "></i>
+                        <i class="bi-star-fill text-yellow-500 "></i>
                         {% endfor %}
                         {% for i in product.stats.rate_complement %}
                         <i class="bi-star "></i>
@@ -197,21 +218,21 @@
                 </div>
                 <div class="flex items-center justify-center w-full gap-1 ">
                     {% if not product.shop == user.shops.first %}
-                    <button onclick="addToCart(this);" data-pid="{{product.id}}"
+                    <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
                         class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-bag text-gray  text-xl"></i>
                     </button>
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <button onclick="like(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}" class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-heart text-gray  text-xl"></i>
                     </button>
                     {% else  %}
-                    <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                    <a href="{% url 'users:edit-product' product.id %}"
                         class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-pencil text-gray  text-xl"></i>
-                    </button>
-                    <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    </a>
+                    <a href="{% url 'users:delete-product' product.id %}" class="btn btn-ghost btn-sm btn-circle text-md">
                         <i class="bi-trash text-gray  text-xl"></i>
-                    </button>
+                    </a>
                     {% endif  %}
 
                 </div>
@@ -225,9 +246,27 @@
                     class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
                 {% endif %}
             </article>
+            {% endif %}            {% empty %}
+            <div class="flex h-screen w-full gap-4 col-span-4 items-center justify-center">
+                <i class="bi-emoji-frown text-4xl text-gray-500"></i>
+                <h1 class="text-sm">هیچ محصولی پیدا نشد!</h1>
+            </div>
+        
             {% endfor %}
         </section>
-
+        <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
+            <div class="text-sm flex gap-2">
+                {% if  page.has_previous %}
+                <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+                {% endif %}
+                {% for p in page.paginator.page_range %}
+                    <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+                {% endfor %}
+                {% if  page.has_next %}
+                <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+                {% endif %}
+            </div>
+        </section>
     </section>
 </div>
 {% endblock %}
@@ -242,5 +281,5 @@
         filter.classList.toggle('hidden');
     }
 </script>
-<script defer src="{% static 'js/functinos.js' %}"></script>
+<script defer src="{% static 'js/functinos.min.js' %}"></script>
 {% endblock %}

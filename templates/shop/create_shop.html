@@ -2,67 +2,74 @@
 {% load static %}
 
 {% block title %}
-
+درخواست ساخت بوتیک
 {% endblock %}
 
 {% block content  %}
-<div class="flex flex-col md:flex-row md:mt-8 items-center justify-center w-full h-full gap-2">
+<div class="flex flex-col md:flex-row md:mt-8 mb-20 items-center justify-center w-full h-full gap-2">
     <form class=" p-3 w-11/12 md:w-1/3 bg-base-100 rounded-box shadow flex flex-col gap-2"
         action="{% url 'users:create-shop' %}" method="post">
         {% if shop_req  %}
 
         {% if shop_req.rejected %}
 
-            <div class="w-full  flex flex-col gap-2 items-center justify-center">
-                <i class="bi-shop text-primary text-7xl"></i>
-                <p class="text-gray-500 text-sm">
-                    با ساخت بوتیک...
-                </p>
-            </div>
-            <div class="divider -mt-1 w-2/3 mx-auto"></div>
+        <div class="w-full  flex flex-col gap-2 items-center justify-center">
+            <i class="bi-shop text-primary text-7xl"></i>
             <h4 class="text-center text-md text-gray-800 mb-2">درخواست ساخت بوتیک</h4>
-            <p class="text-error text-sm text-center">
-                {{shop_req.reject_status}}
-            </p>
-            <div class="flex gap-1 p-2 items-center" dir="ltr">
-                <span class="w-1/4 text-gray-500">onmode.ir/</span>
-                <input name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 input input-bordered p-1"
-                    type="text" required value="{% if shop_req.rejected %}{{shop_req.name}}{% endif %}">
-            </div>
-            <p class="text-xs text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ باشد.</p>
-            <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
-                value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
-           
-            <button type="submit" class="btn btn-primary">ثبت درخواست</button>
+        </div>
+        <div class="divider -mt-1 w-2/3 mx-auto"></div>
+        <p class="text-error text-sm text-center">
+            {{shop_req.reject_status}}
+        </p>
+        <div class="flex gap-1 p-2 items-center" dir="ltr">
+            <span class="w-1/4 text-gray-500">onmode.ir/</span>
+            <input onblur="check_shop(this);" name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 input input-bordered p-1"
+                type="text" required value="{% if shop_req.rejected %}{{shop_req.name}}{% endif %}">
+            <h2 class="text-[0.6re] text-error text-center">این نام در دسترس نمیباشد.</h2>
+        </div>
+        <p id="name_error" class="text-white hidden text-sm bg-error rounded-box w-ful p-2 text-center">
+            این نشانی در دسترس نمیباشد
+        </p>
+
+        <p class="text-[0.5rem] w-full text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ
+            باشد.</p>
+        <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
+            value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
+
+        <button type="submit" class="btn btn-primary">ثبت درخواست</button>
 
         {% else %}
-            <i class="bi-emoji-heart-eyes text-blue-400 text-5xl mx-auto"></i>
-            <span class="text-sm text-blue-400  text-center">درخواست شما ثبت شده است و درحال بررسی است</span>
+        <i class="bi-emoji-heart-eyes text-blue-400 text-5xl mx-auto"></i>
+        <span class="text-sm text-blue-400  text-center">درخواست شما ثبت شده است و درحال بررسی است</span>
         {% endif %}
 
         {% else %}
         <div class="w-full  flex flex-col gap-2 items-center justify-center">
             <i class="bi-shop text-primary text-7xl"></i>
-            <p class="text-gray-500 text-sm">
-                با ساخت بوتیک...
-            </p>
+            <h4 class="text-center text-md text-gray-800 mb-2">درخواست ساخت بوتیک</h4>
+
         </div>
         <div class="divider -mt-1 w-2/3 mx-auto"></div>
-        <h4 class="text-center text-md text-gray-800 mb-2">درخواست ساخت بوتیک</h4>
         <div class="flex gap-1 p-2 items-center" dir="ltr">
             <span class="w-1/4 text-gray-500 text-xs">onmode.ir/</span>
-            <input name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 text-xs input input-bordered p-1"
+            <input onblur="check_email(this);" name="name" placeholder="نشانی اینترنتی به انگلیسی " class="w-3/4 text-xs input input-bordered p-1"
                 type="text" required>
+
         </div>
-        <p class="text-xs text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ باشد.</p>
+        <p id="name_error" class="text-white hidden text-sm bg-error rounded-box w-ful p-2 text-center">
+            این نشانی در دسترس نمیباشد
+        </p>
+        <p class="text-[0.6rem] w-full text-error p-2">نشانی اینترنتی تنها میتواند شامل حروف و اعداد انگلیسی و علامت ـ
+            باشد.</p>
         <input name="title" placeholder="نام بوتیک به فارسی" class="input input-bordered p-1" type="text" required
             value="{% if shop_req.rejected %}{{shop_req.title}}{% endif %}">
-        <button type="submit" class="btn btn-primary">ثبت درخواست</button>
-
+        <button id="submit_button" type="submit" class="btn btn-primary">ثبت درخواست</button>
+      
         {% endif %}
         {% csrf_token %}
     </form>
     {% if not shop or  shop_req.rejected %}
+    {% comment %}
     <div class="bg-white rounded-box shadow-md w-11/12 md:w-1/3 md:basis-1/3 p-2 flex flex-col">
         <div class="flex gap-2 p-2">
             <p class="text-xs text-gray-400">
@@ -95,6 +102,44 @@
             </p>
         </div>
     </div>
+    {% endcomment %}
+    <div class="bg-white rounded-box shadow-md mb-32 w-11/12 md:w-1/3 md:basis-1/3 p-2 ">
+        {{guide.content|safe}}
+    </div>
     {% endif %}
+
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script defer>
+    selectMenu('shop')
+
+    function check_shop(sender) {
+        const name = sender.value;
+        const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        const error_box = document.getElementById('name_error');
+        const submit = document.getElementById('submit_button');
+        fetch('/catalogue/shop/check_name/' + name ).then(res => {
+            if (res.status == 200) {
+                res.json().then(data => {
+                    const status = data['status'];
+                    if (status == 'available') {
+                        error_box.classList.add('hidden');
+                        submit.disabled = false;
+                    }
+                    else if (status == 'unavailable') {
+                        submit.disabled = true;
+                        error_box.classList.remove('hidden');
+                    }
+                });
+            }
+            else {
+            }
+        })
+    }
+</script>
+
 {% endblock %}

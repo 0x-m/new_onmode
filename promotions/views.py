@@ -1,3 +1,11 @@
+
+'''
+
+author: hamze ghaedi (github: 0x-m)
+
+'''
+
+
 from django.http import HttpRequest, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.decorators import login_required

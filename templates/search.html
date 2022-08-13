@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load options  %}
+
+{% block title %}
+نتایج جستجو
+{% endblock %}
+
+{% block content %}
+
+{% comment %}
+{% if collection.page_poster_url %}
+<img src="{{collection.page_poster_url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+    alt="{{collectin.page_poster_alt}}">
+
+{% elif collection.page_poster %}
+<img src="{{collection.page_poster.url}}" class=" w-full   h-60 md:h-96  object-cover  shadow "
+    alt="{{collectin.page_poster_alt}}">
+{% endif %}
+{% endcomment %}
+<section class=" w-full  md:w-3/4 md:basis-3/4 mx-auto">
+    {% comment %}
+    <h2 class="p-2 mt-8 text-2xl text-center">{{collection.name}}</h2>
+    <h4 class="p-1 text-center text-xs">{{collection.slogan}}</h4>
+    {% endcomment %}
+    {% if not page.object_list %}
+
+    <div class="flex h-screen w-full gap-4 items-center justify-center">
+        <i class="bi-emoji-frown text-4xl text-gray-500"></i>
+        <h1>نتیجه ای یافت نشد!</h1>
+    </div>
+    {% endif  %}
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 w-full mt-6">
+        {% for product in page.object_list %}
+        <article class="relative bg-base-100 flex flex-col gap-2 items-center  p-2  rounded-box" action=""
+            method="post">
+            <a href="">
+                <img src="{{product.preview.img.url}}" class="w-60 rounded-box h-52 object-cover"
+                    alt="{{product.preview.img.alt}}">
+            </a>
+            <div class="flex justify-between w-full items-center">
+                <h4 class="text-gray-500 text-[0.6rem] md:text-sm">{{product.name}}</h4>
+                <div dir="ltr" class="text-xs md:text-sm flex gap-1  text-gray-500">
+                    {% for i in product.stats.rate %}
+                    <i class="bi-star-fill "></i>
+                    {% endfor %}
+                    {% for i in product.stats.rate_complement %}
+                    <i class="bi-star "></i>
+                    {% endfor%}
+                </div>
+            </div>
+            <div class="flex justify-between gap-4">
+                {% if collection.discount.is_valid or product.discount.is_valid %}
+
+                <del
+                    class="text-[0.6rem] md:text-sm text-gray-400">{% if product.has_sales %}{{product.sales_price}}{% else %}{{product.price}}{% endif %}</del>
+                <strong class="text-[0.6rem] md:text-sm text-red-400">{% compute_price product collection %}
+                    تومان</strong>
+                {% else %}
+                <strong class="text-[0.6rem] md:text-sm text-gray-600">{% compute_price product collection %}
+                    تومان</strong>
+                {% endif %}
+            </div>
+            <div class="flex items-center justify-center w-full gap-1 ">
+                {% if not product.shop == user.shops.first %}
+                <button onclick="addToCart(this);" data-pid="{{product.id}}"
+                    class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-bag text-gray  text-xl"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-heart text-gray  text-xl"></i>
+                </button>
+                {% else  %}
+                <button onclick="addToCart(this);" data-pid="{{product.id}}" data-collection="{{collection.id}}"
+                    class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-pencil text-gray  text-xl"></i>
+                </button>
+                <button class="btn btn-ghost btn-sm btn-circle text-md">
+                    <i class="bi-trash text-gray  text-xl"></i>
+                </button>
+                {% endif  %}
+
+            </div>
+            {% if collection.discount.is_valid  %}
+            {% if collection.prefer_collection_discount or not product.discount %}
+            <span
+                class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{collection.discount.percent}}%</span>
+            {% endif %}
+            {% elif product.discount and product.discount.is_valid %}
+            <span
+                class="absolute top-4 left-4 p-2 rounded-md text-white text-sm bg-red-600">{{product.discount.percent}}%</span>
+            {% endif %}
+        </article>
+        {% endfor %}
+    </section>
+   
+    <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
+        <div class="text-sm flex gap-2">
+            {% if  page.has_previous %}
+            <a href="?page={{page.previous_page_number}}&keywords={{keywords}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+            {% endif %}
+            {% for p in page.paginator.page_range %}
+                <a href="?page={{p}}&keywords={{keywords}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+            {% endfor %}
+            {% if  page.has_next %}
+            <a href="?page={{page.next_page_number}}&keywords={{keywords}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+            {% endif %}
+
+        </div>
+    </section>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+
+
+{% endblock %}

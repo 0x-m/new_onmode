@@ -2,12 +2,26 @@
 {% load static %}
 
 {% block title %}
-
+سفارشها
 {% endblock %}
 
 {% block content  %}
-<div class="grid grid-cols-1 content-start md:grid-cols-4 md:mt-8  w-full h-full gap-2 p-2">
-    {% for order in orders %}
+<div class="flex justify-center gap-2 mt-4  text-xs p-2 w-full ">
+    <form action="{% url 'orders:user_orders' %}">
+        <select dir="rtl" class="select" name="state" id="">
+            <option value="pending" {% if state == 'pending'  %}selected{% endif %}>جدید</option>
+            <option value="accepted" {% if state == 'accepted'  %}selected{% endif %}>در حال انجام</option>
+            <option value="sent" {% if state == 'sent'  %}selected{% endif %}>ارسال شده</option>
+            <option value="fulfilled" {% if state == 'fulfilled'  %}selected{% endif %}>دریافت شده</option>
+            <option value="canceled" {% if state == 'canceled'  %}selected{% endif %}>لغو شده</option>
+            <option value="returned" {% if state == 'returned'  %}selected{% endif %}>بازگشتی</option>
+        </select>
+        <button class="btn btn-primary">فیلتر</button>
+    </form>
+</div>
+<div class="flex flex-col gap-2 ">
+    <div class="grid grid-cols-1 content-start md:grid-cols-4 md:mt-8  w-full h-full gap-2 p-2">
+        {% for order in page.object_list %}
         <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
             <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
                 <span>کد سفارش:</span>
@@ -26,26 +40,26 @@
             </div>
             <a href="{% url 'orders:user_order' order.code %}" class="btn btn-primary">مشاهده جزییات</a>
         </article>
-    {% endfor %}
-    <!-- <article class="bg-white shadow-md rounded-box p-2  flex flex-col gap-2">
-        <div class="w-full p-2 bg-gray-50 rounded-md text-gray-700 flex justify-between">
-            <span>شماره سفارش:</span>
-            <span>112</span>
+        {% endfor %}
+    </div>
+    <section class="flex justify-center mt-20 items-center p-1" aria-label="pagination">
+        <div class="text-sm flex gap-2">
+            {% if  page.has_previous %}
+            <a href="?page={{page.previous_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&laquo;</a>
+            {% endif %}
+            {% for p in page.paginator.page_range %}
+                <a href="?page={{p}}" class="{% if p == page.number %} bg-stone-200 text-gray-800 {% else %} bg-stone-100 text-gray-500 {% endif %} hover:bg-stone-200 rounded-md   w-8 h-8 p-2 flex justify-center items-center ">{{p}}</a>
+            {% endfor %}
+            {% if  page.has_next %}
+            <a href="?page={{page.next_page_number}}" class=" bg-stone-100 hover:bg-stone-200 rounded-md text-gray-500 w-8 h-8 p-2 flex justify-center items-center ">&raquo;</a>
+            {% endif %}
         </div>
-        <div class="flex flex-col gap-2 w-full p-2">
-            <div class="flex justify-between ">
-                <h2>تعداد اقلام:</h2>
-                <h2>5</h2>
-            </div>
-            <div class="flex justify-between ">
-                <h2>جمع کل:</h2>
-                <h2>500000 تومان</h2>
-            </div>
+    </section>  
 
-        </div>
-        <a href="#" class="btn btn-primary">مشاهده جزییات</a>
-    </article> -->
-
-    
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+    selectMenu('orders')
+</script>
 {% endblock %}

@@ -1,8 +1,9 @@
 {% extends 'user/dashboard/dashboard.html' %}
 {% load static %}
 {% load options %}
-{% block title %}
 
+{% block title %}
+ویژگیها
 {% endblock %}
 
 {% block content  %}
@@ -10,8 +11,9 @@
 
 <div class="flex justify-center items-center mt-8 p-2">
     <div class="tabs gap-4">
-        <a class="tab tab-bordered " href="{% if product %}{% url 'users:edit-product' product.id %}{% endif %}">مشخصات</a>
-        <a class="tab tab-bordered tab-active"  >سایر ویژگیها</a>
+        <a class="tab tab-bordered " href="{% if product %}{% url 'users:edit-product' product.id %}{% endif %}">مشخصات
+            کلی</a>
+        <a class="tab tab-bordered tab-active">سایر ویژگیها</a>
     </div>
 </div>
 
@@ -19,45 +21,48 @@
     <section class="flex flex-col w-full  md:basis-3/5">
         <section class="bg-base-100  rounded-box shadow-md flex-col p-2   mb-20  gap-2">
             <h2 class="text-center text-lg text-blue-500">تصاویر</h2>
+            <h4 class="text-[0.6rem] text-center text-gray-400 mt-2">فضای باقیمانده: {{user.left_storage}}MB</h4>
             <div class="flex flex-col md:flex-row w-full mt-4">
                 <div class="flex flex-col  gap-2 basis-1/2 ">
                     {% if product.preview.img %}
-                        <img src="{{product.preview.img.url}}" class=" w-80 h-72 rounded-box object-cover" alt="{{product.preview.alt}}">
+                    <img src="{{product.preview.img.url}}" class=" w-80 h-72 rounded-box object-cover"
+                        alt="{{product.preview.alt}}">
                     {% endif %}
                 </div>
                 <div class="flex flex-col gap-1 mt-2 w-full basis-1/2 ">
-                   {% if product.photos %}
-                        {% for photo in product.photos.all %}
-                            <div class="flex w-full items-center  bg-slate-50 justify-between p-1 rounded-md">
-                                <img src="{% if photo.img %}{{photo.img.url}}{% else %}{% if photo.url %}{{photo.url}}{% endif %}{% endif %}" 
-                                class="w-12 h-12 rounded-box object-cover" 
-                                alt="{{photo.alt}}">
-                                <form action="{% url 'users:delete-photo' product.id %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="photo_id" value="{{photo.id}}">
-                                    <div class="flex gap-2">
-                                        <button formmethod="post" formaction="{% url 'users:make-as-preview' product.id %}" type="submit">
-                                           {% if product.preview.id == photo.id %} 
-                                           <i class="bi-check-circle text-gray-800 text-lg "></i>
-                                           {% else %}
-                                           <i class="bi-file-earmark-image text-gray-300 text-lg "></i>
-                                           {% endif %}
-                                        </button>
-                                        <button type="submit">
-                                            <i class="bi-trash text-gray-500 text-lg "></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>    
-                        {% endfor %}
-                   {% endif %}
+                    {% if product.photos %}
+                    {% for photo in product.photos.all %}
+                    <div class="flex w-full items-center  bg-slate-50 justify-between p-1 rounded-md">
+                        <img src="{% if photo.img %}{{photo.img.url}}{% else %}{% if photo.url %}{{photo.url}}{% endif %}{% endif %}"
+                            class="w-12 h-12 rounded-box object-cover" alt="{{photo.alt}}">
+                        <form action="{% url 'users:delete-photo' product.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="photo_id" value="{{photo.id}}">
+                            <div class="flex gap-2">
+                                <button formmethod="post" formaction="{% url 'users:make-as-preview' product.id %}"
+                                    type="submit">
+                                    {% if product.preview.id == photo.id %}
+                                    <i class="bi-check-circle text-gray-800 text-lg "></i>
+                                    {% else %}
+                                    <i class="bi-file-earmark-image text-gray-300 text-lg "></i>
+                                    {% endif %}
+                                </button>
+                                <button type="submit">
+                                    <i class="bi-trash text-gray-500 text-lg "></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
             <div class="divider w-1/3 mx-auto"></div>
-            <form enctype="multipart/form-data" class="w-full p-2  mt-4 flex flex-col items-center gap-2" method="post" action="{% url 'users:add-photo' product.id %}">
+            <form enctype="multipart/form-data" class="w-full p-2  mt-4 flex flex-col items-center gap-2" method="post"
+                action="{% url 'users:add-photo' product.id %}">
                 {% csrf_token %}
                 <h2 class="text-sm text-gray-500 text-center ">افزودن تصویر</h2>
-                <input type="file" class="" name="photo" accept="image/*" >
+                <input type="file" class="" name="photo" accept="image/*">
                 <input type="text" name="alt" placeholder="متن جایگزین تصویر" class="input input-bordered mt-2" id="">
                 <button class="btn btn-primary w-1/2 mx-auto mt-2">افزودن</button>
             </form>
@@ -65,12 +70,13 @@
     </section>
 
     <section class="flex flex-col gap-2 w-full md:w-1/4 md:basis-1/4">
-        <form method="post" accept="{% url 'users:add-option' product.id %}" class="bg-base-100 p-3  rounded-box shadow-md flex flex-col gap-2">
+        <form method="post" accept="{% url 'users:add-option' product.id %}"
+            class="bg-base-100 p-3  rounded-box shadow-md flex flex-col gap-2">
             {% csrf_token %}
             <input type="hidden" name="name" value="brand">
             <h2 class="text-center text-sm text-blue-500">برند</h2>
             {% get_option brand as brands  %}
-            
+
             {% if brands %}
             <div class="p-2 rounded border border-gray-400 max-h-52 overflow-auto">
                 {% for brand in brands.choices %}
@@ -87,11 +93,12 @@
                 <button type="submit" class="btn w-1/2 btn-primary">ثبت</button>
                 <a href="#" class="btn w-1/2 btn-outline">لغو</a>
             </div>
-                {% else %}
-                {% endif %}
+            {% else %}
+            {% endif %}
         </form>
 
-        <form method="post" accept="{% url 'users:add-option' product.id %}" class="bg-base-100 p-4   rounded-box shadow-md flex flex-col gap-2">
+        <form method="post" action="{% url 'users:add-option' product.id %}"
+            class="bg-base-100 p-4   rounded-box shadow-md flex flex-col gap-2">
             {% csrf_token %}
             <h2 class="text-center text-sm text-blue-500">رنگبندی</h2>
             {% get_option color as colors  %}
@@ -112,18 +119,19 @@
             <div class="flex gap-2 -full p-1 items-center justify-center">
                 <button type="submit" class="btn w-1/2 btn-primary">ثبت</button>
             </div>
-                {% else %}
-                {% endif %}
+            {% else %}
+            {% endif %}
         </form>
-        <form method="post" accept="{% url 'users:add-option' product.id %}" class="bg-base-100  p-4 rounded-box shadow-md flex flex-col gap-1">
+        <form method="post" action="{% url 'users:add-option' product.id %}"
+            class="bg-base-100  p-4 rounded-box shadow-md flex flex-col gap-1">
             {% csrf_token %}
-    
+
             <h2 class="text-center text-sm text-blue-500">سایزبندی</h2>
             {% get_option size as sizes  %}
             {% if sizes %}
             <input type="hidden" name="name" value="size">
             <div class="flex gap-1 flex-wrap w-full pr-1 pl-1 -mt-4 text-xs">
-            {% for size in sizes.choices %}
+                {% for size in sizes.choices %}
                 <div class="form-control">
                     <label class="rounded-full p-1 group cursor-pointer">
                         <input name="value" type="checkbox" value="{{size.id}}" class="appearance-none peer">
@@ -138,17 +146,44 @@
                 <button type="submit" class="btn w-1/2 btn-primary">ثبت</button>
                 <a href="#" class="btn w-1/2 btn-outline">لغو</a>
             </div>
-                {% else %}
-                {% endif %}
+            {% else %}
+            {% endif %}
         </form>
+        <div class="bg-base-100 p-4   rounded-box shadow-md flex flex-col gap-2">
+            <h2 class="text-center text-sm basis-1/4 text-blue-500">محصولات مرتبط</h2>
+            <h5 class="text-[0.6rem] text-red-400 text-center">حداکثر 5 مورد</h5>
+            <form class="flex gap-2 max-w-full" method="get" action="{% url 'catalogue:add-related' product.id %}">
+                <input id="related_prod" type="text" class="input p-2 input-bordered w-3/4" placeholder="کد محصول"
+                    name="prod_code">
+                <button type="submit" class="btn w-1/4 btn-primary">ثبت</button>
+            </form>
+            <div class="flex flex-col gap-2">
+                {% for rel in product.relateds.all %}
+                <article class="w-full rounded-box bg-stone-50 p-1 flex justify-between items-center">
+                    <img src="{% if rel.preview %}{{rel.preview.img.url}}{% endif %}"
+                        class="object-cover rounded-box h-16 w-16" alt="{{rel.preview.alt}}">
+                    <h2 class="text-xs text-gray-600 truncate ">{{ rel.name }}</h2>
+                    <form method="get" action="{% url 'catalogue:delete-related' product.id %}">
+                        <input type="hidden" name="prod_code" value="{{rel.prod_code}}">
+                        <button type="submit">
+                            <i class="bi-x text-lg "></i>
+                        </button>
+                    </form>
+                </article>
+                <h1>
+                </h1>
+                {% endfor %}
+            </div>
+        </div>
     </section>
 
 </div>
 
 {% endblock %}
 
+
 {% block scripts %}
-<script defer>
-   
+<script>
+    selectMenu('shop')
 </script>
 {% endblock %}
