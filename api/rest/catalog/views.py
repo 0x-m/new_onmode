@@ -1,14 +1,16 @@
-from urllib import request
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.routers import DefaultRouter
 from .permissions import IsOwnerOrAdmin, IsProductSellerOrAdmin, IsSeller, IsOwner
-
 from .serializers import *
 from apps.catalogue.models import *
 from .permissions import IsSeller, isSellerOrAdmin
 from rest_framework.permissions import SAFE_METHODS
+from rest_framework.response import Response
+from rest_framework import status
+from apps.catalogue.models import *
 
 
 class CategoryAPIViewset(ModelViewSet):
@@ -38,11 +40,27 @@ class ShopAPIViewset(ModelViewSet):
         return [isSellerOrAdmin]  # Owner of the shop can edit the shop.
 
     def perform_destroy(self, instance):
-        if request.user.is_staff:
+        if self.request.user.is_staff:
             return super().perform_destroy(instance)
 
         instance.deleted = True
         instance.save()
+
+    @action(detail=True, methods=["POST", "GET"], url_name="shop_products")
+    def products(self, product_id=None):
+        if not product_id:  # get all products
+            ProductAPIViewset(self.request)
+
+        # Get a single product
+        try:
+            product = get_object_or_404(Product, pk=product_id)
+            data = ProductSerializer(product).data
+            return Response(data)
+        except Product.DoesNotExist:
+            return Response(
+                "The product was not found!",
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
 class ProductAPIViewset(ModelViewSet):

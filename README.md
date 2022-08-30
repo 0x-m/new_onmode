@@ -1,74 +1,64 @@
 
-Onmode fashion shopping platform
-==========================
+# Introduction
 
-Onmode is an E-commerce platform that helps fashion vendors to have their shopping webpage,  connect to their customers and manage their sales.
+Onmode is a **multi-vendor E-commerce platform** targeting fashion retailers.
+Onmode aimed to empower retailers by providing them with basic online shopping capabilities including customer management, sales management, product management, and order management, and especially, undertakes the process of shipping parcels, tracking them, and handling related issues. Forthemore, All User activities and other informations including (products, shops, orders,...) may be accessed via REST API endpoints, which facilitates the development of custom apps, robots, and analyzers.
+
+# Features
+- **For users**:
+    - Simple dashboard for users to handle their activities including, tracking orders, listing their desired products on wishlist, and managing their comments, wallets, and tickets.
+    - Any user may demand having a custom shoppage, selling products, and managing orders and sales.
+    - The shop may have an URL like : https://onmode.ir/<desired_shop_name>/
+    - Ticket system for answering users questions and problems.
+    - Custom shopping cart specialized for multi-vendor shopping.
+    - Rating system for shopkeepers and products.
+    
+- **For admin**:
+    - Customized Django admin panel for site management.
+    - Categories up to 5 nested levels.
+    - Create customizable collections of products.
+    - Three levels of discount:
+        - The shopkeeper can define discounts for his(or her) products.
+        - Admin users can define discounts for any product.
+        - Admin users can define discounts for a collection that may apply to some (or all) products belonging to that collection.
+    - Create collections of shops.
+    - Coupon system.
+    - Create an arbitrary static page.
+    - Flitering, importing, and exporting information(ex. Products, Orders,... ) in common formats (ex. XML, JSON, XLSX,..).
+    - SMS services for user activities.
+    - All site static files and user uploaded files may be served through any S3 compatible service (ex. Amazon S3, Arvan cloud)
+    (**I used Arvancloud for CND and file serving**)
+
+    - Admin can configure the following properties for each shop individually:
+        - The maximum number of products a shop can have.
+        - The maximum file storage size a shop can use.
+        - Fee per transaction of a shop.
+        **Also, the Default values for each of the above fields can be configured via Environment variables**
+
+## Technologies
+- Backend: 
+    - Programming: Pyhton, Django, Django Rest Framework
+    - Deployment: Gunicorn
+    - Database: Postgresql, SQLite
+    - Other modules:
+        - venv for virtual environment
+        - IPPanel for sms service
+        - Boto3 for S3 storage.
+        - MPTT for implementing nested category architecture.
+        - Spectacular for API Doumentation and schema.
+        - Spinx for project documentation
+        - Black for code formatting
+        - mypy for static type checking
+        - django-silk for profiling
+        - allauth
+        - simple_jwt
+        - corsheaders
+        - django_exports
+- Frontend: Tailwind css, Django templates
 
 
-==========================
-Features 
-==========================
+# Installation
 
-1) Simple signup process, only a phone number is needed and authentication will be done through a code sent to the user's phone. after signup, users may need to complete their profile information.
-
-2) Users have a simple and intuitive dashboard for managing their activities including wishlist, comments, orders, personal information, wallet, tickets, and their shop if have any.
-
-
-
-3) Users could have a shop page with their desired name (if available)  to sell their products. 
- The Shop page has a customizable header (poster), logo, and shop description.
-
-3) SEO friendly, products and shop pages have meta title, meta keywords, and meta description fields, all user's uploaded images also have alt text field.
-
-4) Categories up to 5 nested levels!
-
-5) Ticket system for solving user problems.
-
-8) Intuitive Shopping Cart specialized for multi-vendor shopping
-
-9) 
-
-Administration
-==============
-A) Customized Django Admin Panel for site management
-
-B) Creating customizable collections of products, each collection has its customizable page. 
-
-C) Three levels of Discount,
-        each vendor user could define a discount on his(her) product (via sales price field)
-        admin could define discount for any product (by creating an discount instance through the admin panel)
-        each collection could have a discount model which may be applied to the selected products belongs to that collection
-
-D) Create a collection of shops
-
-E) Coupon system
-
-F) Create customizable static pages. (ex. About-us, contact-us, policies,...)
-
-G) Admin can adjust the number of products that a user could add to his(her) shop, the maximum size of images users upload, the transaction fee for each shop, and ...
-
-H) All media and static files can be served through a S3 compatible service (ex. Amazon S3, Arvan Cloud Storage,..)
-
-I) Import and export in many formats (pdf, xml, json, xls, xslx,...)
-
-J) 
-
-=================
-Technologies
-=================
-Programming language: Python 3.10
-Web framework: Django 4.0
-Database: Tested with SQLite, Postgresql, MYSQL (needs additional configuration)
-Other modules:
-    ippanel SMS
-    boto3 for s3 storage (Can be configured through env variables)
-    pytest
-    Django Rest Framework for REST API
-    Sphinx for documentation
-
-=================
-Installation
-=================
 1) clone the repository: `git clone ...`
 2) change to the directory: `cd ...`
 3) [Optional]: create a virtual environment: 'python3 -m venv venv'
@@ -76,21 +66,12 @@ Installation
 5) install the requirements: `pip install -r requirements.txt`
 6) Run the development server: `python manage.py runserver`
 
+# Contribute & Support
+- This repository was a private project and currently, I have no plan for further development or support!
 
-=================
-Contribute
-=================
 
-=================
-Support
-=================
 
-=================
-License
-=================
-
-The project is licensed under the BSD license.
-
+# License
 
 
 

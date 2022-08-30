@@ -5,7 +5,6 @@ author: hamze ghaedi (github: 0x-m)
 """
 
 
-from urllib.request import HTTPDefaultErrorHandler
 from django.http import HttpRequest, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
