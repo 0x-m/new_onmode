@@ -1,5 +1,48 @@
+from email.mime import base
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ShopAPIViewset
+from rest_framework_nested import routers
+from .views import (
+    CategoryListAPIView,
+    ProductAPIViewset,
+    ShopAPIViewset,
+    UserFavouriteViewset,
+    ProductFavouriteViewset,
+    UserCommentViewset,
+    ProductCommentViewset,
+    get_user_shop,
+)
 
 router = DefaultRouter()
+router.register(r"categories", CategoryListAPIView, basename="categories")
 router.register(r"shops", ShopAPIViewset, basename="shops")
+router.register(
+    r"products/<product_pk>/comments",
+    ProductCommentViewset,
+    basename="product-comments",
+)
+router.register(
+    r"products/<product_pk>/favourites",
+    ProductFavouriteViewset,
+    basename="product-favourites",
+)
+router.register(r"user/comments", UserCommentViewset, basename="user-comments")
+router.register(r"user/favourites", UserFavouriteViewset, basename="use-favourites")
+
+
+urlpatterns = [
+    path("", include(router.urls)),
+    path("user/shop/", get_user_shop, name="user-shop"),
+    # path(
+    #     "/products/<product_pk>/comments/",
+    #     ProductCommentViewset.as_view(),
+    #     name="product-comments",
+    # ),
+    # path(
+    #     "/products/<product_pk>/favourites/",
+    #     ProductFavouriteViewset.as_view(),
+    #     name="product-favourites",
+    # ),
+    # path("/user/comments/", UserCommentViewset.as_view(), name="user-comments"),
+    # path("/user/favourites", UserFavouriteViewset.as_view(), name="user-favourites"),
+]

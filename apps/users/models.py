@@ -12,7 +12,12 @@ from apps.utils.random_code_generator import generate_code
 
 
 class CustomUserManager(UserManager):
-    def create_superuser(self, phone_num, email, password: str):
+    def create_superuser(
+        self,
+        phone_num,
+        password: str,
+        email=None,
+    ):
         u = self.model(phone_num=phone_num, email=self.normalize_email(email))
         u.set_password(password)
         u.is_staff = True

@@ -1,4 +1,6 @@
 from pathlib import Path
+import os
+import sys
 from decouple import config
 
 from . import storage_backends
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     "apps.orders",
 ]
 
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -49,6 +52,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "onmode.urls"
+
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -95,11 +100,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+REST_FRAMEWORK = {
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 10,
+}
+
 AUTH_USER_MODEL = "users.user"
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "users.OTP.OTPAuthenticationBackend",
+    "apps.users.OTP.OTPAuthenticationBackend",
 ]
 
 LANGUAGE_CODE = "en-us"

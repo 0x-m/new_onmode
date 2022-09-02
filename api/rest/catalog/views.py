@@ -2,29 +2,27 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import action
-from rest_framework.routers import DefaultRouter
+
+from apps.users.views import comments
+
 from .permissions import IsOwnerOrAdmin, IsProductSellerOrAdmin, IsSeller, IsOwner
 from .serializers import *
 from apps.catalogue.models import *
 from .permissions import IsSeller, isSellerOrAdmin
-from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework import status
 from apps.catalogue.models import *
 
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework import exceptions as rest_exceptions
+from rest_framework import permissions
+from rest_framework.decorators import api_view, permission_classes
 
-class CategoryAPIViewset(ModelViewSet):
-    queryset = Category.objects.all()
+
+class CategoryListAPIView(ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
-
-    def get_permissions(self):
-        if self.action in SAFE_METHODS:
-            return super().get_permissions()
-
-        return [IsAdminUser]
-
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    queryset = Category.objects.all()
+    permission_classes = [AllowAny]
 
 
 class ShopAPIViewset(ModelViewSet):
@@ -32,12 +30,13 @@ class ShopAPIViewset(ModelViewSet):
     serializer_class = ShopSerializer
 
     def get_permissions(self):
-        # Only Admin can Createor truely Remove a Shop or get a list of all shops.
+        # Only Admin can Create or truely Remove a Shop or get a list of all shops.
         if self.action in ["create", "list"]:
-            return [IsAdminUser]
+            return [IsAdminUser()]
+
         elif self.action in ["retrieve"]:  # Anybody can see a shop page!
-            return [AllowAny]
-        return [isSellerOrAdmin]  # Owner of the shop can edit the shop.
+            return [AllowAny()]
+        return [isSellerOrAdmin()]  # Owner of the shop can edit the shop.
 
     def perform_destroy(self, instance):
         if self.request.user.is_staff:
@@ -46,33 +45,32 @@ class ShopAPIViewset(ModelViewSet):
         instance.deleted = True
         instance.save()
 
-    @action(detail=True, methods=["POST", "GET"], url_name="shop_products")
-    def products(self, product_id=None):
-        if not product_id:  # get all products
-            ProductAPIViewset(self.request)
 
-        # Get a single product
-        try:
-            product = get_object_or_404(Product, pk=product_id)
-            data = ProductSerializer(product).data
-            return Response(data)
-        except Product.DoesNotExist:
-            return Response(
-                "The product was not found!",
-                status=status.HTTP_404_NOT_FOUND,
-            )
+@api_view(http_method_names=["GET"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def get_user_shop(request: HttpRequest):
+    try:
+        shop = Shop.objects.get(owner=request.user)
+        ser = ShopSerializer(shop)
+        return Response(ser.data, status=200)
+
+    except Shop.DoesNotExist:
+        raise rest_exceptions.NotFound("shop was not found")
 
 
 class ProductAPIViewset(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-    def get_permissions(self):
-        if self.action == "retrieve":
-            return [AllowAny]
-        elif self.action == "list":
-            return [IsAdminUser]
+    def get_queryset(self):
+        shop_pk = self.kwargs.get("shop_pk")
+        if shop_pk:
+            return Product.objects.filter(shop__id=shop_pk)
+        return Product.objects.all()
 
+    def get_permissions(self):
+        if self.action in ["retrieve", "list"]:
+            return [AllowAny]
         return [IsProductSellerOrAdmin]
 
     def perform_destroy(self, instance):
@@ -81,22 +79,61 @@ class ProductAPIViewset(ModelViewSet):
         instance.deleted = True
         instance.save()
 
-    # Filtering should be added..
 
-
-class CommentViewset(ModelViewSet):
+class ProductCommentViewset(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+    def get_object(self):
+        try:
+            product_pk = self.kwargs.get("product_pk")
+            comment = Comment.objects.get(
+                product__pk=product_pk, user=self.request.user
+            )
+            return comment
+        except Comment.DoesNotExist:
+            raise rest_exceptions.NotFound("No commnet with the give id was found.")
+
+    def get_queryset(self):
+        product_id = self.kwargs.get("product_pk")
+        return Comment.objects.filter(product__id=product_id)
+
     def get_permissions(self):
-        if self.action == "list":
-            return [IsAdminUser]
-        elif self.action in ["update", "parial_update", "destroy"]:
-            return [IsOwnerOrAdmin]
+        if self.action in ["update", "parial_update", "destroy"]:
+            return [IsOwnerOrAdmin()]
+        elif self.action == "craete":
+            return [IsAuthenticated()]
+        return [AllowAny()]  # any Authenticatd user can leave a commnent.
 
-        return [IsAuthenticated]  # any Authenticatd user can leave a commnent.
+    def perform_create(self, serializer):
+        product_pk = self.kwargs.get("product_pk")
+        serializer.save(user=self.request.user, product__pk=product_pk)
 
 
-class FavouritViewset(ModelViewSet):
-    queryset = Favourite.objects.all()
+class UserCommentViewset(ReadOnlyModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(user=self.request.user)
+
+
+class ProductFavouriteViewset(ModelViewSet):
     serializer_class = FavouriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action != "create":
+            return [IsAdminUser()]
+
+    def perform_create(self, serializer):
+        product_pk = self.kwargs.get("product_pk")
+        serializer.save(product__pk=product_pk, user=self.request.user)
+
+
+class UserFavouriteViewset(ReadOnlyModelViewSet):
+    serializer_class = FavouriteSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Favourite.objects.filter(user=self.request.user)

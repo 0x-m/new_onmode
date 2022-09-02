@@ -43,17 +43,24 @@ Onmode aimed to empower retailers by providing them with basic online shopping c
     - Other modules:
         - venv for virtual environment
         - IPPanel for sms service
-        - Boto3 for S3 storage.
+        - Boto3 for S3 storage
         - MPTT for implementing nested category architecture.
+        - tinymce (a simple WYSIWYG editor)
+        - django_jalai_date
+        - django_filters 
         - Spectacular for API Doumentation and schema.
         - Spinx for project documentation
         - Black for code formatting
-        - mypy for static type checking
+        - mypy for static code analysis
+        - faker for dump data generation
+        - locust for API load testing
+        - python_decouple for env variable management
+        - precommit for checking coding style, format,... before commit
         - django-silk for profiling
-        - allauth
-        - simple_jwt
+        - allauth for provides social media login
+        - simple_jwt 
         - corsheaders
-        - django_exports
+        - django_imports_exports for importing, and exporting data in common formats (ex. XML, JSON,...)
 - Frontend: Tailwind css, Django templates
 
 

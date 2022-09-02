@@ -1,4 +1,5 @@
 import os
+from pyexpat import model
 from django.db import models
 from django.dispatch import receiver
 from django.http import HttpRequest
@@ -15,6 +16,7 @@ from onmode.storage_backends import SiteStorage
 from apps.utils.persian_slugify import persian_slugify
 from apps.utils.random_code_generator import generate_code
 from mptt.models import MPTTModel, TreeForeignKey
+
 
 class Category(MPTTModel):
     name = models.CharField(max_length=50)
@@ -238,15 +240,22 @@ class Product(models.Model):
     date_created = models.DateTimeField(default=timezone.now, editable=False)
     last_updated = models.DateTimeField(auto_now=True, null=True, editable=False)
     preview = models.ForeignKey(
-        to="Photo", related_name="preview", on_delete=models.SET_NULL, null=True
+        to="Photo",
+        related_name="preview",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     discount = models.ForeignKey(
         to=Discount, on_delete=models.SET_NULL, null=True, blank=True
     )
-    relateds = models.ManyToManyField(to="self")
+    relateds = models.ManyToManyField(to="self", blank=True)
 
-    publisheds = PublishedProductManger()
     objects = models.Manager()
+    publisheds = PublishedProductManger()
+
+    class Meta:
+        base_manager_name = "objects"
 
     def save(self, *args, **kwargs):
         if self.en_name:

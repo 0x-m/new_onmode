@@ -1,11 +1,29 @@
 from rest_framework import serializers
 from apps.catalogue.models import *
+from rest_framework.relations import PrimaryKeyRelatedField
+
+
+class SubCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ("id", "name", "en_name")
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    childs = SubCategorySerializer(many=True, read_only=True)
+
     class Meta:
         model = Category
-        fields = ["id", "name", "en_name", "slug", "en_slug", "meta_keywords", "parent"]
+        fields = [
+            "id",
+            "name",
+            "en_name",
+            "slug",
+            "en_slug",
+            "meta_keywords",
+            "parent",
+            "childs",
+        ]
 
 
 class ShopSerializer(serializers.ModelSerializer):
@@ -28,6 +46,7 @@ class ShopSerializer(serializers.ModelSerializer):
             "deleted",
             "date_created",
         ]
+        extra_kwargs = {"id": {"read_only": True}, "owner": {"read_only": True}}
 
 
 class DiscountSerializer(serializers.ModelSerializer):
@@ -106,10 +125,10 @@ class CollectionSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fidels = ["product", "user", "body", "published", "rate", "date_created"]
+        fidels = ["product", "body", "published", "rate", "date_created"]
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favourite
-        fields = ["id", "user", "product"]
+        fields = ["id", "product"]

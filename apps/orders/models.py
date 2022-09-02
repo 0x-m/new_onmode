@@ -366,7 +366,7 @@ class OrderItem(models.Model):
     )
     raced = models.BooleanField(default=False)
 
-    def refresh(self):
+    def prepare(self):
         self.price = self.product.price
         self.prod_name = self.product.name
         self.prod_en_name = self.product.en_name
@@ -379,6 +379,13 @@ class OrderItem(models.Model):
         if discount:
             self.discount_code = discount.code
             self.discount_pecent = discount.percent
+
+    def save(self, *args, **kwargs):
+        self.prepare()
+        super().save(*args, **kwargs)
+
+    def refresh(self):
+        self.prepare()
         self.save()
 
     def is_expired(self):

@@ -20,6 +20,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.conf import settings
 from ippanel import Client
 from decouple import config
 import requests
@@ -46,11 +47,11 @@ from .OTP import OTP, InvalidCodeException, ExpiredCodeException
 
 # helper functions--------------------
 def send_verification_code(phone, code):
-    api_key = config("VERIFICATION_SMS_API_KEY")
+    api_key = config("VERIFICATION_SMS_API_KEY", "")
     sms = Client(api_key)
     pattern_values = {"verification_code": code}
-    pattern_code = config("VERIFICATION_CODE_SMS_CODE")
-    num = config("SMS_NUMBER")
+    pattern_code = config("VERIFICATION_CODE_SMS_CODE", "")
+    num = config("SMS_NUMBER", "")
     is_sent = sms.send_pattern(pattern_code, num, phone, pattern_values)
     return is_sent
 
@@ -77,9 +78,14 @@ def signup(request: HttpRequest):
 
             OTP(request).clear()
             code = OTP(request).code
-            res = send_verification_code(phone_num, code)
-            # print(code)
-            # res = True
+
+            if not settings.DEBUG:
+                res = send_verification_code(phone_num, code)
+            else:
+                res = True
+                print("verification code: ", code)
+                return JsonResponse({"code": code})
+
             if res:
                 return redirect("users:verify")
             else:
@@ -90,7 +96,9 @@ def signup(request: HttpRequest):
                 request,
                 "user/signup.html",
                 {"form": SignUpForm(), "errors": form.errors},
+                status=400,
             )
+
     return render(request, "user/signup.html", {"form": SignUpForm()})
 
 
@@ -104,7 +112,7 @@ def verify_code(request: HttpRequest):
         form = VerificationCodeForm(request.POST)
 
         if not form.is_valid():
-            return render(request, "user/verify.html", {"error": "invalid"})
+            return render(request, "user/verify.html", {"error": "invalid"}, status=400)
 
         code = form.cleaned_data.get("code")
         try:
@@ -112,7 +120,7 @@ def verify_code(request: HttpRequest):
             otp.check(code)
             # user, _ = User.objects.get_or_create(phone_num=phone_num)
             user = authenticate(phone_num=phone_num)
-            user.backend = "users.OTP.OTPAuthenticationBackend"
+            user.backend = "apps.users.OTP.OTPAuthenticationBackend"
             # user.set_unusable_password()
             login(request=request, user=user)
             del request.session["phone_num"]
@@ -120,7 +128,9 @@ def verify_code(request: HttpRequest):
             return redirect("index:index")
 
         except InvalidCodeException:
-            return render(request, "user/verify.html", {"error": "invalid code"})
+            return render(
+                request, "user/verify.html", {"error": "invalid code"}, status=400
+            )
         except ExpiredCodeException:
             del request.session["phone_num"]
             request.session.save()
@@ -412,22 +422,27 @@ def read_message(request: HttpRequest, message_id):
     return redirect("users:messages")
 
 
+@login_required
 def orders(request: HttpRequest):
     return render(request, "user/dashboard/orders.html")
 
 
+@login_required
 def wallet(request: HttpRequest):
     return render(request, "user/dashboard/wallet.html")
 
 
+@login_required
 def about_shop(request: HttpRequest):
     return render(request, "shop/about.html")
 
 
+@login_required
 def shop_orders(request: HttpRequest):
     return render(request, "shop/orders.html")
 
 
+@login_required
 def shop_order(request: HttpRequest):
     return render(request, "shop/order.html")
 
