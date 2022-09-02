@@ -33,11 +33,11 @@ from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import exceptions
-from rest_framework import status as http_status
-
-from apps.catalogue.models import Product
 
 
+# -----------------------------------------
+# ------------ Get User orders API --------
+# -----------------------------------------
 class UserOrdersVAPIView(ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsOrderOwner]
@@ -50,51 +50,12 @@ class UserOrdersVAPIView(ReadOnlyModelViewSet):
         return Order.objects.filter(paid=True, user=self.request.user, pk=pk)
 
 
-# class CartAPIView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request, *args, **kwargs):
-#         carts = Order.objects.filter(paid=False, user=request.user)
-#         cart_serializer = OrderSerializer(carts, many=True)
-#         return Response(cart_serializer.data, status=200)
-
-#     def post(self, request, *args, **kwargs):
-#         """_summary_
-
-#         Args:
-#             request (_type_): _description_
-
-#         Returns:
-#             _type_: _description_
-#         """
-#         shop_id = request.data.get("shop_id")
-#         product_id = request.data.get("product_id")
-#         quantity = request.data.get("quantity")
-#         # need validation--------------
-
-#         order, created = Order.objects.get_or_create(
-#             user=self.request.user, paid=False, shop__id=shop_id
-#         )
-
-#         order_item, created = OrderItem.objects.update_or_create(
-#             order=order, product_id=product_id, quantity=quantity
-#         )
-#         return Response(OrderItemSerialzier(instance=order_item).data, status=201)
-
-#     def delete(self, request, *args, **kwargs):
-#         item_id = request.data.get("item_id")
-#         if item_id:
-#             try:
-#                 order_item = OrderItem.objects.get(
-#                     order__user=self.request.user, pk=item_id
-#                 )
-#                 order_item.delete()
-#                 return Response("item deleted successfully", status=200)
-#             except OrderItem.DoesNotExist:
-#                 raise exceptions.NotFound("orde item was not found!")
-#         raise exceptions.ValidationError("item_id is not provided")
+# --------------------------------------------
 
 
+# ------------------------------------------------
+# --------------- CART API -----------------------
+# ------------------------------------------------
 class CartAPIView(ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
@@ -133,3 +94,6 @@ class CartAPIView(ModelViewSet):
         order_item.quantity = quantity
         order_item.save()
         return Response("item was updated", status=200)
+
+
+# -----------------------------------------------------------
