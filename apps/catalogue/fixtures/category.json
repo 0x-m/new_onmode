@@ -1,0 +1,10 @@
+[
+    {
+        "model": "catalogue.Category",
+        "pk": 1,
+        "fields": {
+            "name": "men",
+            "parent": null
+        }
+    }
+]

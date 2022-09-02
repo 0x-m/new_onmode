@@ -4,22 +4,22 @@ from decouple import config
 
 
 class PublicMediaStorage(S3Boto3Storage):
-    location = 'media'
+    location = "media"
     file_overwrite = False
-    default_acl = 'public-read-write'
-    bucket_name = config('PUBLIC_MEDIA_BUCKET_NAME')
-    custom_domain = '%s.s3.ir-thr-at1.arvanstorage.com' % bucket_name
-    
+    default_acl = "public-read-write"
+    bucket_name = config("PUBLIC_MEDIA_BUCKET_NAME", "")
+    custom_domain = "%s.s3.ir-thr-at1.arvanstorage.com" % bucket_name
+
 
 class StaticStorage(S3Boto3Storage):
-    location = 'static'
-    default_acl = 'public-read'
-    bucket_name = config('STATIC_FILES_BUCKET_NAME')
-    custom_domain = '%s.s3.ir-thr-at1.arvanstorage.com' % bucket_name
+    location = "static"
+    default_acl = "public-read"
+    bucket_name = config("STATIC_FILES_BUCKET_NAME", "")
+    custom_domain = "%s.s3.ir-thr-at1.arvanstorage.com" % bucket_name
 
-    
+
 class SiteStorage(S3Boto3Storage):
-    location = 'site'
-    default_acl = 'public-read'
-    bucket_name = config('PRIVATE_MEDIA_BUCKET_NAME')
-    custom_domain= '%s.s3.ir-thr-at1.arvanstorage.com' % bucket_name
+    location = "site"
+    default_acl = "public-read"
+    bucket_name = config("PRIVATE_MEDIA_BUCKET_NAME", "")
+    custom_domain = "%s.s3.ir-thr-at1.arvanstorage.com" % bucket_name
