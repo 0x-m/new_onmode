@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     "import_export",
     "django_filters",
     "jalali_date",
-    "users",
     "django.contrib.admin",
     "django.contrib.contenttypes",
     "django.contrib.auth",
