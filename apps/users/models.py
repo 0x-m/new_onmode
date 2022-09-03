@@ -201,8 +201,6 @@ class Wallet(models.Model):
     )
     available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    available = models.PositiveBigIntegerField(default=0)
-    freezed = models.PositiveBigIntegerField(default=0)
     date_last_withdraw = models.DateTimeField(null=True, blank=True)
 
     def has_balance(self, amount):

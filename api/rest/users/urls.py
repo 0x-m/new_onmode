@@ -15,12 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from asyncio import base_events
 from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .views import CartAPIView, UserOrdersVAPIView
 
-router = DefaultRouter()
-router.register(r"user/cart", CartAPIView, basename="user-cart")
-router.register(r"orders", UserOrdersVAPIView, basename="user-orders")
-urlpatterns = router.urls
+from rest_framework.routers import DefaultRouter, SimpleRouter
+from .views import UserProfileAPIView, WalletAPIView
+
+
+urlpatterns = [
+    path("user/wallet/", WalletAPIView.as_view(), name="user-wallet"),
+    path(
+        "user/profile/",
+        UserProfileAPIView.as_view(),
+        name="user-profile",
+    ),
+]

@@ -15,12 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from asyncio import base_events
-from django.urls import path
-from rest_framework.routers import DefaultRouter
-from .views import CartAPIView, UserOrdersVAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework import permissions
+from .serializers import UserProfileSerlilizer, WalletSerializer
 
-router = DefaultRouter()
-router.register(r"user/cart", CartAPIView, basename="user-cart")
-router.register(r"orders", UserOrdersVAPIView, basename="user-orders")
-urlpatterns = router.urls
+from apps.users.models import User
+
+
+class UserProfileAPIView(RetrieveUpdateAPIView):
+    serializer_class = UserProfileSerlilizer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+
+class WalletAPIView(RetrieveAPIView):
+    serializer_class = WalletSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.wallet

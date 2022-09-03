@@ -25,6 +25,7 @@ urlpatterns = [
     path("<shop_name>/", shop, name="shop"),
     path("api/v1/", include("api.rest.catalog.urls")),
     path("api/v1/", include("api.rest.orders.urls")),
+    path("api/v1/", include("api.rest.users.urls")),
 ]
 
 

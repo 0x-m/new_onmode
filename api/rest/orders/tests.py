@@ -16,14 +16,33 @@
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from unittest import TestCase
 from rest_framework.test import APITestCase
+
+from apps.users.models import User
+from apps.orders.models import Order, OrderItem
+from apps.catalogue.models import Shop, Product
 
 
 class TestCartAPI(APITestCase):
-    pass
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create(phone_num="099112121414", has_shop=True)
+        cls.shop = Shop.objects.create(name="sss", owner=cls.user)
+        cls.order = Order.objects.create(user=cls.user, shop=cls.shop)
+        cls.product = Product.objects.create(shop=cls.shop, name="nn")
 
+    def test_add_item_to_cart(self):
+        self.client.force_login(self.user)
+        print(self.user)
+        resp = self.client.post(
+            "/api/v1/user/cart/", {"product_id": 1, "shop_id": 1, "quantity": 2}
+        )
+        print(resp.content)
 
-class TestUserOrderAPI(TestCase):
-    def test_get_all_orders(self):
+    def test_remove_item_from_cart(self):
         pass
+
+
+# class TestUserOrderAPI(APITestCase):
+#     def test_get_all_orders(self):
+#         resp = self.client.get("/api/v1/orders/")
