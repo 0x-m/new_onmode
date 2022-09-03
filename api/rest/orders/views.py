@@ -34,10 +34,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import exceptions
 
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 # -----------------------------------------
 # ------------ Get User orders API --------
 # -----------------------------------------
+
+
+@extend_schema_view(
+    list=extend_schema(description="Get the list of all user orders"),
+    retrieve=extend_schema(
+        description="Get the order with the given order_id that belongs to the user who made this request."
+    ),
+)
 class UserOrdersVAPIView(ReadOnlyModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsOrderOwner]
@@ -56,6 +65,18 @@ class UserOrdersVAPIView(ReadOnlyModelViewSet):
 # ------------------------------------------------
 # --------------- CART API -----------------------
 # ------------------------------------------------
+
+
+@extend_schema_view(
+    list=extend_schema(
+        description="Get the list of all unpaid user orders ( or carts!) grouped by shop."
+    ),
+    retrieve=extend_schema(description="Get the order item with the give id"),
+    create=extend_schema(
+        "Takes shop_id, product_id and quantity and create a new order item."
+    ),
+    destroy=extend_schema(description="Delete the order item with the given id."),
+)
 class CartAPIView(ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]

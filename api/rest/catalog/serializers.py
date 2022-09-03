@@ -125,7 +125,7 @@ class CollectionSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fidels = ["product", "body", "published", "rate", "date_created"]
+        fields = ["product", "body", "published", "rate", "date_created"]
 
 
 class FavouriteSerializer(serializers.ModelSerializer):

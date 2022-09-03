@@ -17,12 +17,12 @@ router = DefaultRouter()
 router.register(r"categories", CategoryListAPIView, basename="categories")
 router.register(r"shops", ShopAPIViewset, basename="shops")
 router.register(
-    r"products/<product_pk>/comments",
+    r"products/<int:product_pk>/comments",
     ProductCommentViewset,
     basename="product-comments",
 )
 router.register(
-    r"products/<product_pk>/favourites",
+    r"products/<int:product_pk>/favourites",
     ProductFavouriteViewset,
     basename="product-favourites",
 )

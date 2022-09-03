@@ -21,8 +21,13 @@ from rest_framework import permissions
 from .serializers import UserProfileSerlilizer, WalletSerializer
 
 from apps.users.models import User
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
+@extend_schema_view(
+    retrieve=extend_schema(description="Get the user profile information."),
+    update=extend_schema(description="Update the user profile information."),
+)
 class UserProfileAPIView(RetrieveUpdateAPIView):
     serializer_class = UserProfileSerlilizer
     permission_classes = [permissions.IsAuthenticated]
@@ -32,6 +37,10 @@ class UserProfileAPIView(RetrieveUpdateAPIView):
 
 
 class WalletAPIView(RetrieveAPIView):
+    """
+    Get the user wallet information.
+    """
+
     serializer_class = WalletSerializer
     permission_classes = [permissions.IsAuthenticated]
 

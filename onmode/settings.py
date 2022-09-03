@@ -1,8 +1,7 @@
 from pathlib import Path
 import os
-import sys
 from decouple import config
-
+from datetime import timedelta
 from . import storage_backends
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,19 +25,47 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
+    # 3rd ---------------------
     "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "drf_spectacular",
+    "corsheaders",
     "storages",
     "tinymce",
     "gtm",
     "import_export",
     "django_filters",
     "jalali_date",
+    # ---------------------------
     "apps.users",
     "apps.catalogue",
     "apps.promotions",
     "apps.index",
     "apps.orders",
 ]
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
+}
+
+SITE_ID = 1
+
+CSRF_TRUSTED_ORGINS = ["http://localhost:3000"]
+
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = "none"
+REST_USE_JWT = True
 
 
 MIDDLEWARE = [
@@ -101,8 +128,22 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TTILE": "Onmode",
+    "DESCRIPTION": "Onmode multi-vendor E-commerce platform RESET API endpoints",
+    "VERSION": "1.0.0",
 }
 
 AUTH_USER_MODEL = "users.user"
@@ -207,3 +248,6 @@ else:
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
+
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "phone_num"

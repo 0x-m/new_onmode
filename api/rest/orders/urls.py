@@ -22,5 +22,5 @@ from .views import CartAPIView, UserOrdersVAPIView
 
 router = DefaultRouter()
 router.register(r"user/cart", CartAPIView, basename="user-cart")
-router.register(r"orders", UserOrdersVAPIView, basename="user-orders")
+router.register(r"user/orders", UserOrdersVAPIView, basename="user-orders")
 urlpatterns = router.urls
