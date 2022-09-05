@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from apps.users.models import User, Wallet
 from rest_framework import serializers
+
+from apps.users.models import User, Wallet
 
 
 class UserProfileSerlilizer(serializers.ModelSerializer):

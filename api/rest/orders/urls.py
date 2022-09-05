@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from asyncio import base_events
-from django.urls import path
 from rest_framework.routers import DefaultRouter
+
 from .views import CartAPIView, UserOrdersVAPIView
 
 router = DefaultRouter()

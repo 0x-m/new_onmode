@@ -5,12 +5,24 @@ author: hamze ghaedi (github: 0x-m)
 """
 
 
-from django.http import HttpRequest, HttpResponseNotAllowed, JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
+from apps.catalogue.models import Collection, Product
+
 from .forms import ContactUsForm
-from .models import *
-from apps.catalogue.models import Product, Collection
+from .models import (
+    About,
+    BlogPost,
+    Certificate,
+    ContactUsType,
+    GeoLocation,
+    Law,
+    ReturnOrderGuide,
+    ShopSet,
+    SitePage,
+    SliderPhoto,
+)
 
 
 def about_us(request: HttpRequest):
@@ -68,13 +80,17 @@ def contact_us(request: HttpRequest):
         )
 
     return render(
-        request, "contactus.html", {"status": "", "types": ContactUsType.objects.all()}
+        request,
+        "contactus.html",
+        {"status": "", "types": ContactUsType.objects.all()},
     )
 
 
 def return_terms(request: HttpRequest):
     return render(
-        request, "return_order_guide.html", {"guide": ReturnOrderGuide.objects.first()}
+        request,
+        "return_order_guide.html",
+        {"guide": ReturnOrderGuide.objects.first()},
     )
 
 

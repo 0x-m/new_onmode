@@ -4,31 +4,27 @@ author: hamze ghaedi (github: 0x-m)
 """
 
 
+import requests
+from decouple import config
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import (
     Http404,
     HttpRequest,
-    HttpResponse,
     HttpResponseBadRequest,
-    HttpResponseForbidden,
     HttpResponseNotAllowed,
-    HttpResponseNotModified,
     JsonResponse,
 )
-from django.shortcuts import get_list_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from apps.catalogue.models import Shop, Product
-
-from apps.users.models import Address
-from apps.promotions.models import Coupon
-import requests
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from .models import Order, OrderItem
-from .forms import AcceptOrderForm, AddOrderItemForm
-from django.core.paginator import *
-from decouple import config
+
+from apps.catalogue.models import Shop
 from apps.index.models import GeoLocation
+from apps.promotions.models import Coupon
+from apps.users.models import Address
+
+from .forms import AddOrderItemForm
+from .models import Order, OrderItem
 
 
 def cart(request: HttpRequest):
@@ -61,7 +57,9 @@ def add_item(request: HttpRequest):
             if user.shop == shop:
                 return JsonResponse({"status": "invalid action"})
 
-            order, _ = Order.objects.get_or_create(shop=shop, user=user, paid=False)
+            order, _ = Order.objects.get_or_create(
+                shop=shop, user=user, paid=False
+            )
 
             # WARN: smelly code...!
             order_item, created = OrderItem.objects.get_or_create(
@@ -111,7 +109,7 @@ def increment(request: HttpRequest, order_item_id):
     )
     try:
         order_item.increment()
-    except:
+    except Exception:
         return HttpResponseBadRequest()
 
     return JsonResponse(
@@ -133,7 +131,7 @@ def decrement(request: HttpRequest, order_item_id):
     # TODO: need special exception
     try:
         order_item.decrement()
-    except:
+    except Exception:
         order_item.delete()
 
     if len(order) == 0:
@@ -195,12 +193,17 @@ def checkout(request: HttpRequest, shop_name):
                 "merchant_id": merchant_id,
                 "amount": cart.final_price,
                 "callback_url": "https://onmode.ir"
-                + reverse("orders:verify_payment", kwargs={"order_id": cart.id}),
+                + reverse(
+                    "orders:verify_payment", kwargs={"order_id": cart.id}
+                ),
                 "currency": "IRT",
                 "description": cart.description,
                 "metadata": {"mobile": request.user.phone_num},
             }
-            headers = {"content-type": "application/json", "accept": "application/json"}
+            headers = {
+                "content-type": "application/json",
+                "accept": "application/json",
+            }
 
             req_result = requests.post(
                 "https://api.zarinpal.com/pg/v4/payment/request.json",
@@ -210,7 +213,8 @@ def checkout(request: HttpRequest, shop_name):
             res = req_result.json()
             if res["data"]["code"] == 100:
                 return redirect(
-                    "https://www.zarinpal.com/pg/StartPay/" + res["data"]["authority"]
+                    "https://www.zarinpal.com/pg/StartPay/"
+                    + res["data"]["authority"]
                 )
             else:
                 return render(
@@ -218,7 +222,9 @@ def checkout(request: HttpRequest, shop_name):
                     "shop/checkout.html",
                     {
                         "cart": cart,
-                        "address_status": "invalid address" if not address else "",
+                        "address_status": "invalid address"
+                        if not address
+                        else "",
                         "pay_status": "invalid pay_via" if not pay_via else "",
                         "wallet_has_balance": wallet_has_balance,
                         "connection": "error",
@@ -280,7 +286,10 @@ def verify_payment(request: HttpRequest, order_id):
             "amount": order.final_price,
         }
 
-        headers = {"content-type": "application/json", "accept": "application/json"}
+        headers = {
+            "content-type": "application/json",
+            "accept": "application/json",
+        }
 
         req = requests.post(
             "https://api.zarinpal.com/pg/v4/payment/verify.json",
@@ -291,7 +300,7 @@ def verify_payment(request: HttpRequest, order_id):
         res = None
         try:
             res = req.json()
-        except:
+        except Exception:
             return Http404()
 
         if res["data"]["code"] == 100:
@@ -357,7 +366,9 @@ def tracking_code(request: HttpRequest):
     if request.method == "POST":
         tracking_code = request.POST.get("tracking_code")
         order_id = request.POST.get("order_id")
-        order = get_object_or_404(Order, paid=True, shop=request.user.shop, pk=order_id)
+        order = get_object_or_404(
+            Order, paid=True, shop=request.user.shop, pk=order_id
+        )
 
         order.set_tracking_code(tracking_code)
         return redirect("orders:shop_order", order_code=order.code)
@@ -371,7 +382,9 @@ def reject(request: HttpRequest):
     if request.method == "POST":
         order_id = request.POST.get("order_id")
         msg = request.POST.get("reject_msg", "")
-        order = get_object_or_404(Order, pk=order_id, shop=request.user.shop, paid=True)
+        order = get_object_or_404(
+            Order, pk=order_id, shop=request.user.shop, paid=True
+        )
 
         order.reject(msg)
         return redirect("orders:shop_order", order_code=order.code)
@@ -385,7 +398,7 @@ def cancel(request: HttpRequest):
     if request.method == "POST":
         order_id = request.POST.get("order_id")
         shop_id = request.POST.get("shop_Id")
-        cancel_msg = request.POST.get("cancel_msg", "")
+        request.POST.get("cancel_msg", "")
         order = get_object_or_404(
             Order, pk=order_id, user=request.user, shop__pk=shop_id, paid=True
         )
@@ -412,7 +425,9 @@ def fulfill(request: HttpRequest):
 
 @login_required
 def user_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, user=request.user, paid=True)
+    order = get_object_or_404(
+        Order, code=order_code, user=request.user, paid=True
+    )
     return render(request, "user/dashboard/order.html", {"order": order})
 
 
@@ -421,7 +436,9 @@ def user_orders(request: HttpRequest):
     state = request.GET.get("state", "pending")
     orders = request.user.orders.filter(state=state, paid=True)
     if state == "accepted":
-        orders |= request.user.orders.filter(state="notverified", paid=True).all()
+        orders |= request.user.orders.filter(
+            state="notverified", paid=True
+        ).all()
     if state == "canceled":
         orders |= request.user.orders.filter(state="Rejected", paid=True).all()
     paginator = Paginator(orders.order_by("-date_created").all(), 20)
@@ -434,12 +451,16 @@ def user_orders(request: HttpRequest):
     except EmptyPage:
         page = paginator.get_page(paginator.num_pages)
 
-    return render(request, "user/dashboard/orders.html", {"page": page, "state": state})
+    return render(
+        request, "user/dashboard/orders.html", {"page": page, "state": state}
+    )
 
 
 @login_required
 def shop_order(request: HttpRequest, order_code):
-    order = get_object_or_404(Order, code=order_code, shop=request.user.shop, paid=True)
+    order = get_object_or_404(
+        Order, code=order_code, shop=request.user.shop, paid=True
+    )
     return render(request, "shop/order.html", {"order": order})
 
 
@@ -483,14 +504,20 @@ def set_coupon(request: HttpRequest):
 
         # coupon  = Coupon.objects.filter(code=coupon_code, used=False).first()
         coupon = get_object_or_404(Coupon, code=coupon_code, used=False)
-        order = get_object_or_404(Order, pk=order_id, paid=False, user=request.user)
+        order = get_object_or_404(
+            Order, pk=order_id, paid=False, user=request.user
+        )
         # order = Order.objects.filter(pk=order_id, user=request.user, paid=False)
 
         if coupon.is_valid():
             order.set_coupon(coupon)
-            return JsonResponse({"status": "set", "final_price": order.final_price})
+            return JsonResponse(
+                {"status": "set", "final_price": order.final_price}
+            )
         else:
-            return JsonResponse({"status": "invalid", "final_price": order.fina_price})
+            return JsonResponse(
+                {"status": "invalid", "final_price": order.fina_price}
+            )
 
     return HttpResponseNotAllowed(["POST"])
 
@@ -503,10 +530,14 @@ def delete_coupon(request: HttpRequest):
         if not order_id:
             return HttpResponseBadRequest()
 
-        order = get_object_or_404(Order, pk=order_id, user=request.user, paid=False)
+        order = get_object_or_404(
+            Order, pk=order_id, user=request.user, paid=False
+        )
         if order.coupon:
             order.delete_coupon()
-            return JsonResponse({"status": "deleted", "final_price": order.final_price})
+            return JsonResponse(
+                {"status": "deleted", "final_price": order.final_price}
+            )
         return JsonResponse({"status": "coupon was not found"})
 
     return HttpResponseNotAllowed(["POST"])

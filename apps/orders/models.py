@@ -1,14 +1,14 @@
-import string
 import secrets
+import string
+
+from decouple import config
 from django.db import models
 from django.utils import timezone
-from apps.promotions.models import Coupon
-from apps.users.models import Address
-from apps.users.models import User
-from apps.catalogue.models import Shop, Product, Collection
-from decouple import config
 from ippanel import Client
-from django.db.models.signals import post_save
+
+from apps.catalogue.models import Collection, Product, Shop
+from apps.promotions.models import Coupon
+from apps.users.models import Address, User
 
 SEL_API_KEY = config("SELLER_SMS_API_KEY")
 CUS_API_KEY = config("CUSTOMER_SMS_API_KEY")
@@ -16,6 +16,8 @@ cus_sms_client = Client(CUS_API_KEY)
 sel_sms_client = Client(SEL_API_KEY)
 
 # --------------helper functinos-----------------
+
+
 def send_notification(client: Client, pattern, values, phone_no):
     pattern_code = config(pattern)
     num = config("SMS_NUMBER")
@@ -51,10 +53,18 @@ class Order(models.Model):
         max_length=20, default=generate_code, editable=False, db_index=True
     )
     user = models.ForeignKey(
-        to=User, related_name="orders", on_delete=models.SET_NULL, null=True, blank=True
+        to=User,
+        related_name="orders",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     shop = models.ForeignKey(
-        to=Shop, related_name="orders", on_delete=models.SET_NULL, null=True, blank=True
+        to=Shop,
+        related_name="orders",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     state = models.CharField(
         max_length=20, choices=STATES.choices, default=STATES.PENDING
@@ -86,14 +96,9 @@ class Order(models.Model):
     ref_id = models.CharField(max_length=255, blank=True, db_index=True)
     authority = models.CharField(max_length=50, blank=True)
     paid = models.BooleanField(default=False)
-    pay_source = models.CharField(max_length=20, choices=PAYSOURCE.choices, null=True)
-
-    @property
-    def quantity(self):
-        q = 0
-        for item in self.items.all():
-            q += item.quantity
-        return q
+    pay_source = models.CharField(
+        max_length=20, choices=PAYSOURCE.choices, null=True
+    )
 
     def set_coupon(self, coupon: Coupon):
         if coupon.used:
@@ -298,7 +303,7 @@ class Order(models.Model):
                     },
                     self.shop.owner.phone_num,
                 )
-            except:
+            except Exception:
                 pass
         else:
             raise Exception()
@@ -322,7 +327,7 @@ class Order(models.Model):
                     },
                     self.user.phone_num,
                 )
-            except:
+            except Exception:
                 pass
 
         else:
@@ -338,7 +343,9 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(to=Order, on_delete=models.CASCADE, related_name="items")
+    order = models.ForeignKey(
+        to=Order, on_delete=models.CASCADE, related_name="items"
+    )
 
     product = models.ForeignKey(
         to=Product, related_name="orders", on_delete=models.SET_NULL, null=True

@@ -15,26 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from ast import expr_context
-from curses import REPORT_MOUSE_POSITION
-from http.client import ImproperConnectionState
-from importlib.machinery import PathFinder
-from os import stat
-from ssl import create_default_context
-from xmlrpc.client import ResponseError
-from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAuthenticated
-from apps.orders.models import Order, OrderItem
-from apps.users.views import orders
-from .permissions import IsOrderItemOwner, IsOrderOwner
-from .serializes import CartItemSerializer, OrderItemSerialzier, OrderSerializer
-
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import exceptions
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from drf_spectacular.utils import extend_schema_view, extend_schema
+from apps.orders.models import Order, OrderItem
+
+from .permissions import IsOrderOwner
+from .serializes import CartItemSerializer, OrderItemSerialzier, OrderSerializer
 
 # -----------------------------------------
 # ------------ Get User orders API --------
@@ -75,7 +65,9 @@ class UserOrdersVAPIView(ReadOnlyModelViewSet):
     create=extend_schema(
         "Takes shop_id, product_id and quantity and create a new order item."
     ),
-    destroy=extend_schema(description="Delete the order item with the given id."),
+    destroy=extend_schema(
+        description="Delete the order item with the given id."
+    ),
 )
 class CartAPIView(ModelViewSet):
     serializer_class = CartItemSerializer
@@ -85,7 +77,9 @@ class CartAPIView(ModelViewSet):
         order_item_id = self.kwargs.get("pk")
         try:
             Order_item = OrderItem.objects.get(
-                pk=order_item_id, order__user=self.request.user, order__paid=False
+                pk=order_item_id,
+                order__user=self.request.user,
+                order__paid=False,
             )
             return Order_item
         except OrderItem.DoesNotExist:

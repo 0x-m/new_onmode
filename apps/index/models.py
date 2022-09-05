@@ -1,11 +1,11 @@
-from ast import arg
 from django.db import models
-from django.dispatch import receiver
-from apps.catalogue.models import Shop
 from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 from django.utils.text import slugify
-from tinymce.models import HTMLField
 from onmode.storage_backends import SiteStorage
+from tinymce.models import HTMLField
+
+from apps.catalogue.models import Shop
 
 
 class SliderPhoto(models.Model):
@@ -86,7 +86,7 @@ class BlogPost(models.Model):
 
 
 @receiver(pre_delete, sender=BlogPost)
-def delet_photo(sender, instance, **kwargs):
+def delete_photo(sender, instance, **kwargs):
     if instance.photo:
         instance.photo.delete()
 

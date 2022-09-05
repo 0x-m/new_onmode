@@ -16,15 +16,14 @@
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
 from rest_framework.test import APITestCase
-from django.urls import reverse
+
 from apps.catalogue.models import Category
 
 
 class TestCategoryListAPI(APITestCase):
     @classmethod
     def setUpTestData(cls) -> None:
-        cat = Category.objects.create(name="books")
-        sub_cat = Category.objects.create(name="sci-fi", parent=cat)
+        cls.cat = Category.objects.create(name="books")
         return super().setUpTestData()
 
     def test_get_categories(self):

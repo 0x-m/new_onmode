@@ -15,13 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveAPIView
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework import permissions
-from .serializers import UserProfileSerlilizer, WalletSerializer
-
-from apps.users.models import User
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import permissions
+from rest_framework.generics import RetrieveAPIView, RetrieveUpdateAPIView
+
+from .serializers import UserProfileSerlilizer, WalletSerializer
 
 
 @extend_schema_view(

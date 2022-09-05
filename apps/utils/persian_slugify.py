@@ -1,8 +1,8 @@
 def persian_slugify(txt: str):
-    slug = ''
+    slug = ""
     for c in txt:
-        if c not in [' ', ' ', '?', '(', ')', '%', '٪']:
+        if c not in [" ", " ", "?", "(", ")", "%", "٪"]:
             slug += c
         else:
-            slug += '-'
+            slug += "-"
     return slug

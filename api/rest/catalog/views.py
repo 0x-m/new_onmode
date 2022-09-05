@@ -1,34 +1,22 @@
-from importlib import import_module
-from turtle import update
-from venv import create
-from django.shortcuts import get_list_or_404, get_object_or_404
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
-from rest_framework.decorators import action
-
-from apps.users.views import comments
-
-from .permissions import IsOwnerOrAdmin, IsProductSellerOrAdmin, IsSeller, IsOwner
-from .serializers import *
-from apps.catalogue.models import *
-from .permissions import IsSeller, isSellerOrAdmin
-from rest_framework.response import Response
-from rest_framework import status
-from apps.catalogue.models import *
-
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework import exceptions as rest_exceptions
-from rest_framework import permissions
-from rest_framework.decorators import api_view, permission_classes
+from django.http import HttpRequest
 from django_filters.rest_framework.backends import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import exceptions as rest_exceptions
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from drf_spectacular.utils import (
-    extend_schema_view,
-    extend_schema,
-    OpenApiParameter,
-    OpenApiResponse,
+from apps.catalogue.models import Category, Comment, Favourite, Product, Shop
+
+from .permissions import IsOwnerOrAdmin, IsProductSellerOrAdmin, isSellerOrAdmin
+from .serializers import (
+    CategorySerializer,
+    CommentSerializer,
+    FavouriteSerializer,
+    ProductSerializer,
+    ShopSerializer,
 )
-from drf_spectacular.types import OpenApiTypes
 
 
 @extend_schema_view(
@@ -54,7 +42,9 @@ class CategoryListAPIView(ReadOnlyModelViewSet):
     ),
     create=extend_schema("Create a new shop (ADMIN ONLY)"),
     retrieve=extend_schema("Get the shop by id"),
-    update=extend_schema("Update the information of a shop (ADMIN OR SHOPKEEPER)"),
+    update=extend_schema(
+        "Update the information of a shop (ADMIN OR SHOPKEEPER)"
+    ),
 )
 class ShopAPIViewset(ModelViewSet):
     queryset = Shop.objects.all()
@@ -96,7 +86,9 @@ def get_user_shop(request: HttpRequest):
     list=extend_schema(
         description="Get the list of all products (ADMIN ONLY) or all products belongs to the specific shop"
     ),
-    create=extend_schema(description="Create a new product for the user's shop"),
+    create=extend_schema(
+        description="Create a new product for the user's shop"
+    ),
 )
 class ProductAPIViewset(ModelViewSet):
     queryset = Product.objects.all()
@@ -150,7 +142,9 @@ class ProductCommentViewset(ModelViewSet):
             )
             return comment
         except Comment.DoesNotExist:
-            raise rest_exceptions.NotFound("No commnet with the give id was found.")
+            raise rest_exceptions.NotFound(
+                "No commnet with the give id was found."
+            )
 
     def get_queryset(self):
         product_id = self.kwargs.get("product_pk")

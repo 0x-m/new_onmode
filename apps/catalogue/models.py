@@ -1,21 +1,21 @@
 import os
-from pyexpat import model
+
+import django_filters
+from decouple import config
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.http import HttpRequest
-from django.utils import timezone
-from django.db.models.signals import pre_delete, post_save
-from django.core.validators import MinValueValidator, MaxValueValidator
-from apps.users.models import User
 from django.urls.base import reverse
-import django_filters
+from django.utils import timezone
 from django.utils.text import slugify
-from decouple import config
+from mptt.models import MPTTModel, TreeForeignKey
 from onmode.storage_backends import SiteStorage
 
+from apps.users.models import User
 from apps.utils.persian_slugify import persian_slugify
 from apps.utils.random_code_generator import generate_code
-from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Category(MPTTModel):
@@ -112,7 +112,9 @@ class Discount(models.Model):
     def get_discount_code():
         return generate_code(8)
 
-    code = models.CharField(max_length=8, default=get_discount_code, editable=False)
+    code = models.CharField(
+        max_length=8, default=get_discount_code, editable=False
+    )
     percent = models.PositiveIntegerField(default=0)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
@@ -152,7 +154,9 @@ class Option(models.Model):
 
     fa_name = models.CharField(max_length=20, blank=True)
     name = models.CharField(max_length=20, unique=True)
-    type = models.CharField(max_length=3, choices=TYPES.choices, default=TYPES.Number)
+    type = models.CharField(
+        max_length=3, choices=TYPES.choices, default=TYPES.Number
+    )
 
     default = models.CharField(max_length=100, blank=True)
     identifier = models.CharField(max_length=255, blank=True)
@@ -210,19 +214,30 @@ class Product(models.Model):
     def get_product_code():
         return generate_code(12)
 
-    shop = models.ForeignKey(to=Shop, related_name="products", on_delete=models.CASCADE)
+    shop = models.ForeignKey(
+        to=Shop, related_name="products", on_delete=models.CASCADE
+    )
     prod_code = models.CharField(
         max_length=20, default=get_product_code, editable=False
     )
     category = models.ForeignKey(
-        to=Category, related_name="products", on_delete=models.CASCADE, null=True
+        to=Category,
+        related_name="products",
+        on_delete=models.CASCADE,
+        null=True,
     )
-    name = models.CharField(max_length=50, blank=False, null=False, db_index=True)
-    en_name = models.CharField(max_length=50, blank=True, null=False, db_index=True)
+    name = models.CharField(
+        max_length=50, blank=False, null=False, db_index=True
+    )
+    en_name = models.CharField(
+        max_length=50, blank=True, null=False, db_index=True
+    )
     slug = models.SlugField(blank=True, null=True, allow_unicode=True)
     en_slug = models.SlugField(null=True, blank=True)
     meta_title = models.CharField(max_length=255, blank=True, db_index=True)
-    meta_description = models.CharField(max_length=255, blank=True, db_index=True)
+    meta_description = models.CharField(
+        max_length=255, blank=True, db_index=True
+    )
     meta_keywords = models.CharField(max_length=255, blank=True, db_index=True)
     sku = models.CharField(max_length=50, blank=True)
     quantity = models.PositiveIntegerField(default=0, blank=False)
@@ -238,7 +253,9 @@ class Product(models.Model):
     description = models.TextField(max_length=5000, blank=True)
     attributes = models.JSONField(default=dict, null=True, blank=True)
     date_created = models.DateTimeField(default=timezone.now, editable=False)
-    last_updated = models.DateTimeField(auto_now=True, null=True, editable=False)
+    last_updated = models.DateTimeField(
+        auto_now=True, null=True, editable=False
+    )
     preview = models.ForeignKey(
         to="Photo",
         related_name="preview",
@@ -268,27 +285,31 @@ class Product(models.Model):
     def colors(self):
         try:
             colors = Option.objects.get(name="color").choices
-            product_colors = self.options.get(option__name="color").value.split(",")
+            product_colors = self.options.get(option__name="color").value.split(
+                ","
+            )
             res = []
             for color in colors:
                 if str(color["id"]) in product_colors:
                     res.append(color)
             return res
-        except:
+        except Option.DoesNotExist:
             pass
 
     @property
     def sizes(self):
         try:
             sizes = Option.objects.get(name="size").choices
-            product_colors = self.options.get(option__name="size").value.split(",")
+            product_colors = self.options.get(option__name="size").value.split(
+                ","
+            )
             res = []
             for size in sizes:
                 if str(size["id"]) in product_colors:
                     res.append(size)
 
             return res
-        except:
+        except Option.DoesNotExist:
             pass
 
     @property
@@ -375,7 +396,9 @@ class ProductFilter(django_filters.FilterSet):
 
     def brand_filter(self, queryset, name, value):
         ls = self.request.GET.getlist("brands")
-        return queryset.filter(options__option__name="brand", options__value__in=ls)
+        return queryset.filter(
+            options__option__name="brand", options__value__in=ls
+        )
 
     def color_filter(self, queryset, name, value):
         ids = self.request.GET.getlist("colors")
@@ -387,7 +410,9 @@ class ProductFilter(django_filters.FilterSet):
         rx = rx[: len(rx) - 1]
         rx += ")"
 
-        return queryset.filter(options__option__name="color", options__value__regex=rx)
+        return queryset.filter(
+            options__option__name="color", options__value__regex=rx
+        )
 
     def size_filter(self, queryset, name, value):
         ids = self.request.GET.getlist("sizes")
@@ -397,7 +422,9 @@ class ProductFilter(django_filters.FilterSet):
         rx = rx[: len(rx) - 1]
         rx += ")"
 
-        return queryset.filter(options__option__name="size", options__option__regex=rx)
+        return queryset.filter(
+            options__option__name="size", options__option__regex=rx
+        )
 
     def order_by(self, queryset, name, value):
         if value == "newest":
@@ -453,14 +480,18 @@ class ProductStats(models.Model):
             self.save()
 
     def inc_comments(self, rate):
-        new_rate_avg = (self.comments * self.rates_avg + rate) / (self.comments + 1)
+        new_rate_avg = (self.comments * self.rates_avg + rate) / (
+            self.comments + 1
+        )
         self.comments += 1
         self.rates_avg = new_rate_avg
         self.save()
 
     def dec_comments(self, rate):
         if self.comments > 0:
-            new_rate_avg = (self.comments * self.rates_avg - rate) / (self.comments - 1)
+            new_rate_avg = (self.comments * self.rates_avg - rate) / (
+                self.comments - 1
+            )
             self.comments -= 1
             self.rates_avg = new_rate_avg
             self.save()
@@ -509,7 +540,9 @@ class Collection(models.Model):
     featureds = models.CharField(max_length=1000, blank=True)
     name = models.CharField(max_length=40, unique=True)
     en_name = models.CharField(max_length=40, unique=True)
-    slug = models.SlugField(editable=False, blank=True, null=True, allow_unicode=True)
+    slug = models.SlugField(
+        editable=False, blank=True, null=True, allow_unicode=True
+    )
     en_slug = models.SlugField(editable=False, blank=True, null=True)
     slogan = models.CharField(max_length=1000, blank=True)
     meta_title = models.CharField(max_length=40, blank=True)
@@ -521,9 +554,13 @@ class Collection(models.Model):
     prefer_collection_discount = models.BooleanField(default=False)
     page_poster_alt = models.CharField(max_length=255, blank=True)
     page_poster_url = models.URLField(blank=True, null=True)
-    page_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
+    page_poster = models.ImageField(
+        null=True, blank=True, storage=SiteStorage()
+    )
     index_view = models.BooleanField(default=False)
-    index_poster = models.ImageField(null=True, blank=True, storage=SiteStorage())
+    index_poster = models.ImageField(
+        null=True, blank=True, storage=SiteStorage()
+    )
     index_poster_url = models.URLField(null=True, blank=True)
     index_poster_link = models.URLField(blank=True, null=True)
     index_poster_alt = models.CharField(max_length=255, blank=True)
@@ -559,7 +596,9 @@ class ProductOptionValue(models.Model):
 
 class Photo(models.Model):
     def generate_path(instance, filename):
-        return os.path.join("product", str(instance.product.id), "photos", filename)
+        return os.path.join(
+            "product", str(instance.product.id), "photos", filename
+        )
 
     product = models.ForeignKey(
         to=Product, related_name="photos", on_delete=models.CASCADE
@@ -578,7 +617,9 @@ class Comment(models.Model):
     product = models.ForeignKey(
         to=Product, related_name="comments", on_delete=models.CASCADE
     )
-    user = models.ForeignKey(to=User, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        to=User, related_name="comments", on_delete=models.CASCADE
+    )
     body = models.TextField()
     published = models.BooleanField(default=False)
     rate = models.PositiveBigIntegerField()
@@ -614,11 +655,11 @@ class Favourite(models.Model):
 
 
 @receiver(post_save, sender=Favourite)
-def increase_comments(sender, instance: Comment, created, **kwargs):
+def increase_favs(sender, instance: Comment, created, **kwargs):
     if created:
         instance.product.stats.inc_likes()
 
 
 @receiver(pre_delete, sender=Favourite)
-def decrease_comment(sender, instance, **kwargs):
+def decrease_favs(sender, instance, **kwargs):
     instance.product.stats.dec_likes()

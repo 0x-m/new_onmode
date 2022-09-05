@@ -1,7 +1,9 @@
+import secrets
+import string
+
 from django.db import models
 from django.utils import timezone
-import string
-import secrets
+
 from apps.users.models import User
 
 
@@ -18,7 +20,9 @@ class Coupon(models.Model):
         PERCENT = "PC", "Percent"
 
     code = models.CharField(max_length=10, default=generate_code)
-    type = models.CharField(max_length=2, choices=TYPE.choices, default=TYPE.PERCENT)
+    type = models.CharField(
+        max_length=2, choices=TYPE.choices, default=TYPE.PERCENT
+    )
     percent = models.PositiveIntegerField(default=0)
     amount = models.PositiveBigIntegerField(default=0)
     max_amount = models.PositiveBigIntegerField(default=10000)
@@ -73,7 +77,9 @@ class GiftCard(models.Model):
     date_used = models.DateTimeField(null=True, blank=True, editable=False)
     start_date = models.DateTimeField(null=True)
     end_date = models.DateTimeField(null=True)
-    code = models.CharField(max_length=15, default=generate_code, editable=False)
+    code = models.CharField(
+        max_length=15, default=generate_code, editable=False
+    )
 
     def apply(self, user: User):
         if self.is_valid():

@@ -18,9 +18,9 @@
 
 from rest_framework.test import APITestCase
 
+from apps.catalogue.models import Product, Shop
+from apps.orders.models import Order
 from apps.users.models import User
-from apps.orders.models import Order, OrderItem
-from apps.catalogue.models import Shop, Product
 
 
 class TestCartAPI(APITestCase):

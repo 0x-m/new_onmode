@@ -1,12 +1,11 @@
-from django.db import models
+from decouple import config
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.validators import RegexValidator
-from django.dispatch import receiver
-from django.utils import timezone
+from django.db import models
 from django.db.models.signals import post_save
-
-from decouple import config
+from django.dispatch import receiver
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.utils.random_code_generator import generate_code
 
@@ -197,7 +196,10 @@ class Address(models.Model):
 
 class Wallet(models.Model):
     user = models.OneToOneField(
-        to=User, related_name="wallet", on_delete=models.CASCADE, primary_key=True
+        to=User,
+        related_name="wallet",
+        on_delete=models.CASCADE,
+        primary_key=True,
     )
     available = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     freezed = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -341,7 +343,9 @@ class TicketType(models.Model):
 
 
 class Ticket(models.Model):
-    user = models.ForeignKey(to=User, related_name="tickets", on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        to=User, related_name="tickets", on_delete=models.CASCADE
+    )
     type = models.ForeignKey(
         to=TicketType, related_name="tickets", on_delete=models.CASCADE
     )
@@ -372,7 +376,10 @@ class TicketReply(models.Model):
     )
     body = models.TextField(max_length=5000)
     user = models.ForeignKey(
-        to=User, related_name="answered_tickets", on_delete=models.SET_NULL, null=True
+        to=User,
+        related_name="answered_tickets",
+        on_delete=models.SET_NULL,
+        null=True,
     )
     date_created = models.DateTimeField(default=timezone.now)
     seen_by_user = models.BooleanField(default=False)
@@ -385,8 +392,12 @@ class Message(models.Model):
         WARNING = ("Warning",)
         INFO = "Info"
 
-    user = models.ForeignKey(to=User, related_name="messages", on_delete=models.CASCADE)
-    type = models.CharField(max_length=10, choices=TYPES.choices, default=TYPES.INFO)
+    user = models.ForeignKey(
+        to=User, related_name="messages", on_delete=models.CASCADE
+    )
+    type = models.CharField(
+        max_length=10, choices=TYPES.choices, default=TYPES.INFO
+    )
     title = models.CharField(max_length=255, blank=True)
     body = models.TextField(max_length=5000, blank=True)
     read = models.BooleanField(default=False)

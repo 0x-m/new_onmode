@@ -17,9 +17,7 @@
 
 from django.urls import path
 
-from rest_framework.routers import DefaultRouter, SimpleRouter
 from .views import UserProfileAPIView, WalletAPIView
-
 
 urlpatterns = [
     path("user/wallet/", WalletAPIView.as_view(), name="user-wallet"),

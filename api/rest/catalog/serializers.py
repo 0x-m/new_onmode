@@ -1,6 +1,15 @@
 from rest_framework import serializers
-from apps.catalogue.models import *
-from rest_framework.relations import PrimaryKeyRelatedField
+
+from apps.catalogue.models import (
+    Category,
+    Collection,
+    Comment,
+    Discount,
+    Favourite,
+    Product,
+    ProductStats,
+    Shop,
+)
 
 
 class SubCategorySerializer(serializers.ModelSerializer):

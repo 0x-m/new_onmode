@@ -1,24 +1,21 @@
 from django.contrib import admin
+from django.db.models import Count
 from import_export import resources
-from import_export.admin import ImportExportMixin
+from import_export.admin import ExportMixin, ImportExportMixin
+from import_export.resources import ModelResource
+from import_export.tmp_storages import MediaStorage
+
 from .models import (
     Category,
     Collection,
+    Comment,
     CreateShopRequest,
     Option,
     Photo,
     Product,
-    ProductOptionValue,
     ProductStats,
-    ProductType,
     Shop,
-    Comment,
 )
-from import_export.admin import ExportMixin
-from import_export.resources import ModelResource
-from import_export.fields import Field
-from django.db.models import Count
-from import_export.tmp_storages import MediaStorage
 
 
 @admin.register(CreateShopRequest)
@@ -129,13 +126,21 @@ class ProductRateFilter(admin.SimpleListFilter):
         if value == "0s":
             return queryset.filter(stats__rates_avg__lt=1)
         elif value == "1s":
-            return queryset.filter(stats__rates_avg__gte=1, stats__rates_avg__lt=2)
+            return queryset.filter(
+                stats__rates_avg__gte=1, stats__rates_avg__lt=2
+            )
         elif value == "2s":
-            return queryset.filter(stats__rates_avg__gte=2, stats__rates_avg__lt=3)
+            return queryset.filter(
+                stats__rates_avg__gte=2, stats__rates_avg__lt=3
+            )
         elif value == "3s":
-            return queryset.filter(stats__rates_avg__gte=3, stats__rates_avg__lt=4)
+            return queryset.filter(
+                stats__rates_avg__gte=3, stats__rates_avg__lt=4
+            )
         elif value == "4s":
-            return queryset.filter(stats__rates_avg__gte=4, stats__rates_avg__lt=5)
+            return queryset.filter(
+                stats__rates_avg__gte=4, stats__rates_avg__lt=5
+            )
 
         elif value == "5s":
             return queryset.filter(stats__rates_avg=5)
@@ -168,15 +173,25 @@ class ProductCommentFilter(admin.SimpleListFilter):
         elif value == "l50":
             return queryset.filter(stats__comments__lte=50)
         elif value == "b100":
-            return queryset.filter(stats__comments__gte=50, stats__comments__lte=200)
+            return queryset.filter(
+                stats__comments__gte=50, stats__comments__lte=200
+            )
         elif value == "b200":
-            return queryset.filter(stats__comments__gte=200, stats__comments__lte=300)
+            return queryset.filter(
+                stats__comments__gte=200, stats__comments__lte=300
+            )
         elif value == "b300":
-            return queryset.filter(stats__comments__gte=300, stats__comments__lte=400)
+            return queryset.filter(
+                stats__comments__gte=300, stats__comments__lte=400
+            )
         elif value == "b400":
-            return queryset.filter(stats__comments__gte=400, stats__comments__lte=500)
+            return queryset.filter(
+                stats__comments__gte=400, stats__comments__lte=500
+            )
         elif value == "b500":
-            return queryset.filter(stats__comments__gte=500, stats__comments__lte=1000)
+            return queryset.filter(
+                stats__comments__gte=500, stats__comments__lte=1000
+            )
         elif value == "g1000":
             return queryset.filter(stats__comments__gte=1000)
         elif value == "top":
@@ -216,7 +231,9 @@ class ProductLikesFilter(admin.SimpleListFilter):
         elif value == "b400":
             return queryset.filter(stats__likes__gte=400, stats__likes__lte=500)
         elif value == "b500":
-            return queryset.filter(stats__likes__gte=500, stats__likes__lte=1000)
+            return queryset.filter(
+                stats__likes__gte=500, stats__likes__lte=1000
+            )
         elif value == "g1000":
             return queryset.filter(stats__likes__gte=1000)
         elif value == "top":
@@ -248,15 +265,25 @@ class ProductSalesFilter(admin.SimpleListFilter):
         elif value == "l50":
             return queryset.annotate(c=Count("orders")).filter(c__lte=50)
         elif value == "b100":
-            return queryset.annotate(c=Count("orders")).filter(c__gte=50, c__lte=200)
+            return queryset.annotate(c=Count("orders")).filter(
+                c__gte=50, c__lte=200
+            )
         elif value == "b200":
-            return queryset.annotate(c=Count("orders")).filter(c__gte=201, c__lte=300)
+            return queryset.annotate(c=Count("orders")).filter(
+                c__gte=201, c__lte=300
+            )
         elif value == "b300":
-            return queryset.annotate(c=Count("orders")).filter(c__gte=301, c__lte=400)
+            return queryset.annotate(c=Count("orders")).filter(
+                c__gte=301, c__lte=400
+            )
         elif value == "b400":
-            return queryset.annotate(c=Count("orders")).filter(c__gte=401, c__lte=500)
+            return queryset.annotate(c=Count("orders")).filter(
+                c__gte=401, c__lte=500
+            )
         elif value == "b500":
-            return queryset.annotate(c=Count("orders")).filter(c__gte=500, c__lte=1000)
+            return queryset.annotate(c=Count("orders")).filter(
+                c__gte=500, c__lte=1000
+            )
         elif value == "g1000":
             return queryset.annotate(c=Count("orders")).filter(c__gte=1000)
         elif value == "top":

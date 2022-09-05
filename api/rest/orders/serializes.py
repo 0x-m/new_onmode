@@ -15,12 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Onmode fashoin Shop.  If not, see <http://www.gnu.org/licenses/>.
 
-from dataclasses import field, fields
-from pkgutil import ImpImporter
-from pydoc import ModuleScanner
-from time import clock_settime
-from tkinter.messagebox import RETRY
-from wsgiref import validate
 from rest_framework import serializers
 
 from apps.orders.models import Order, OrderItem
@@ -78,7 +72,9 @@ class CartItemSerializer(serializers.Serializer):
     def validate_quantity(self, value):
         if value > 0:
             return value
-        return serializers.ValidationError("quantity must be greather than zero")
+        return serializers.ValidationError(
+            "quantity must be greather than zero"
+        )
 
     def save(self, **kwargs):
         order = Order.objects.get_or_create(

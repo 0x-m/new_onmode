@@ -5,6 +5,12 @@ author: hamze ghaedi (github: 0x-m)
 """
 
 
+import requests
+from decouple import config
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import (
     Http404,
     HttpRequest,
@@ -12,37 +18,29 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotAllowed,
-    HttpResponseServerError,
     JsonResponse,
 )
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import EmptyPage, InvalidPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.conf import settings
 from ippanel import Client
-from decouple import config
-import requests
+
 from apps.index.models import GeoLocation
-
 from apps.promotions.models import GiftCard
-
-# from catalog.models import Product
-
-from .models import DepositTransaction, Message, Ticket, TicketType, User, Wallet
 
 from .forms import (
     AddressForm,
     CheckoutForm,
     EmailCheckerForm,
+    ProfileForm,
     SignUpForm,
     TicketForm,
     TicketReplyForm,
     VerificationCodeForm,
-    ProfileForm,
 )
-from .OTP import OTP, InvalidCodeException, ExpiredCodeException
+from .models import DepositTransaction, Message, Ticket, TicketType, User
+from .OTP import OTP, ExpiredCodeException, InvalidCodeException
+
+# from catalog.models import Product
 
 
 # helper functions--------------------
@@ -89,7 +87,9 @@ def signup(request: HttpRequest):
             if res:
                 return redirect("users:verify")
             else:
-                return HttpResponseBadRequest()  # TODO: make a decent error page
+                return (
+                    HttpResponseBadRequest()
+                )  # TODO: make a decent error page
 
         else:
             return render(
@@ -112,7 +112,9 @@ def verify_code(request: HttpRequest):
         form = VerificationCodeForm(request.POST)
 
         if not form.is_valid():
-            return render(request, "user/verify.html", {"error": "invalid"}, status=400)
+            return render(
+                request, "user/verify.html", {"error": "invalid"}, status=400
+            )
 
         code = form.cleaned_data.get("code")
         try:
@@ -129,7 +131,10 @@ def verify_code(request: HttpRequest):
 
         except InvalidCodeException:
             return render(
-                request, "user/verify.html", {"error": "invalid code"}, status=400
+                request,
+                "user/verify.html",
+                {"error": "invalid code"},
+                status=400,
             )
         except ExpiredCodeException:
             del request.session["phone_num"]
@@ -237,7 +242,7 @@ def wallet_checkout(request: HttpRequest):
         amount = form.cleaned_data["amount"]
         try:
             amount = int(amount)
-        except:
+        except ValueError:
             amount = 0
 
         if not (MIN_AMOUNT <= amount <= MAX_AMOUNT):
@@ -248,7 +253,9 @@ def wallet_checkout(request: HttpRequest):
 
         if status:
             return render(
-                request, "user/dashboard/wallet.html", {"checkout_status": status}
+                request,
+                "user/dashboard/wallet.html",
+                {"checkout_status": status},
             )
 
         c = form.save(commit=False)
@@ -256,7 +263,9 @@ def wallet_checkout(request: HttpRequest):
         c.save()
 
         return render(
-            request, "user/dashboard/wallet.html", {"checkout_status": "success"}
+            request,
+            "user/dashboard/wallet.html",
+            {"checkout_status": "success"},
         )
 
     return Http404()
@@ -273,7 +282,7 @@ def wallet_deposit(request: HttpRequest):
                 gift = GiftCard.objects.get(code=amount)
                 gift.apply(request.user)
                 return redirect("users:wallet")
-            except:
+            except GiftCard.DoesNotExist:
                 return HttpResponse("not found....")
         else:
             merchant_id = config("MERCHANT_ID", "")
@@ -286,7 +295,10 @@ def wallet_deposit(request: HttpRequest):
                 "description": "wallet deposit",
                 "metadata": {"mobile": request.user.phone_num},
             }
-            headers = {"content-type": "application/json", "accept": "application/json"}
+            headers = {
+                "content-type": "application/json",
+                "accept": "application/json",
+            }
 
             req_result = requests.post(
                 "https://api.zarinpal.com/pg/v4/payment/request.json",
@@ -296,7 +308,8 @@ def wallet_deposit(request: HttpRequest):
             res = req_result.json()
             if res["data"]["code"] == 100:
                 return redirect(
-                    "https://www.zarinpal.com/pg/StartPay/" + res["data"]["authority"]
+                    "https://www.zarinpal.com/pg/StartPay/"
+                    + res["data"]["authority"]
                 )
             else:
                 return render(
@@ -310,9 +323,16 @@ def wallet_deposit_verify(request: HttpRequest, amount):
     if request.GET.get("Status") == "OK":
         authority = request.GET.get("Authority")
         merchant_id = config("MERCHANT_ID", "")
-        params = {"merchant_id": merchant_id, "authority": authority, "amount": amount}
+        params = {
+            "merchant_id": merchant_id,
+            "authority": authority,
+            "amount": amount,
+        }
 
-        headers = {"content-type": "application/json", "accept": "application/json"}
+        headers = {
+            "content-type": "application/json",
+            "accept": "application/json",
+        }
 
         req = requests.post(
             "https://api.zarinpal.com/pg/v4/payment/verify.json",
@@ -323,7 +343,7 @@ def wallet_deposit_verify(request: HttpRequest, amount):
         res = None
         try:
             res = req.json()
-        except:
+        except Exception:
             return Http404()
 
         if res["data"]["code"] == 100:
@@ -450,7 +470,9 @@ def shop_order(request: HttpRequest):
 @login_required
 def favourites(request: HttpRequest):
     # likeds = request.user.favourites
-    return render(request, "user/dashboard/favourites.html", {"favourites": "likeds"})
+    return render(
+        request, "user/dashboard/favourites.html", {"favourites": "likeds"}
+    )
 
 
 def check_email(request: HttpRequest):
@@ -458,7 +480,9 @@ def check_email(request: HttpRequest):
         email_fom = EmailCheckerForm(request.POST)
         status = "invalid"
         if email_fom.is_valid():
-            user = User.objects.filter(email=email_fom.cleaned_data["email"]).first()
+            user = User.objects.filter(
+                email=email_fom.cleaned_data["email"]
+            ).first()
             if not user or user == request.user:
                 status = "valid"
 
@@ -486,10 +510,14 @@ def create_ticket(request: HttpRequest):
             return redirect("users:ticket", ticket_id=ticket.id)
         else:
             return render(
-                request, "user/dashboard/create_ticket.html", {"errors": form.errors}
+                request,
+                "user/dashboard/create_ticket.html",
+                {"errors": form.errors},
             )
 
-    return render(request, "user/dashboard/create_ticket.html", {"types": ticket_types})
+    return render(
+        request, "user/dashboard/create_ticket.html", {"types": ticket_types}
+    )
 
 
 @login_required

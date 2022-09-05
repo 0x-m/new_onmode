@@ -1,4 +1,5 @@
 import random
+
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -18,14 +19,20 @@ class TestUserRegistration(TestCase):
     def test_user_signup_with_invalid_phoneno(self):
         for _ in range(10):
             # create random 11 length string as invalid phone_no
-            phone_no = "".join(random.choice("0123456789abcdef-*!@") for _ in range(11))
-            resp = self.client.post("/users/signup/", {"phone_number": phone_no})
+            phone_no = "".join(
+                random.choice("0123456789abcdef-*!@") for _ in range(11)
+            )
+            resp = self.client.post(
+                "/users/signup/", {"phone_number": phone_no}
+            )
             self.assertEqual(resp.status_code, 400)
 
     @override_settings(DEBUG=True)
     def test_user_signup_with_valid_phoneno(self):
         for _ in range(10):
-            phone_no = "091" + "".join(random.choice("123456789") for _ in range(8))
+            phone_no = "091" + "".join(
+                random.choice("123456789") for _ in range(8)
+            )
             resp = self.client.post("/users/signup/", {"phone_num": phone_no})
             self.assertEqual(resp.status_code, 200)
             self.assertContains(resp, "code")

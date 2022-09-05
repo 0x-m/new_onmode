@@ -5,24 +5,25 @@ author: hamze ghaedi (github: 0x-m)
 """
 
 
-from types import MethodDescriptorType
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Q
 from django.http import (
     Http404,
     HttpRequest,
-    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotAllowed,
     HttpResponseNotFound,
     JsonResponse,
 )
-from django.shortcuts import redirect, render, get_object_or_404, get_list_or_404
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Page, PageNotAnInteger, Paginator, EmptyPage
-from django.views.generic import ListView
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.decorators import method_decorator
+from django.views.generic import ListView
+
 from apps.index.models import CreateShopGuide
+
+from .forms import CommentForm, CreateShopForm, ProductForm, ShopForm
 from .models import (
     Category,
     Collection,
@@ -36,7 +37,6 @@ from .models import (
     ProductOptionValue,
     Shop,
 )
-from .forms import CommentForm, CreateShopForm, ProductForm, ShopForm
 
 # TODO: move to the shop custom manager!
 
@@ -109,7 +109,11 @@ def delete_product(request: HttpRequest, pid):
         return Http404()
 
     product = get_object_or_404(
-        Product, pk=pid, shop=request.user.shop, shop__active=True, deleted=False
+        Product,
+        pk=pid,
+        shop=request.user.shop,
+        shop__active=True,
+        deleted=False,
     )
     if request.method == "POST":
         product.deleted = True
@@ -119,7 +123,9 @@ def delete_product(request: HttpRequest, pid):
             request, "shop/delete_product_consent.html", {"status": "success"}
         )  # TODO
 
-    return render(request, "shop/delete_product_consent.html", {"product": product})
+    return render(
+        request, "shop/delete_product_consent.html", {"product": product}
+    )
 
 
 @login_required
@@ -155,7 +161,9 @@ def filter(request: HttpRequest, shop_name):
     shop = get_object_or_404(Shop, name=shop_name, active=True)
     form = ProductFilter(
         data=request.GET,
-        queryset=Product.objects.filter(deleted=False, shop__name=shop_name).all(),
+        queryset=Product.objects.filter(
+            deleted=False, shop__name=shop_name
+        ).all(),
         request=request,
     )
 
@@ -193,7 +201,9 @@ def add_option(request: HttpRequest, pid):
             product=product, option=option
         )
         if option.type in [Option.TYPES.Choices, Option.TYPES.MultiChoices]:
-            option_value = ",".join(data.getlist("value")) + ","  # needed for filtering
+            option_value = (
+                ",".join(data.getlist("value")) + ","
+            )  # needed for filtering
 
         print(option_value, created)
         optval.value = option_value
@@ -261,14 +271,13 @@ def add_photo(request: HttpRequest, pid):
             else:
                 return HttpResponseBadRequest(
                     "Run out of storage."
-                )  ##make decent error page
+                )  # make decent error page
 
         if url:
             product_photo = Photo(product=product, url=url)
             product.photo.save()
             return redirect("users:add-option", pid=pid)
 
-    # ...
     return HttpResponseNotAllowed(["POST"])
 
 
@@ -341,7 +350,9 @@ def edit_shop(requeset: HttpRequest):
                 shop.banner.delete()
             shop.banner = banner
         shop.save()
-        return render(requeset, "shop/about.html", {"status": "success", "shop": shop})
+        return render(
+            requeset, "shop/about.html", {"status": "success", "shop": shop}
+        )
 
     return render(requeset, "shop/about.html", {"shop": shop})
 
@@ -383,7 +394,11 @@ def create_shop_request(request: HttpRequest):
                 return render(
                     request,
                     "shop/create_shop.html",
-                    {"status": "invalid name", "shop_req": shop_req, "guide": guide},
+                    {
+                        "status": "invalid name",
+                        "shop_req": shop_req,
+                        "guide": guide,
+                    },
                 )
 
         else:
@@ -422,7 +437,9 @@ def collection(request: HttpRequest, slug):
         page = paginator.get_page(paginator.num_pages)
 
     return render(
-        request, "shop/collection.html", {"collection": collection, "page": page}
+        request,
+        "shop/collection.html",
+        {"collection": collection, "page": page},
     )
 
 
@@ -460,7 +477,9 @@ def comment(request: HttpRequest):
             else:
                 product.stats.inc_comments()
 
-            return redirect("catalogue:product_detail", product_code=product.prod_code)
+            return redirect(
+                "catalogue:product_detail", product_code=product.prod_code
+            )
 
         else:
             return HttpResponseBadRequest("bad request...")
@@ -487,11 +506,13 @@ def like(request: HttpRequest, product_id):
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code=product_code)
     liked = product.likes.filter(user=request.user).exists()
-    can_comment = request.use.orders.filter(items__product=product, paid=True).exists()
+    can_comment = request.use.orders.filter(
+        items__product=product, paid=True
+    ).exists()
     comment = None
     try:
         comment = request.user.comments.get(product=product)
-    except:
+    except Comment.DoesNotExist:
         pass
 
     return render(
@@ -510,7 +531,6 @@ def search(request: HttpRequest):
     keywords = request.GET.get("keywords", None)
     if not keywords:
         return render(request, "search.html", {"page": None})
-    print("here.....search")
     # products = Product.objects.filter(name__search=keywords) full text-search...
     # MYSQL has limitted support....
 
@@ -538,7 +558,9 @@ def search(request: HttpRequest):
 # obsolete in favor of CBV version..........................................
 def shop(request: HttpRequest, shop_name):
     shop = get_object_or_404(Shop, name=shop_name, active=True)
-    paginator = Paginator(shop.products.filter(deleted=False, published=True).all(), 20)
+    paginator = Paginator(
+        shop.products.filter(deleted=False, published=True).all(), 20
+    )
     pg = request.GET.get("page")
 
     page = None
@@ -671,7 +693,9 @@ class UserCommentsListVie(ListView):
 
     def get_queryset(self):
         state = self.kwargs.get("state", "published")
-        return super().get_queryset().filter(user=self.request.user, state=state)
+        return (
+            super().get_queryset().filter(user=self.request.user, state=state)
+        )
 
 
 # --------------------------------------------------------

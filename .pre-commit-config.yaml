@@ -23,14 +23,18 @@ repos:
     hooks:
       - id: black
         language_version: python3
+        args:
+        - --line-length=80
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
-        additional_dependencies:
-          - flake8-black>=0.1.1
         language_version: python3
+        args:
+          - --max-line-length=80
+          - --max-doc-length=80
+          - --ignore=E203,W503,E501,W505,F405, E262
 
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
@@ -40,3 +44,4 @@ repos:
           - --line-length=80
           - --src=./apps
           - --src=./api
+          - --profile=black

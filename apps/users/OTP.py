@@ -1,7 +1,8 @@
 import secrets
+
 from django.contrib.auth.backends import BaseBackend
-from django.utils import timezone
 from django.http import HttpRequest
+from django.utils import timezone
 
 from .models import User
 
@@ -47,7 +48,9 @@ class OTP:
         return "".join(secrets.choice(alphabets) for i in range(5))
 
     def _expire_at(self):
-        expire = timezone.now() + timezone.timedelta(seconds=self._DURATION_SECONDS)
+        expire = timezone.now() + timezone.timedelta(
+            seconds=self._DURATION_SECONDS
+        )
         return expire.strftime(self._DT_FORMAT)
 
     def _make_token(self):

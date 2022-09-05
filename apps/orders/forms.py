@@ -1,6 +1,8 @@
 from django import forms
+
+from apps.catalogue.models import Shop
+
 from .models import Order, OrderItem
-from apps.catalogue.models import Collection, Product, Shop
 
 
 class AcceptOrderForm(forms.Form):
@@ -12,7 +14,7 @@ class AcceptOrderForm(forms.Form):
         try:
             order = Order.objects.get(pk=id)
             return order
-        except:
+        except Order.DoesNotExist:
             raise forms.ValidationError("Order does not exist")
 
     def clean_shop(self):
@@ -20,7 +22,7 @@ class AcceptOrderForm(forms.Form):
         try:
             shop = Shop.objects.get(pk=id, active=True)
             return shop
-        except:
+        except Shop.DoesNotExist:
             raise forms.ValidationError("Shop does not exist")
 
     def clean(self, **kwargs):

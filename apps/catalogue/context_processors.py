@@ -1,6 +1,7 @@
-from .models import Category, Option
+from .models import Category
+
 
 def CategoryContextProcessor(request):
     return {
-        'categories': Category.objects.filter(parent=None),
+        "categories": Category.objects.filter(parent=None),
     }
