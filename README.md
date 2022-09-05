@@ -1,4 +1,8 @@
 
+[![Visual Studio Code](https://img.shields.io/badge/--007ACC?logo=visual%20studio%20code&logoColor=ffffff)](https://code.visualstudio.com/)
+ [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)   [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html) [![python version](https://img.shields.io/badge/Python-3.7-green.svg)](https://shields.io/) [![django version](https://img.shields.io/badge/Django-4.0-green.svg)](https://shields.io/) [![DRF](https://img.shields.io/badge/DRF-armygreen.svg)](https://shields.io/) 
+ [![Website fakesite.invalid](https://img.shields.io/website-up-down-green-red/http/fakesite.invalid.svg)](http://fakesite.invalid/) [![Docker](https://badgen.net/badge/icon/docker?icon=docker&label)](https://https://docker.com/)
+ 
 # Introduction
 
 Onmode is a **multi-vendor E-commerce platform** targeting fashion retailers.
@@ -75,7 +79,6 @@ Onmode aimed to empower retailers by providing them with basic online shopping c
 
 # Contribute & Support
 - This repository was a private project and currently, I have no plan for further development or support!
-
 
 
 # License
