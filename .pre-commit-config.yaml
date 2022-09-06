@@ -34,7 +34,7 @@ repos:
         args:
           - --max-line-length=80
           - --max-doc-length=80
-          - --ignore=E203,W503,E501,W505,F405, E262
+          - --ignore=E203,W503,E501,W505,F405, E262,F403
 
   - repo: https://github.com/PyCQA/isort
     rev: 5.10.1
