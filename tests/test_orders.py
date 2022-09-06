@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from catalogue.models import Product, Shop
-from promotions.models import Coupon, Discount
-from users.models import User
+from apps.catalogue.models import Discount, Product, Shop
+from apps.promotions.models import Coupon
+from apps.users.models import User
 
 
 class AddOrderItemTest(TestCase):
@@ -33,7 +33,7 @@ class AddOrderItemTest(TestCase):
         self.client.force_login(self.user)
         res = self.client.post("/cart/add", {"product": 1, "quantity": 2})
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 3000}
+            res.content, {"status": "added", "final_price": 3000, "cart": 2}
         )
 
     def test_add_two_products_to_order(self):
@@ -42,11 +42,11 @@ class AddOrderItemTest(TestCase):
         res_2 = self.client.post("/cart/add", {"product": 2, "quantity": 1})
 
         self.assertJSONEqual(
-            res_1.content, {"status": "added", "final_price": 3000}
+            res_1.content, {"status": "added", "final_price": 3000, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 5500}
+            res_2.content, {"status": "added", "final_price": 5500, "cart": 3}
         )
 
     def test_add_non_existing_product_to_order(self):
@@ -80,11 +80,11 @@ class AddOrderItemTest(TestCase):
         res = self.client.post("/cart/add", {"product": 1, "quantity": 2})
         res_2 = self.client.post("/cart/add", {"product": 2, "quantity": 1})
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 2700}
+            res.content, {"status": "added", "final_price": 2700, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 3950}
+            res_2.content, {"status": "added", "final_price": 3950, "cart": 3}
         )
 
     def test_add_coupon_to_order(self):
@@ -124,11 +124,11 @@ class AddOrderItemTest(TestCase):
             "/cart/coupon/add", {"code": coupon.code, "order_id": 1}
         )
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 2700}
+            res.content, {"status": "added", "final_price": 2700, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 3950}
+            res_2.content, {"status": "added", "final_price": 3950, "cart": 3}
         )
         print(res_3.content)
         self.assertJSONEqual(
@@ -162,14 +162,14 @@ class AddOrderItemTest(TestCase):
 
         res_3 = self.client.get("/cart/delete/1", {})
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 2700}
+            res.content, {"status": "added", "final_price": 2700, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 3950}
+            res_2.content, {"status": "added", "final_price": 3950, "cart": 3}
         )
         self.assertJSONEqual(
-            res_3.content, {"status": "deleted", "final_price": 1250}
+            res_3.content, {"status": "deleted", "final_price": 1250, "cart": 1}
         )
 
     def test_delete_coupon_of_order(self):
@@ -210,11 +210,11 @@ class AddOrderItemTest(TestCase):
         )
         res_4 = self.client.post("/cart/coupon/delete", {"order_id": 1})
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 2700}
+            res.content, {"status": "added", "final_price": 2700, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 3950}
+            res_2.content, {"status": "added", "final_price": 3950, "cart": 3}
         )
 
         self.assertJSONEqual(
@@ -270,16 +270,16 @@ class AddOrderItemTest(TestCase):
         res_4 = self.client.post("/cart/coupon/delete", {"order_id": 1})
 
         self.assertJSONEqual(
-            res.content, {"status": "added", "final_price": 2700}
+            res.content, {"status": "added", "final_price": 2700, "cart": 2}
         )
 
         self.assertJSONEqual(
-            res_2.content, {"status": "added", "final_price": 3950}
+            res_2.content, {"status": "added", "final_price": 3950, "cart": 3}
         )
 
         self.assertJSONEqual(
             res_3.content, {"status": "set", "final_price": 3555}
         )
         self.assertJSONEqual(
-            res_4.content, {"status": "deleted", "final_price": 5200}
+            res_4.content, {"status": "deleted", "final_price": 3950}
         )

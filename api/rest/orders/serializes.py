@@ -77,7 +77,7 @@ class CartItemSerializer(serializers.Serializer):
         )
 
     def save(self, **kwargs):
-        order = Order.objects.get_or_create(
+        order, created = Order.objects.get_or_create(
             shop_id=self.validated_data.get("shop_id"),
             user=kwargs.get("user"),
             paid=False,
@@ -87,7 +87,6 @@ class CartItemSerializer(serializers.Serializer):
             product_id=self.validated_data.get("product_id"),
             quantity=self.validated_data["quantity"],
         )
-        print("here")
 
         order_item.refresh()
         return order_item
