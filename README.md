@@ -117,3 +117,4 @@ Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode
 
 
 # License
+See the [LICENSE](https://github.com/0x-m/new_onmode/blob/main/LICENSE) file for licensing information.
