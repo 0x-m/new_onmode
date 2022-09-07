@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.utils.text import slugify
-from onmode.storage_backends import SiteStorage
 from tinymce.models import HTMLField
 
 from apps.catalogue.models import Shop
@@ -39,8 +38,14 @@ class Law(models.Model):
 
 
 class SiteInfo(models.Model):
-    logo = models.ImageField(null=True, blank=True, storage=SiteStorage())
-    favicon = models.ImageField(null=True, blank=True, storage=SiteStorage())
+    logo = models.ImageField(
+        null=True,
+        blank=True,
+    )  # storage=SiteStorage()
+    favicon = models.ImageField(
+        null=True,
+        blank=True,
+    )  # storage=SiteStorage()
     site_title = models.CharField(max_length=255, blank=True)
     site_description = models.TextField(max_length=1000, blank=True)
     pinned_message = models.CharField(max_length=500, blank=True)
@@ -79,7 +84,7 @@ class SiteInfo(models.Model):
 
 
 class BlogPost(models.Model):
-    photo = models.ImageField(null=True, storage=SiteStorage())
+    photo = models.ImageField(null=True)  # storage=SiteStorage()
     photo_url = models.URLField(null=True, blank=True)
     title = models.CharField(max_length=255, blank=True)
     url = models.URLField(blank=True, null=True)

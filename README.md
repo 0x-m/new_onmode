@@ -103,7 +103,7 @@ Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode
 
 - Run the development server
 
-    > `python manage.py runserver`
+    > `python manage.py runserver --settings onmode.settings.dev`
 
 ## Using docker
 

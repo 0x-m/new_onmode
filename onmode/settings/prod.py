@@ -3,7 +3,7 @@ from decouple import Csv, config
 
 # ---------------- DJANGO BASICS ---------
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = False
+DEBUG = config("DEBUG", cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 # -----------------------------------------
 

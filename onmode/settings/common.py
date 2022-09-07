@@ -73,7 +73,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # "apps.catalogue.context_processors.CategoryContextProcessor",
+                "apps.catalogue.context_processors.CategoryContextProcessor",
                 "apps.index.context_processors.info",
             ],
         },
