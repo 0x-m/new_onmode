@@ -1,3 +1,5 @@
+import os
+
 from .common import *
 
 # -------------DJANGO BASIC SETTINGS -----------
@@ -5,7 +7,7 @@ SECRET_KEY = (
     "django-insecure-xty0%&omz0mo&f%69!_l%2nq(h0(oa^w7b%0$$8!(ts16$ei&!"
 )
 DEBUG = True
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 # ----------------------------------------------
 
 # ------------ DJANGO CORS HEADERS --------------

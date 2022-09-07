@@ -85,13 +85,33 @@ Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode
 
 # Installation
 
-1) clone the repository: `git clone ...`
-2) change to the directory: `cd ...`
-3) [Optional]: create a virtual environment: 'python3 -m venv venv'
-4) [Optiona]: activate the virtual environment: `source venv/bin/activate`
-5) install the requirements: `pip install -r requirements.txt`
-6) Run the development server: `python manage.py runserver`
+- Create and activate a new virtual environment
 
+    > `python3 -m venv .env && source .env/bin/activate`
+
+- Clone the this repository:
+
+    > `git clone https://github.com/0x-m/new_onmode.git`
+
+- Install dependencies
+
+    > `python -m pip install -r requirements/dev.txt`
+
+- Install all migrations
+
+    > `python manage.py migrate`
+
+- Run the development server
+
+    > `python manage.py runserver`
+
+## Using docker
+
+**NOTE**: both way are for development only.
+
+- Goto to the http://localhost:8000 to visit the site
+- REST APIS URL: http://localhost:8000/api/v1/
+- API DOCS URL: http://localhost:8000/api/v1/docs/swagger/
 # Contribute & Support
 - This repository was a private project and currently, I have no plan for further development or support!
 
