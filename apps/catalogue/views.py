@@ -506,7 +506,7 @@ def like(request: HttpRequest, product_id):
 def product_detail(request: HttpRequest, product_code):
     product = get_object_or_404(Product, prod_code=product_code)
     liked = product.likes.filter(user=request.user).exists()
-    can_comment = request.use.orders.filter(
+    can_comment = request.user.orders.filter(
         items__product=product, paid=True
     ).exists()
     comment = None
