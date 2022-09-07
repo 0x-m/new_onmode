@@ -9,7 +9,7 @@ SECRET_KEY = (
     "django-insecure-xty0%&omz0mo&f%69!_l%2nq(h0(oa^w7b%0$$8!(ts16$ei&!"
 )
 DEBUG = config("DEV_DEBUG", cast=bool)
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", ".vercel.app", ".now.sh"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0"]
 # ----------------------------------------------
 
 # ------------ DJANGO CORS HEADERS --------------
@@ -18,12 +18,12 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
 # -----------------------------------------------
 
 # ------------- DATABASES ------------------------
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
 # -------------------------------------------------
 USE_S3 = config("USE_S3", default=False, cast=bool)
 
@@ -54,8 +54,7 @@ USE_S3 = config("USE_S3", default=False, cast=bool)
 #     MEDIA_URL = "/media/"
 #     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build", "static")  # vercel
-# STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
