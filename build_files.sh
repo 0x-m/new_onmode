@@ -1,2 +1,2 @@
-pip install -r ./requirements/dev.txt
+pip install -r ./requirements/prod.txt
 python3 manage.py collectstatic
