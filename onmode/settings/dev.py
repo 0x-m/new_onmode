@@ -18,12 +18,12 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:8000"]
 # -----------------------------------------------
 
 # ------------- DATABASES ------------------------
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 # -------------------------------------------------
 USE_S3 = config("USE_S3", default=False, cast=bool)
 
