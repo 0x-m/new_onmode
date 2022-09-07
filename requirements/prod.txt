@@ -1,5 +1,5 @@
 
 -r common.txt
 
-boto3=1.22.9
-ippanel=1.1.0
+boto3==1.22.9
+ippanel==1.1.0
