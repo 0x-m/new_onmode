@@ -24,7 +24,10 @@ Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode
 **Onmode** extensible architecture provides for the definition of fully customizable products with custom-defined options and attributes, in which each attribute has a Type and Default value(s), and each product may have any number of options. (Currently, only the admin can define custom product options). In addition, products may be categorized or gathered into collections. (Currently, only the admin can define category and collection)
 
 # Demo
-A demo is available on [this link](https://oxm.pythonanywhere.com/)
+**A demo is available on** [this link](https://oxm.pythonanywhere.com/)
+
+**REST API docs is availabe here:** [REST API Docs](https://oxm.pythonanywhere.com/api/v1/docs/swagger)
+
 
 ![add-product-img](https://github.com/0x-m/new_onmode/blob/main/docs/img/add-product-3.png?raw=true)
 
