@@ -26,6 +26,8 @@ Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode
 # Demo
 A demo is available on [this link](https://oxm.pythonanywhere.com/)
 
+![add-product-img](https://github.com/0x-m/new_onmode/blob/main/docs/img/add-product-3.png?raw=true)
+
 **NOTE: SOME Features are disabled (including sms service) thus, it wouldn't be possible to regisert a new user!**
 Inorder to login:
 > goto [admin-login](https://oxm.pythonanywhere.com/admin)
