@@ -5,7 +5,7 @@
 
  # Introduction
 Onmode is a **multi-vendor E-commerce platform** targeting fashion retailers.
-Onmode is a multi-vendor E-commerce platform targeting fashion retailers. Onmode aimed to empower retailers by providing them with basic online shopping capabilities including customer management, sales management, product management, and order management, and especially, undertakes the process of shipping parcels, tracking them, and handling related issues. Furthermore, All User activities related to products, shops, and orders,... may be accessed via REST API endpoints, which facilitates the development of custom apps, robots, and analyzers.
+Onmode aimed to empower retailers by providing them with basic online shopping capabilities including customer management, sales management, product management, and order management, and especially, undertakes the process of shipping parcels, tracking them, and handling related issues. Furthermore, All User activities related to products, shops, and orders,... may be accessed via REST API endpoints, which facilitates the development of custom apps, robots, and analyzers.
 
 ### How Onmode works:
 
